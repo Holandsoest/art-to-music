@@ -4,7 +4,7 @@
 #Yet to be added processing for the color, the object size size..
 
 #from imageai.Detection import ObjectDetection # For AI object detection AI
-import cv2
+import cv2 # library for the webcam ( this one probably can also find color)
 
 if __name__ == "__main__":
 	
