@@ -31,6 +31,7 @@ img = PhotoImage(file="triangle.png")
 my_image = my_canvas.create_image(260,125, anchor=NW, image=img)
 
 
+
 img2 = PhotoImage(file="hart.png")
 my_image = my_canvas.create_image(260,125, anchor=NW, image=img2)
 

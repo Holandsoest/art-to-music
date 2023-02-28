@@ -17,32 +17,43 @@
 
 
 from tkinter import * 
+from PIL import ImageTk, Image
 root =  Tk()
-#title of the gui
+
 root.title('gui test')
-#size of vester
 root.geometry("900x700")
-#put text into the gui
-#my_label = Label(root, text = 'Git Fetch Bitch!').pack()
-#my_label1 = Label(root, text = 'shapes regognision').pack()
-#make a icon for the map itself
 root.iconbitmap('triangle.ico')
+
+
 
 my_canvas= Canvas(root, width=850, height=560, bg="white")
 my_canvas.pack(pady=20)
 
 a = 20
 b = 50
-img = PhotoImage(file="triangle.png")
-my_image = my_canvas.create_image(a, b, anchor=NW, image=img)
+S1 = 60
+S2 = 50
 
+img = Image.open("triangle.png")
+resized = img.resize((S1,S2), Image.Resampling.LANCZOS)
+img2 = ImageTk.PhotoImage(resized)
+#img2 = PhotoImage(file="triangle.png")
+
+
+my_image = my_canvas.create_image(a, b, anchor=NW, image=img2)
 
 class imageonsite:
     def move(e):
-        if a < e.x < b and a < e.y < b:
-            print("true")
-            return True
+        if a < e.x < S1+a and b < e.y < S2+b:
+            global img2
+            img = Image.open("triangle.png")
+            resized = img.resize((S1,S2), Image.Resampling.LANCZOS)
+            img2 = ImageTk.PhotoImage(resized)
+            my_image = my_canvas.create_image(e.x, e.y, image=img2)
+            # a = e.x
+            # print(a)
         else: 
+            print("false")
             return False
     root.bind('<B1-Motion>', move)  
 
