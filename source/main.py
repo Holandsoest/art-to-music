@@ -1,7 +1,5 @@
-#Follow this guide: https://imageai.readthedocs.io/en/latest/ 
-#This is for processing while using webcam https://wellsr.com/python/object-detection-from-webcams-with-yolo/
-# This code contains code for activating webcam. Everything commented out is code for object class detection
-#Yet to be added processing for the color, the object size size..
+# For adding shape recognition. A useful link https://pyimagesearch.com/2016/02/08/opencv-shape-detection/
+# Does not use AI so probably faster to process. For simple shapes also a better solution
 
 import cv2
 
