@@ -34,13 +34,31 @@ b = 50
 S1 = 60
 S2 = 50
 
+#resized picture 1
 img = Image.open("triangle.png")
 resized = img.resize((S1,S2), Image.Resampling.LANCZOS)
 img2 = ImageTk.PhotoImage(resized)
-#img2 = PhotoImage(file="triangle.png")
-
-
 my_image = my_canvas.create_image(a, b, anchor=NW, image=img2)
+
+a2 = 150
+b2 = 150
+S3 = 60
+S4 = 60
+
+img3 = Image.open("hart.png")
+resized2 = img3.resize((S3,S4), Image.Resampling.LANCZOS)
+img4 = ImageTk.PhotoImage(resized2)
+my_image2 = my_canvas.create_image(a2, b2, anchor=NW, image=img4)
+
+a3 = 100
+b3 = 100
+S5 = 60
+S6 = 60
+
+img5 = Image.open("hart.png")
+resized3 = img5.resize((S5,S6), Image.Resampling.LANCZOS)
+img6 = ImageTk.PhotoImage(resized3)
+my_image3 = my_canvas.create_image(a3, b3, anchor=NW, image=img6)
 
 class imageonsite:
     def move(e):
@@ -52,9 +70,20 @@ class imageonsite:
             my_image = my_canvas.create_image(e.x, e.y, image=img2)
             # a = e.x
             # print(a)
-        else: 
-            print("false")
-            return False
+
+        elif a2 < e.x < S3+a2 and b2 < e.y < S4+b2: 
+            global img4
+            img3 = Image.open("hart.png")
+            resized2 = img3.resize((S3,S4), Image.Resampling.LANCZOS)
+            img4 = ImageTk.PhotoImage(resized2)
+            my_image = my_canvas.create_image(e.x, e.y, image=img4)
+
+        elif a3 < e.x < S5+a3 and b3 < e.y < S6+b3: 
+            global img6
+            img5 = Image.open("star.png")
+            resized3 = img5.resize((S3,S4), Image.Resampling.LANCZOS)
+            img6 = ImageTk.PhotoImage(resized3)
+            my_image = my_canvas.create_image(e.x, e.y, image=img6)
     root.bind('<B1-Motion>', move)  
 
 root.mainloop()
