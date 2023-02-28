@@ -1,3 +1,4 @@
+import filename_example
+
 if __name__ == "__main__":
-    print('spam')
-    print('hoi dit is Jacob')
+    filename_example.bake_eggs_and_spam('Jacob')
