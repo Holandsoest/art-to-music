@@ -1,3 +1,3 @@
 if __name__ == "__main__":
-    print('eggs')
-    print('hoi dit is Josha')
+    print('spam')
+    print('hoi dit is Jacob')
