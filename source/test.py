@@ -122,6 +122,9 @@ my_button.place(x=500, y=620 )
 
 
 class imageonsite:
+    def __init__(e, X,Y):
+        e.x = X
+        e.y = Y   
     def move(e):
         if a < e.x < S1+a and b < e.y < S2+b:
             global img2
@@ -131,7 +134,6 @@ class imageonsite:
             my_image = my_canvas.create_image(e.x, e.y, image=img2)
             # a = e.x
             # print(a)
-
         elif a2 < e.x < S3+a2 and b2 < e.y < S4+b2: 
             global img4
             img3 = Image.open("hart.png")

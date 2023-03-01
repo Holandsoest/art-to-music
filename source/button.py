@@ -37,7 +37,7 @@ img = Image.open("triangle.png")
 resized = img.resize((S1,S2), Image.Resampling.LANCZOS)
 img2 = ImageTk.PhotoImage(resized)
 
-my_label1 = Label(root,image=img2)
+
 my_button = Button(root, text="Red Hart", command=thing1)
 my_button.place(x=200, y=620 )
 
@@ -49,7 +49,7 @@ img3 = Image.open("hart.png")
 resized2 = img3.resize((S3,S4), Image.Resampling.LANCZOS)
 img4 = ImageTk.PhotoImage(resized2)
 
-my_label2 = Label(root,image=img4)
+
 my_button = Button(root, text="Red Hart", command=thing2)
 my_button.place(x=350, y=620 )
 
@@ -62,8 +62,9 @@ img5 = Image.open("star.png")
 resized3 = img5.resize((S5,S6), Image.Resampling.LANCZOS)
 img6 = ImageTk.PhotoImage(resized3)
 
-my_label3 = Label(root,image=img6)
+
 my_button = Button(root, text="Red Hart", command=thing3)
 my_button.place(x=500, y=620 )
+
 
 mainloop()
