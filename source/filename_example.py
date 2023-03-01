@@ -6,7 +6,7 @@ def bake_eggs_and_spam(name_of_the_cook):
 if __name__ == "__main__":
     print('This only runs if this example is run as the "__main__"')
     print('This runs if we press play on this file, otherwise it does not.')
-    print('Place your demo here.')
+    print('In this space i run my demo; dedicated to this part of the code.')
 
     bake_eggs_and_spam(name_of_the_cook = 'Koen')
     # NOTE: Adding the variable with an equals helps to make the code more clear in this case
