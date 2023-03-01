@@ -60,6 +60,19 @@ resized3 = img5.resize((S5,S6), Image.Resampling.LANCZOS)
 img6 = ImageTk.PhotoImage(resized3)
 my_image3 = my_canvas.create_image(a3, b3, anchor=NW, image=img6)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 class imageonsite:
     def move(e):
         if a < e.x < S1+a and b < e.y < S2+b:
@@ -87,6 +100,8 @@ class imageonsite:
     root.bind('<B1-Motion>', move)  
 
 root.mainloop()
+
+
 
 
 
