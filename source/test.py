@@ -151,15 +151,15 @@ class imageonsite:
 
 #screenshot
 my_canvas.update()
-
+picture = 50
 def getter():
-    x=root.winfo_rootx()
+    x=root.winfo_rootx()+picture
     print(x)
-    y=root.winfo_rooty()
+    y=root.winfo_rooty()+picture
     print(y)
-    x1=root.winfo_rootx()+850
+    x1=root.winfo_rootx()+850+picture
     print(x1)
-    y1=root.winfo_rootx()+560
+    y1=root.winfo_rootx()+560+picture
     print(y1)
     ImageGrab.grab().crop((x,y,x1,y1)).save("em.jpg")
 
