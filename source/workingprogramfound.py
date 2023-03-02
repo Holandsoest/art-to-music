@@ -41,7 +41,7 @@ def main():
            ]
 
     layout = [[sg.Graph(
-                canvas_size=(400, 400),
+                canvas_size=(800, 400),
                 graph_bottom_left=(0, 0),
                 graph_top_right=(800, 800),
                 key="-GRAPH-",

@@ -18,6 +18,8 @@
 
 from tkinter import * 
 from PIL import ImageTk, Image
+from PIL import ImageGrab
+
 root =  Tk()
 
 root.title('gui test')
@@ -91,7 +93,7 @@ resized = img.resize((S1,S2), Image.Resampling.LANCZOS)
 img2 = ImageTk.PhotoImage(resized)
 
 my_label1 = Label(root,image=img2)
-my_button = Button(root, text="Red Hart", command=thing1)
+my_button = Button(root, text="triangle", command=thing1)
 my_button.place(x=200, y=620 )
 
 
@@ -116,17 +118,14 @@ resized3 = img5.resize((S5,S6), Image.Resampling.LANCZOS)
 img6 = ImageTk.PhotoImage(resized3)
 
 my_label3 = Label(root,image=img6)
-my_button = Button(root, text="Red Hart", command=thing3)
+my_button = Button(root, text="star", command=thing3)
 my_button.place(x=500, y=620 )
 7
 
 
 class imageonsite:
-    def __init__(e, X,Y):
-        e.x = X
-        e.y = Y   
     def move(e):
-        if a < e.x < S1+a and b < e.y < S2+b:
+        if a < e.x < a+S1 and b < e.y < b+S2:
             global img2
             img = Image.open("triangle.png")
             resized = img.resize((S1,S2), Image.Resampling.LANCZOS)
@@ -134,6 +133,7 @@ class imageonsite:
             my_image = my_canvas.create_image(e.x, e.y, image=img2)
             # a = e.x
             # print(a)
+            return e.x
         elif a2 < e.x < S3+a2 and b2 < e.y < S4+b2: 
             global img4
             img3 = Image.open("hart.png")
@@ -148,6 +148,25 @@ class imageonsite:
             img6 = ImageTk.PhotoImage(resized3)
             my_image = my_canvas.create_image(e.x, e.y, image=img6)
     root.bind('<B1-Motion>', move)  
+
+#screenshot
+my_canvas.update()
+
+def getter():
+    x=root.winfo_rootx()
+    print(x)
+    y=root.winfo_rooty()
+    print(y)
+    x1=root.winfo_rootx()+850
+    print(x1)
+    y1=root.winfo_rootx()+560
+    print(y1)
+    ImageGrab.grab().crop((x,y,x1,y1)).save("em.jpg")
+
+
+my_button = Button(root, text="screenshot", command= getter)
+my_button.place(x=580, y=620 )
+
 
 root.mainloop()
 

@@ -28,7 +28,28 @@ def move():
 
 root.bind('<B1-Motion>', move)  
 
-move()
-print(x)
+
+print(key = move)
 
 root.mainloop()
+
+
+def my_function(x):
+      return 5 * x
+
+print(my_function(3)*2)
+print(my_function(5))
+print(my_function(9))
+
+
+
+def tri_recursion(k):
+    if(k > 0):
+        result = k + tri_recursion(k - 1)
+        print(result)
+    else:
+        result = 0
+    return result
+
+print("Recursion Example Results")
+tri_recursion(6)
