@@ -53,3 +53,5 @@ def tri_recursion(k):
 
 print("Recursion Example Results")
 tri_recursion(6)
+
+#https://www.w3schools.com/python/python_lambda.asp 
