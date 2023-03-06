@@ -6,7 +6,7 @@
         {
             "label": "Sync all dependecies addition",
             "type": "shell",
-            "command": "pip install -r requirements.txt; pip freeze > requirements.txt; echo Updated_requirements.txt_!",
+            "command": "clear;   .\\.venv\\Scripts\\activate;   echo ┌─Install─from─git───────────;   pip install --require-virtualenv -r requirements.txt;   echo ┌─Update─git─from─local──────;   pip freeze --require-virtualenv > requirements.txt;   echo ┌─Check─for─broken─packeges──;   pip --require-virtualenv check",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
