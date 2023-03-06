@@ -7,4 +7,9 @@
         }
       },
       "terminal.integrated.defaultProfile.windows": "PowerShell",
+
+
+    "editor.detectIndentation": false,
+    "git.autofetch": "all",
+    "git.autofetchPeriod": 600,
 }
