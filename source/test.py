@@ -131,6 +131,7 @@ class imageonsite:
             resized = img.resize((S1,S2), Image.Resampling.LANCZOS)
             img2 = ImageTk.PhotoImage(resized)
             my_image = my_canvas.create_image(e.x, e.y, image=img2)
+            print(e.x)
             # a = e.x
             # print(a)
             return e.x
