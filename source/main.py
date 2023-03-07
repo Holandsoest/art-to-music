@@ -35,14 +35,14 @@ my_canvas.pack(pady=20)
 
 thislist=[]
 class shapes:
-    def __init__(self, X, Y):
-        self.X=X
-        self.Y=Y
+    def __init__(self, xs, ys):
+        self.xs=xs
+        self.ys=ys
 thislist.append(shapes(20,20))
 
 # img2 = PhotoImage(file="hart.png")
 # my_image = my_canvas.create_image(260,125, anchor=NW, image=img2)
-
+my_canvas.update()
 x = 0
 y=0
 def move(e):
@@ -52,15 +52,17 @@ def move(e):
     e.y
     x = e.x
     y = e.y
+    print(x)
+    print(y)
 
-    for i in thislist:
-        if i.X < x <i.X+20 and i.Y < y < i.Y+20:
-            i.x = x
-            i.y = y
-        img5 = Image.open("hart.png")
-        resized3 = img5.resize((60,60), Image.Resampling.LANCZOS)
-        img6 = ImageTk.PhotoImage(resized3)
-        my_image3 = my_canvas.create_image(i.X, i.Y, anchor=NW, image=img6)
+for i in thislist:
+    if i.xs < x <i.xs+20 and i.ys < y < i.ys+20:
+        i.xs = x
+        i.ys = y
+    img5 = Image.open("hart.png")
+    resized3 = img5.resize((60,60), Image.Resampling.LANCZOS)
+    img6 = ImageTk.PhotoImage(resized3)
+    my_image3 = my_canvas.create_image(i.xs, i.ys, anchor=NW, image=img6)
 
     #global img
     #global img2

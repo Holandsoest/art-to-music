@@ -126,18 +126,31 @@ a = 20
 b = 50
 S1 = 60
 S2 = 50
+
+thislist=[]
+class shapes:
+    def __init__(self, xs, xy):
+        self.xs=xs
+        self.xy=xy
+thislist.append(shapes(20,20))
 class imageonsite:
     def move(e):
+        global x 
+        global y
+        x = e.x
+        y = e.y
         if a < e.x < a+S1 and b < e.y < b+S2:
             global img2
             img = Image.open("triangle.png")
             resized = img.resize((S1,S2), Image.Resampling.LANCZOS)
             img2 = ImageTk.PhotoImage(resized)
-            my_image = my_canvas.create_image(e.x, e.y, image=img2)
+            my_image = my_canvas.create_image(x, y, image=img2)
             print(e.x)
             # a = e.x
             # print(a)
-            return e.x
+            #a = x
+
+
         elif a2 < e.x < S3+a2 and b2 < e.y < S4+b2: 
             global img4
             img3 = Image.open("hart.png")
