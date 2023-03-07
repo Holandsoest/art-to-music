@@ -88,37 +88,123 @@ my_canvas= Canvas(root, width=850, height=560, bg="white")
 my_canvas.pack(pady=20)
 
 class Shapes:
-    def __init__(shape, size_x, size_y, x_axis, y_axis, coller):
+    def __init__(shape, size_x, size_y, x_axis, y_axis):
         shape.size_x = size_x
         shape.size_y = size_y
         shape.x_axis = x_axis
         shape.y_axes = y_axis
-        shape.coller = coller
-    def thing1 (size_x, size_y, x_axis, y_axis, coller):
-        my_canvas.create_rectangle(size_x, size_y, x_axis, y_axis, fill=coller)
-    def thing2 (size_x, size_y, x_axis, y_axis, coller):
-        my_canvas.create_rectangle(size_x, size_y, x_axis, y_axis, fill=coller)
+    def thing1 (size_x, size_y, x_axis, y_axis):
+        my_canvas.create_rectangle(size_x, size_y, x_axis, y_axis)
+    def thing2 (size_x, size_y, x_axis, y_axis):
+        my_canvas.create_rectangle(size_x, size_y, x_axis, y_axis)
 
+
+star = Shapes.thing2(20, 50, 60 , 50) 
+
+# a3 = 20
+# b3 = 50
+# S5 = 60
+# S6 = 50
+
+# my_image3 = my_canvas.create_image(a3, b3, anchor=NW, image=img6)
+# img5 = Image.open("star.png")
+# resized3 = img5.resize((S5,S6), Image.Resampling.LANCZOS)
+# img6 = ImageTk.PhotoImage(resized3)
+
+
+a3 = 100
+b3 = 100
+S5 = 60
+S6 = 60
+
+img5 = Image.open("hart.png")
+resized3 = img5.resize((60,60), Image.Resampling.LANCZOS)
+img6 = ImageTk.PhotoImage(resized3)
+my_image3 = my_canvas.create_image(a3, b3, anchor=NW, image=img6)
+
+
+
+w=600
+h=400
+x=w//2
+y=h//2
+a = 10
+b = 10
+
+my_circle = my_canvas.create_oval(x,y, x+a, y+b)
 # my_canvas.create_rectangle.(350, 400, 500, 550, fill="red")
-class coller:
-    def collor(kleur, rood, groen, blauw)
-        kleur.rood = rood
-        kleur.groen = groen
-        kleur.blauw = blauw
-    def keuzen(rood, groen, blauw)
-        if(button1 == 1)
+# class coller:
+#     def collor(kleur, rood, groen, blauw)
+#         kleur.rood = rood
+#         kleur.groen = groen
+#         kleur.blauw = blauw
+#     def keuzen(rood, groen, blauw)
+#         if(button1 == 1)
 
-my_button = Button(root, text="Red Hart", command=thing2)
-my_button.place(x=350, y=620 )
+def pressing():
+    d = 0
+    if (my_button6 == ".!button"):
+        d = d+10
+    print(d)
 
-my_button = Button(root, text="Red Hart", command=thing2)
-my_button.place(x=350, y=620 )
 
-my_button = Button(root, text="Red Hart", command=thing2)
-my_button.place(x=350, y=620 )
+my_button6 = Button(root, text="up", command=pressing)
+my_button6.place(x=800, y=620 )
+    
+# class movement1:
+#     def __init__(mv, a, b):
+#         mv.a = a
+#         mv.b = b
+#     def movementx(a):
+#         triangle = Shapes.thing1(20 - a, 20, 30 + a , 30 , "green")
+#     def movementy(b):
+#         triangle = Shapes.thing1(20 , 20 - b, 30 , 30 + b, "green")
+    # def presseing(a):
+    #     if (my_button == 1):
+    #         a = 30  
+    #     else:
+    #         print("none")
+    
 
-triangle = Shapes.thing1(20, 20, 50 , 150, "red")
-triangle = Shapes.thing2(130, 130, 110 , 150 , "blue")
+
+
+
+# my_button = Button(root, text="up", command=movement1.movementx( a= +30))
+# my_button.place(x=350, y=620 )
+
+# my_button2 = Button(root, text="down", command=movement1.movementx(a = -30))
+# my_button2.place(x=390, y=620 )
+
+# my_button3 = Button(root, text="left", command=movement1.movementy(b =+30))
+# my_button3.place(x=430, y=620 )
+
+# my_button4 = Button(root, text="left", command=movement1.movementy(b = -30))
+# my_button4.place(x=470, y=620 )
+
+
+
+# my_button = Button(root, text="blue", command=thing2)
+# my_button.place(x=350, y=620 )
+
+# my_button = Button(root, text="red", command=thing2)
+# my_button.place(x=350, y=620 )
+
+
+
+
+
+
+
+# def thing1():
+#     my_image = my_canvas.create_image(a, b, anchor=NW, image=img2)
+#     img = Image.open("triangle.png")
+#     resized = img.resize((S1,S2), Image.Resampling.LANCZOS)
+#     img2 = ImageTk.PhotoImage(resized)
+
+# my_label1 = Label(root,image=img2)
+# my_button = Button(root, text="triangle", command=thing1)
+# my_button.place(x=200, y=620 )
+
 
 mainloop()
 

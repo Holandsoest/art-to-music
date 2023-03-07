@@ -122,7 +122,10 @@ my_button = Button(root, text="star", command=thing3)
 my_button.place(x=500, y=620 )
 7
 
-
+a = 20
+b = 50
+S1 = 60
+S2 = 50
 class imageonsite:
     def move(e):
         if a < e.x < a+S1 and b < e.y < b+S2:
