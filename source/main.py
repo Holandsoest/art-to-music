@@ -44,16 +44,16 @@ def drag(mouse):
     shape_x, shape_y = my_canvas.coords(closest_shape)
     my_canvas.moveto(closest_shape, mouse.x, mouse.y)
 
-# Changes the size of the shape, with scrolling the mouse
-def mouse_wheel(event):
-    # respond to Linux or Windows wheel event
-    delta = 0
-    if event.num == 5 or event.delta == -120: delta = 1
-    elif event.num == 4 or event.delta == 120: delta = -1
-    else: print("Something went wrong while scrolling: " + str(event))
+# # Changes the size of the shape, with scrolling the mouse
+# def mouse_wheel(event):
+#     # respond to Linux or Windows wheel event
+#     delta = 0
+#     if event.num == 5 or event.delta == -120: delta = 1
+#     elif event.num == 4 or event.delta == 120: delta = -1
+#     else: print("Something went wrong while scrolling: " + str(event))
 
-    # Get current scale as a double
-    closest_shape = my_canvas.find_closest(event.x, event.y)
+#     # Get current scale as a double
+#     closest_shape = my_canvas.find_closest(event.x, event.y)
     
 
 my_label = Label(root, text="")
@@ -61,9 +61,9 @@ my_label.pack(pady=20)
 
 my_canvas.bind('<B1-Motion>', drag) # Create a callback. Whenever we hold `LMB` and move the mouse this function is called.
 
-my_canvas.bind("<MouseWheel>", mouse_wheel) # with Windows OS, Create a callback, Whenever ... call this function.
-my_canvas.bind("<Button-4>", mouse_wheel) # with Linux OS, Create a callback, Whenever ... call this function.
-my_canvas.bind("<Button-5>", mouse_wheel) # with Linux OS, Create a callback, Whenever ... call this function.
+#my_canvas.bind("<MouseWheel>", mouse_wheel) # with Windows OS, Create a callback, Whenever ... call this function.
+#my_canvas.bind("<Button-4>", mouse_wheel) # with Linux OS, Create a callback, Whenever ... call this function.
+#my_canvas.bind("<Button-5>", mouse_wheel) # with Linux OS, Create a callback, Whenever ... call this function.
 
 #button for quitting the program
 #button_quit = Button(root, text="Exit", command=root.quit)
