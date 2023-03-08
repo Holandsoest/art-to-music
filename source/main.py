@@ -1,13 +1,11 @@
 from tkinter import * 
-from PIL import ImageTk, Image
-from PIL import ImageGrab
+
 root =  Tk()
 #title of the gui
 root.title('gui test')
 #size of vester
 root.geometry("900x700")
 #put text into the gui
-#my_label = Label(root, text = 'Git Fetch Bitch!').pack()
 my_label1 = Label(root, text = 'shapes regognision').pack()
 #make a icon for the map itself
 root.iconbitmap('triangle.ico')
@@ -32,64 +30,44 @@ my_canvas.pack(pady=20)
 # img = PhotoImage(file="triangle.png")
 # my_image = my_canvas.create_image(260,125, anchor=NW, image=img)
 
+# Initialize our basic shapes for the demo
+import shapes
+my_canvas.create_image(70,100, anchor=CENTER, image=shapes.img_heart) # TODO: Fix anchor to the center of the image.
+my_canvas.create_image(80,150, anchor=CENTER, image=shapes.img_heart) # TODO: Fix anchor to the center of the image.
+my_canvas.create_image(90,200, anchor=CENTER, image=shapes.img_heart) # TODO: Fix anchor to the center of the image.
+my_canvas.create_image(100,250, anchor=CENTER, image=shapes.img_triangle) # TODO: Fix anchor to the center of the image.
+my_canvas.create_image(110,300, anchor=CENTER, image=shapes.img_triangle) # TODO: Fix anchor to the center of the image.
 
-thislist=[]
-class shapes:
-    def __init__(self, xs, ys):
-        self.xs=xs
-        self.ys=ys
-thislist.append(shapes(20,20))
+# Move the closest image to the mouse to the location of the mouse TODO(if they are in range)
+def drag(mouse):
+    closest_shape = my_canvas.find_closest(mouse.x, mouse.y)
+    shape_x, shape_y = my_canvas.coords(closest_shape)
+    my_canvas.moveto(closest_shape, mouse.x, mouse.y)
 
-# img2 = PhotoImage(file="hart.png")
-# my_image = my_canvas.create_image(260,125, anchor=NW, image=img2)
-my_canvas.update()
-x = 0
-y=0
-def move(e):
-    global x 
-    global y
-    e.x
-    e.y
-    x = e.x
-    y = e.y
-    print(x)
-    print(y)
+# Changes the size of the shape, with scrolling the mouse
+def mouse_wheel(event):
+    # respond to Linux or Windows wheel event
+    delta = 0
+    if event.num == 5 or event.delta == -120: delta = 1
+    elif event.num == 4 or event.delta == 120: delta = -1
+    else: print("Something went wrong while scrolling: " + str(event))
 
-for i in thislist:
-    if i.xs < x <i.xs+20 and i.ys < y < i.ys+20:
-        i.xs = x
-        i.ys = y
-    img5 = Image.open("hart.png")
-    resized3 = img5.resize((60,60), Image.Resampling.LANCZOS)
-    img6 = ImageTk.PhotoImage(resized3)
-    my_image3 = my_canvas.create_image(i.xs, i.ys, anchor=NW, image=img6)
-
-    #global img
-    #global img2
-    #image 1
-    # img = PhotoImage(file="triangle.png")
-    # my_image = my_canvas.create_image(e.x, e.y, image=img)
-    #image 2
-    #img2 = PhotoImage(file="hart.png")
-    #my_image = my_canvas.create_image(e.x, e.y, image=img2)
-    #configureation of the coordinates
-    # my_label.config(text="coordinates x " + str(e.x) + " y " + str(e.y))
+    # Get current scale as a double
+    closest_shape = my_canvas.find_closest(event.x, event.y)
+    
 
 my_label = Label(root, text="")
 my_label.pack(pady=20)
 
-my_canvas.bind('<B1-Motion>', move)
+my_canvas.bind('<B1-Motion>', drag) # Create a callback. Whenever we hold `LMB` and move the mouse this function is called.
 
-
-#class shapes:
-#    def check_if_works(self):
-#        if self.marks >= 260
-
-
+my_canvas.bind("<MouseWheel>", mouse_wheel) # with Windows OS, Create a callback, Whenever ... call this function.
+my_canvas.bind("<Button-4>", mouse_wheel) # with Linux OS, Create a callback, Whenever ... call this function.
+my_canvas.bind("<Button-5>", mouse_wheel) # with Linux OS, Create a callback, Whenever ... call this function.
 
 #button for quitting the program
 #button_quit = Button(root, text="Exit", command=root.quit)
 #button_quit.pack()
 
 root.mainloop()
-
+print('exited')
