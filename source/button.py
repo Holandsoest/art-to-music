@@ -79,7 +79,7 @@ root.geometry("900x700")
 #my_label = Label(root, text = 'Git Fetch Bitch!').pack()
 my_label1 = Label(root, text = 'shapes regognision').pack()
 #make a icon for the map itself
-root.iconbitmap('triangle.ico')
+
 
 #canvas with shapes in it
 
@@ -117,7 +117,7 @@ b3 = 100
 S5 = 60
 S6 = 60
 
-img5 = Image.open("hart.png")
+img5 = Image.open("HartBlue.png")
 resized3 = img5.resize((60,60), Image.Resampling.LANCZOS)
 img6 = ImageTk.PhotoImage(resized3)
 my_image3 = my_canvas.create_image(a3, b3, anchor=NW, image=img6)

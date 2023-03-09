@@ -1,8 +1,9 @@
 from PIL import ImageTk, Image, ImageGrab
 
 # Define images
-img_heart = ImageTk.PhotoImage(Image.open("hart.png").resize((60,60), Image.Resampling.LANCZOS))
-img_triangle = ImageTk.PhotoImage(Image.open("triangle.png").resize((60,60), Image.Resampling.LANCZOS))
-img_triangle = ImageTk.PhotoImage(Image.open("star.png").resize((60,60), Image.Resampling.LANCZOS))
-img_star = ImageTk.PhotoImage(Image.open("star.png").resize((60,60), Image.Resampling.LANCZOS))
-img_trianglered = ImageTk.PhotoImage(Image.open("trianglered.png").resize((60,60), Image.Resampling.LANCZOS))
+B=120
+CircleBlue = ImageTk.PhotoImage(Image.open("CircleBlue.png").resize((B,B), Image.Resampling.LANCZOS))
+CircleGreen = ImageTk.PhotoImage(Image.open("CircleGreen.png").resize((B,B), Image.Resampling.LANCZOS))
+CircleOrange = ImageTk.PhotoImage(Image.open("CircleOrange.png").resize((B,B), Image.Resampling.LANCZOS))
+CirclePurple = ImageTk.PhotoImage(Image.open("CirclePurple.png").resize((B,B), Image.Resampling.LANCZOS))
+CircleYellow = ImageTk.PhotoImage(Image.open("CircleYellow.png").resize((B,B), Image.Resampling.LANCZOS))
