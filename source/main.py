@@ -9,7 +9,7 @@ root.geometry("900x700")
 #put text into the gui
 my_label1 = Label(root, text = 'shapes regognision').pack()
 #make a icon for the map itself
-root.iconbitmap('triangle.ico')
+# root.iconbitmap('CircleBlue.png)
 
 #canvas with shapes in it
 
@@ -33,13 +33,13 @@ my_canvas.pack(pady=20)
 
 # Initialize our basic shapes for the demo
 import shapes
-my_canvas.create_image(70,100, anchor=CENTER, image=shapes.img_heart) # TODO: Fix anchor to the center of the image.
-my_canvas.create_image(80,150, anchor=CENTER, image=shapes.img_heart) # TODO: Fix anchor to the center of the image.
-my_canvas.create_image(90,200, anchor=CENTER, image=shapes.img_heart) # TODO: Fix anchor to the center of the image.
-my_canvas.create_image(100,250, anchor=CENTER, image=shapes.img_triangle) # TODO: Fix anchor to the center of the image.
-my_canvas.create_image(110,300, anchor=CENTER, image=shapes.img_triangle) # TODO: Fix anchor to the center of the image.
-my_canvas.create_image(140, 350, anchor=CENTER, image=shapes.img_star)
-my_canvas.create_image(160, 380, anchor=CENTER, image=shapes.img_trianglered)
+my_canvas.create_image(70,100, anchor=CENTER, image=shapes.CircleBlue) # TODO: Fix anchor to the center of the image.
+my_canvas.create_image(80,150, anchor=CENTER, image=shapes.CircleGreen) # TODO: Fix anchor to the center of the image.
+my_canvas.create_image(90,200, anchor=CENTER, image=shapes.CircleOrange) # TODO: Fix anchor to the center of the image.
+my_canvas.create_image(100,250, anchor=CENTER, image=shapes.CirclePurple) # TODO: Fix anchor to the center of the image.
+my_canvas.create_image(110,300, anchor=CENTER, image=shapes.CircleYellow) # TODO: Fix anchor to the center of the image.
+# my_canvas.create_image(140, 350, anchor=CENTER, image=shapes.img_star)
+# my_canvas.create_image(160, 380, anchor=CENTER, image=shapes.img_trianglered)
 
 import tkinter as tk
 
@@ -63,7 +63,7 @@ import tkinter as tk
 # my_button = Button(root, text="up", command=movement1.movementx( a= +30))
 # my_button.place(x=350, y=620 )
 
-S1 =20
+
 
 # Move the closest image to the mouse to the location of the mouse TODO(if they are in range)
 # def drag(mouse):
@@ -71,13 +71,28 @@ S1 =20
 #     shape_x, shape_y = my_canvas.coords(closest_shape)
 #     my_canvas.moveto(closest_shape, mouse.x, mouse.y)
 
+
+S2 =60
+S1 =S2 - 20
+
 def drag(mouse):
     closest_shape = my_canvas.find_closest(mouse.x, mouse.y)
     shape_x, shape_y = my_canvas.coords(closest_shape)
     if (shape_x - S1 < mouse.x < shape_x + S1 and shape_y - S1 < mouse.y < shape_y + S1):
-        my_canvas.moveto(closest_shape, mouse.x-30, mouse.y-30)
+        my_canvas.moveto(closest_shape, mouse.x-S2, mouse.y-S2)
     else :
-        print("nothing close enough")    
+        print("not close enough")    
+
+
+
+# def thing2():
+#     my_image2 = my_canvas.create_image(a2, b2, anchor=NW, image=img4)
+
+# my_label2 = Label(root,image=img4)
+# my_button = Button(root, text="Red Hart", command=thing2)
+# my_button.place(x=350, y=620 )
+
+
 
 # # Changes the size of the shape, with scrolling the mouse
 # def mouse_wheel(event):

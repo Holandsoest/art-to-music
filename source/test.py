@@ -100,13 +100,15 @@ my_button.place(x=200, y=620 )
 def thing2():
     my_image2 = my_canvas.create_image(a2, b2, anchor=NW, image=img4)
 
+my_label2 = Label(root,image=img4)
+my_button = Button(root, text="Red Hart", command=thing2)
+my_button.place(x=350, y=620 )
+
 img3 = Image.open("hart.png")
 resized2 = img3.resize((S3,S4), Image.Resampling.LANCZOS)
 img4 = ImageTk.PhotoImage(resized2)
 
-my_label2 = Label(root,image=img4)
-my_button = Button(root, text="Red Hart", command=thing2)
-my_button.place(x=350, y=620 )
+
 
 
 
