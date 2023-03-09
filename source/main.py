@@ -1,4 +1,5 @@
 from tkinter import * 
+import tkinter as tk
 
 root =  Tk()
 #title of the gui
@@ -37,12 +38,46 @@ my_canvas.create_image(80,150, anchor=CENTER, image=shapes.img_heart) # TODO: Fi
 my_canvas.create_image(90,200, anchor=CENTER, image=shapes.img_heart) # TODO: Fix anchor to the center of the image.
 my_canvas.create_image(100,250, anchor=CENTER, image=shapes.img_triangle) # TODO: Fix anchor to the center of the image.
 my_canvas.create_image(110,300, anchor=CENTER, image=shapes.img_triangle) # TODO: Fix anchor to the center of the image.
+my_canvas.create_image(140, 350, anchor=CENTER, image=shapes.img_star)
+my_canvas.create_image(160, 380, anchor=CENTER, image=shapes.img_trianglered)
+
+import tkinter as tk
+
+# class Main():
+
+#     def __init__(self, root):
+#         self.root = root
+#         self.count = 0
+
+#         btn = Button(root, text ='click me')
+#         btn.bind('<Button-1>', self.click)
+#         btn.place(x=350, y=620 )
+
+#     def click(self, event):
+#         self.count += 1
+#         self.lbl.config(text=f'count {self.count}')
+
+
+
+
+# my_button = Button(root, text="up", command=movement1.movementx( a= +30))
+# my_button.place(x=350, y=620 )
+
+S1 =20
 
 # Move the closest image to the mouse to the location of the mouse TODO(if they are in range)
+# def drag(mouse):
+#     closest_shape = my_canvas.find_closest(mouse.x, mouse.y)
+#     shape_x, shape_y = my_canvas.coords(closest_shape)
+#     my_canvas.moveto(closest_shape, mouse.x, mouse.y)
+
 def drag(mouse):
     closest_shape = my_canvas.find_closest(mouse.x, mouse.y)
     shape_x, shape_y = my_canvas.coords(closest_shape)
-    my_canvas.moveto(closest_shape, mouse.x, mouse.y)
+    if (shape_x - S1 < mouse.x < shape_x + S1 and shape_y - S1 < mouse.y < shape_y + S1):
+        my_canvas.moveto(closest_shape, mouse.x-30, mouse.y-30)
+    else :
+        print("nothing close enough")    
 
 # # Changes the size of the shape, with scrolling the mouse
 # def mouse_wheel(event):
