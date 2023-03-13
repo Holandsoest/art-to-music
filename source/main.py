@@ -1,40 +1,23 @@
-# import cv2 as cv
-# import numpy as np
-# from matplotlib import pyplot as plt
-
-################## Template Matching Example #############
-# img_rgb = cv.imread("res.png")
-# img_gray = cv.cvtColor(img_rgb, cv.COLOR_BGR2GRAY)
-# template = cv.imread(r"C:\Users\mauri\Documents\BlueTriangle.png",0)
-# w, h = template.shape[::-1]
-# res = cv.matchTemplate(img_gray,template,cv.TM_CCOEFF_NORMED)
-# threshold = 0.8
-# loc = np.where( res >= threshold)
-# for pt in zip(*loc[::-1]):
-#     cv.rectangle(img_rgb, pt, (pt[0] + w, pt[1] + h), (0,0,255), 1)
-
-# cv.imwrite('res.png',img_rgb)
-# cv.imshow('image', img_rgb)
-# cv.waitKey(0)
-
-############################### Shape detection #####################################
+############################### Shape and color detection #####################################
 import numpy as np
 import cv2
 import pandas as pd
 import argparse
+import os
 
 #declaring global variables (are used later on)
 clicked = False
 r = g = b = xpos = ypos = 0
 
 #Reading the image with opencv
-img = cv2.imread('res.png')
-imgColor = cv2.imread('res.png')
+img = cv2.imread('imageExample\ExampleShapes.png')
+imgColor = cv2.imread('imageExample\ExampleShapes.png')
 imgGry = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 #Reading csv file with pandas and giving names to each column
 index=["color","color_name","hex","R","G","B"]
-csv = pd.read_csv(r"C:\Users\mauri\Documents\colors.csv", names=index, header=None)
+absolute_path = os.path.join(os.getcwd(), 'datasets', 'colors.csv')
+csv = pd.read_csv(absolute_path, names=index, header=None)
 
 #function to calculate minimum distance from all colors and get the most matching color
 def getColorName(R,G,B):
