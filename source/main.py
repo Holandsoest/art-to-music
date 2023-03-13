@@ -1,17 +1,13 @@
 ############################### Shape and color detection #####################################
-import numpy as np
 import cv2
 import pandas as pd
-import argparse
 import os
 
-#declaring global variables (are used later on)
-clicked = False
-r = g = b = xpos = ypos = 0
+#declaring global variables
+r = g = b = 0
 
 #Reading the image with opencv
 img = cv2.imread('imageExample\ExampleShapes.png')
-imgColor = cv2.imread('imageExample\ExampleShapes.png')
 imgGry = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 #Reading csv file with pandas and giving names to each column
@@ -29,6 +25,7 @@ def getColorName(R,G,B):
             cname = csv.loc[i,"color_name"]
     return cname
 
+#function to set the name and color to the shape
 def setNameShape(nameShape, x, y, img):
         b,g,r = img[y,x]
         b = int(b)
@@ -48,20 +45,24 @@ for contour in contours:
     x = approx.ravel()[0]
     y = approx.ravel()[1]
 
-    if len(approx) == 3:
+    #Triangle
+    if len(approx) == 3: 
         setNameShape("Triangle", x, y, img)
-    elif len(approx) == 4 :
+    #Square or rectangle
+    elif len(approx) == 4 : 
         x, y , w, h = cv2.boundingRect(approx)
         aspectRatio = float(w)/h
         if aspectRatio >= 0.95 and aspectRatio < 1.05:
             setNameShape("Square",x,y,img)
         else:
             setNameShape("Rectangle",x,y,img)
-
+    #Pentgaon
     elif len(approx) == 5 :
         setNameShape("Pentagon",x,y,img)
+    #Star
     elif len(approx) == 10 :
         setNameShape("Star",x,y,img)
+    #Circle
     else:
         setNameShape("Circle",x,y,img)
 
