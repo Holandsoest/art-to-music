@@ -75,7 +75,7 @@ def anti_outline_edge_collision_grabcut(image):
 
 
 if __name__ == "__main__":
-    print ('Running demo image_perspective\nThis demo is about how to find the corners of an transformed rectangle fully automaticly.\nDue to its GIRTH it is adviced to only do it per user request or as part of a first time setup.')
+    print ('Running demo image_perspective\nThis demo is about how to find the corners of an transformed rectangle fully automatically.\nDue to its GIRTH it is advised to only do it per user request or as part of a first time setup.')
 
     # 'Generate' an image
     absolute_path = os.path.join(os.getcwd(), 'source', 'haw.jpg')
@@ -89,23 +89,22 @@ if __name__ == "__main__":
     crop_modifier = common.location.Pos(x=(screen_size.x / img_size.x), y=(screen_size.y / img_size.y))
     print(f'Sizes:\n  Screen:\t{screen_size}\n  Original img:\t{img_size}')
     print(f'  Cropped img:\tx:{int(img_size.x*crop_modifier.min())}, y:{int (img_size.y*crop_modifier.min())}, modifier:{crop_modifier.min()}')
-    # cv2.imshow(f'Before',cv2.resize(img, (int(img_size.x * crop_modifier.min()),int(img_size.y * crop_modifier.min()))))
+    cv2.imshow(f'Before',cv2.resize(img, (int(img_size.x * crop_modifier.min()),int(img_size.y * crop_modifier.min()))))
+
+    # Repeated Closing operation to remove text from the document. (remove foreground)
+    kernel = numpy.ones((3,3),numpy.uint8)
+    img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations= 10)
+    cv2.imshow(f'After Morphing',cv2.resize(img, (int(img_size.x * crop_modifier.min()),int(img_size.y * crop_modifier.min()))))
 
     # Find the whiteboard coordinates
     crop_modifier = common.location.Pos(x=(res_image_processing.x / img_size.x), y=(res_image_processing.y / img_size.y))
     img = cv2.resize(img, (int(img_size.x * crop_modifier.min()),int(img_size.y * crop_modifier.min())))
 
-    # Repeated Closing operation to remove text from the document. (remove foreground)
-    kernel = numpy.ones((3,3),numpy.uint8)
-    img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel, iterations= 15)
-    cv2.imshow(f'After Morphing',img)
-
-    # Grabcut (remove the background)
-    grabcut_margion = 50
+    # GrabCut (remove the background)
     mask = numpy.zeros(img.shape[:2],numpy.uint8)
     bgdModel = numpy.zeros((1,65),numpy.float64)
     fgdModel = numpy.zeros((1,65),numpy.float64)
-    rect = (grabcut_margion,grabcut_margion,img.shape[1]-grabcut_margion,img.shape[0]-grabcut_margion)
+    rect = (5,5,img.shape[1]-10,img.shape[0]-10)
     cv2.grabCut(img,mask,rect,bgdModel,fgdModel,10,cv2.GC_INIT_WITH_RECT)
     mask2 = numpy.where((mask==2)|(mask==0),0,1).astype('uint8')
     img = img*mask2[:,:,numpy.newaxis]
