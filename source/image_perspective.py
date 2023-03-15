@@ -120,14 +120,31 @@ if __name__ == "__main__":
     img = cv2.dilate(img, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
     cv2.imshow(f'After Canny',img)
 
-    # Blank canvas.
+    # Blank canvas
     con = numpy.zeros_like(img)
     # Finding contours for the detected edges.
     contours, hierarchy = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
     # Keeping only the largest detected contour.
     page = sorted(contours, key=cv2.contourArea, reverse=True)[:5]
-    con = cv2.drawContours(con, page, -1, (0, 255, 255), 3)
-    # cv2.imshow(f'Contours',img)
+    # Loop over the contours.
+    for c in page:
+        # Approximate the contour.
+        epsilon = 0.02 * cv2.arcLength(c, True)
+        corners = cv2.approxPolyDP(c, epsilon, True)
+        # If our approximated contour has four points
+        if len(corners) == 4:
+            break
+    cv2.drawContours(con, c, -1, (0, 255, 255), 3)
+    cv2.drawContours(con, corners, -1, (0, 255, 0), 10)
+    # Sorting the corners and converting them to desired shape.
+    corners = sorted(numpy.concatenate(corners).tolist())
+    
+    # Displaying the corners.
+    for index, c in enumerate(corners):
+        character = chr(65 + index)
+        cv2.putText(con, character, tuple(c), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
+    
+    cv2.imshow(f'After Contours',con)
 
 
 
