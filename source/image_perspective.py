@@ -10,18 +10,19 @@ res_image_processing = common.location.Pos(x=1920, y=1080)
 # https://learnopencv.com/automatic-document-scanner-using-opencv/  
 
 def get_coordinates_transform_points(image, verbosity_level=0):
-    """This expensive function checks the image and does multiple checks to find a trapezium that is inside 5px of the image boarders.
+    """This expensive function checks the image and does multiple checks to find a trapezium that is inside 5px's of the image boarders.
     Use this function to calibrate the positional-transform (moving the camera into the correct perspective)
-    ---
-    @param image the image to check for rectangle (works with openCV image or TODO: camera_frame)
-    TODO: @param verbosity_level 0-2 wherein [   nothing(default),   prints info,   opens images for intermediate steps   ]
+    
+    ## Parameters
+    @param image the image to check for rectangle (works with openCV image or TODO:camera_frame)
+    @param verbosity_level 0-2 wherein [   nothing(default),   prints info,   opens images for intermediate steps   ]
     TODO: @returns tuple with 4 common.location.Pos in the order TopLeft,TopRight,BottomLeft,BottomRight
-    ---
-    Limitations: This function does not handle it well if the rectangle is not within 5px of the image edges.  
+    
+    ## Limitations
+    - This function does not handle it well if the rectangle is not within 5px of the image edges.  
+    - This function does not handle it well if the rectangle is not within 5px of the image edges.  
 
-    ## TODO BUG:
-
-    - TODO verbosity_level
+    ## TODO & BUG
     - TODO works with camera_frame
     - TODO work out interface
     - BUG problems with .png
@@ -37,7 +38,6 @@ def get_coordinates_transform_points(image, verbosity_level=0):
     screen_size = common.location.get_screensize()
     image_size = common.location.Pos(x=image.shape[1], y=image.shape[0])
     crop_modifier = min(1, min(screen_size.x / image_size.x, screen_size.y / image_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
-
     if (verbosity_level > 0): print(f'Sizes:\n  Primary screen size:\t{screen_size}\n  Original image:\t{image_size}\n  Cropped image:\tx:{int(image_size.x*crop_modifier)}, y:{int (image_size.y*crop_modifier)}, modifier:{crop_modifier}')
     if (verbosity_level > 1): cv2.imshow(f'Before image',cv2.resize(image, (int(image_size.x * crop_modifier),int(image_size.y * crop_modifier))))
 
@@ -57,10 +57,65 @@ def get_coordinates_transform_points(image, verbosity_level=0):
     if (verbosity_level > 1): cv2.imshow(f'After Scaling',cv2.resize(image_scaled, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
 
 
-    # TODO GrabCut (remove the background)
-    # TODO Blur
-    # TODO Edge Detection.
-    # TODO Blank canvas
+    # GrabCut (remove the background)
+    mask = numpy.zeros(image_scaled.shape[:2],numpy.uint8)
+    bgdModel = numpy.zeros((1,65),numpy.float64)
+    fgdModel = numpy.zeros((1,65),numpy.float64)
+    rect = (5, 5, image_scaled_size.x-10, image_scaled_size.y-10)
+    image_grabcut = image_scaled
+    cv2.grabCut(image_grabcut, mask, rect, bgdModel, fgdModel, 10, cv2.GC_INIT_WITH_RECT)
+    mask2 = numpy.where((mask==2)|(mask==0),0,1).astype('uint8')
+    image_grabcut = image_grabcut * mask2[:,:,numpy.newaxis]
+    if (verbosity_level > 1): cv2.imshow(f'After GrabCut',cv2.resize(image_grabcut, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
+
+
+    # Blur
+    image_gray = cv2.cvtColor(image_grabcut, cv2.COLOR_BGR2GRAY)
+    image_gray = cv2.GaussianBlur(image_gray, (11, 11), 0)
+    if (verbosity_level > 1): cv2.imshow(f'After Grayscale and Blur',cv2.resize(image_gray, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
+    
+
+    # Edge Detection.
+    image_edge = cv2.Canny(image_gray, 0, 140)
+    image_edge = cv2.dilate(image_edge, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
+    if (verbosity_level > 1): cv2.imshow(f'After Canny',cv2.resize(image_edge, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
+
+
+    # Detect contours and only keep the largest one
+    image_contours = numpy.zeros_like(image_scaled)
+
+    # Finding contours for the detected edges.
+    contours, hierarchy = cv2.findContours(image_edge, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+
+    # Keeping only the largest detected contour.
+    whiteboard = sorted(contours, key=cv2.contourArea, reverse=True)[:5]
+    image_contours = cv2.drawContours(image_contours, whiteboard, -1, (0, 255, 255), 3)
+
+    # Loop over the contours.
+    for c in whiteboard:
+        # Approximate the contour.
+        epsilon = 0.02 * cv2.arcLength(c, True)
+        corners = cv2.approxPolyDP(c, epsilon, True)
+        # If our approximated contour has four points
+        if len(corners) == 4:
+            break
+    cv2.drawContours(image_contours, c, -1, (0, 255, 255), 3)
+    cv2.drawContours(image_contours, corners, -1, (0, 255, 0), 10)
+
+    # Sorting the corners and converting them to desired shape.
+    corners = sorted(numpy.concatenate(corners).tolist())
+    if (verbosity_level > 0): print(f'Corners: {corners}')
+    
+    # Displaying the corners.
+    if (verbosity_level > 1): 
+        for index, c in enumerate(corners):
+            character = chr(65 + index)
+            cv2.putText(image_contours, character, tuple(c), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
+        cv2.imshow(f'Contours2',cv2.resize(image_contours, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
+    
+
+
+
 
     # raise NotImplementedError # NOTE: This is a placeholder
     return (common.location.Pos(),common.location.Pos(),common.location.Pos(),common.location.Pos())
@@ -87,51 +142,6 @@ if __name__ == "__main__":
     # Find the whiteboard coordinates
     get_coordinates_transform_points(image=img, verbosity_level=2)
 
-    # # GrabCut (remove the background)
-    # mask = numpy.zeros(img.shape[:2],numpy.uint8)
-    # bgdModel = numpy.zeros((1,65),numpy.float64)
-    # fgdModel = numpy.zeros((1,65),numpy.float64)
-    # rect = (5,5,img.shape[1]-10,img.shape[0]-10)
-    # cv2.grabCut(img,mask,rect,bgdModel,fgdModel,10,cv2.GC_INIT_WITH_RECT)
-    # mask2 = numpy.where((mask==2)|(mask==0),0,1).astype('uint8')
-    # img = img*mask2[:,:,numpy.newaxis]
-    # cv2.imshow(f'After Grabcut TopLeft',img)
-
-    # # Blur
-    # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # img = cv2.GaussianBlur(img, (11, 11), 0)
-    # # cv2.imshow(f'After Blur',img)
-    
-    # # Edge Detection.
-    # img = cv2.Canny(img, 0, 140)
-    # img = cv2.dilate(img, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
-    # cv2.imshow(f'After Canny',img)
-
-    # # Blank canvas
-    # con = numpy.zeros_like(img)
-    # # Finding contours for the detected edges.
-    # contours, hierarchy = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-    # # Keeping only the largest detected contour.
-    # page = sorted(contours, key=cv2.contourArea, reverse=True)[:5]
-    # # Loop over the contours.
-    # for c in page:
-    #     # Approximate the contour.
-    #     epsilon = 0.02 * cv2.arcLength(c, True)
-    #     corners = cv2.approxPolyDP(c, epsilon, True)
-    #     # If our approximated contour has four points
-    #     if len(corners) == 4:
-    #         break
-    # cv2.drawContours(con, c, -1, (0, 255, 255), 3)
-    # cv2.drawContours(con, corners, -1, (0, 255, 0), 10)
-    # # Sorting the corners and converting them to desired shape.
-    # corners = sorted(numpy.concatenate(corners).tolist())
-    
-    # # Displaying the corners.
-    # for index, c in enumerate(corners):
-    #     character = chr(65 + index)
-    #     cv2.putText(con, character, tuple(c), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
-    
-    # cv2.imshow(f'After Contours',con)
     # def order_points(pts):
     #     '''Rearrange coordinates to order:
     #     top-left, top-right, bottom-right, bottom-left'''
