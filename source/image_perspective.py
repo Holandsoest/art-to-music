@@ -153,8 +153,38 @@ def get_coordinates_transform_points(image: cv2.Mat, verbosity_level=0) -> list[
 
     if (verbosity_level > 0): print(f'Corner Top-Left:\t{corners_sorted[0]}\nCorner Top-Right:\t{corners_sorted[1]}\nCorner Bottom-Right:\t{corners_sorted[2]}\nCorner Bottom-Left:\t{corners_sorted[3]}')
     return corners_sorted
-def get_whiteboard_dimensions(coordinates_transform_points: list[list[int,int], list[int,int], list[int,int], list[int,int]]) -> list[int,int]:
-    """"""
+def get_whiteboard_dimensions(coordinates_transform_points: list[list[int,int], list[int,int], list[int,int], list[int,int]], accept_image_loss=False, verbosity_level=0) -> list[int,int]:
+    """TODO Retrace if this works"""
+    import math
+
+    top_left, top_right, bottom_right, bottom_left = coordinates_transform_points
+
+    def difference(a, b):
+        return max(a,b) - min(a,b)
+
+    # Calculate the width of the board
+    dx = difference(top_left[0], top_right[0])
+    dy = difference(top_left[1], top_right[1])
+    width1 = int(math.sqrt(dx**2 + dy**2))
+    dx = difference(bottom_left[0], bottom_right[0])
+    dy = difference(bottom_left[1], bottom_right[1])
+    width2 = int(math.sqrt(dx**2 + dy**2))
+
+    # Calculate the height of the board
+    dx3 = difference(top_left[0], bottom_left[0])
+    dy3 = difference(top_left[1], bottom_left[1])
+    height1 = int(math.sqrt(dx**2 + dy**2))
+    dx3 = difference(top_right[0], bottom_right[0])
+    dy3 = difference(top_right[1], bottom_right[1])
+    height2 = int(math.sqrt(dx**2 + dy**2))
+
+
+    if (verbosity_level > 0): print(f'Whiteboard size:\n  min:{[min(width1,width2),min(height1,height2)]}\n  max:{[max(width1,width2),max(height1,height2)]}')
+
+
+    if accept_image_loss:
+        return [min(width1,width2),min(height1,height2)]
+    return [max(width1,width2),max(height1,height2)]
 def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
     """"""
     # Check input
@@ -167,9 +197,9 @@ def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
     crop_modifier = min(1, min(screen_size.x / image_size.x, screen_size.y / image_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
 
     transform_points = get_coordinates_transform_points(image=image, verbosity_level=verbosity_level)
-    whiteboard_dimensions = get_whiteboard_dimensions(transform_points)
+    whiteboard_dimensions = get_whiteboard_dimensions(transform_points, accept_image_loss=False, verbosity_level=verbosity_level)
 
-
+    print('end')
 
 
 
@@ -191,7 +221,7 @@ if __name__ == "__main__":
     img = cv2.imread(absolute_path, 1)
 
     # Find the whiteboard coordinates
-    readout = get_coordinates_transform_points(image=img, verbosity_level=2)
+    readout = warp_perspective(image=img, verbosity_level=2)
     print(readout[0])
     print(readout[1])
     print(readout[2])
