@@ -19,7 +19,7 @@ class Image:
 list = []
 
 #Reading the image with opencv
-img = cv2.imread('imageExample\ExampleShapes3.png')
+img = cv2.imread('imageExample\ExampleShapes6.png')
 imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 #Get the height(h), width(w) and channel of the image
@@ -52,7 +52,10 @@ def setNameShape(nameShape, x, y, img):
     y0, dy = y, 15
     for i, line in enumerate(text.split('\n')):
         y = y0 + i*dy
-        cv2.putText( img, line, (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0) )
+        if colorName == "Black":
+            cv2.putText( img, line, (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255) )
+        else:
+            cv2.putText( img, line, (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0) )
     return colorName
 
 ret , thrash = cv2.threshold(imgGray, 240 , 255, cv2.CHAIN_APPROX_NONE)
@@ -78,25 +81,25 @@ for contour in contours:
 
     #Square or rectangle
     elif len(approx) == 4 : 
-        x, y , w, h = cv2.boundingRect(approx)
+        x2, y2 , w, h = cv2.boundingRect(approx)
         aspectRatio = float(w)/h
         if aspectRatio >= 0.95 and aspectRatio < 1.05:
-            colorName = setNameShape("Square",int(x), int(y),img)
+            colorName = setNameShape("Square",int(x), int(y), img)
             list.append(Image("Square", int(shapeSize), colorName, int(width), int(height)))
         else:
-            colorName = setNameShape("Rectangle",int(x), int(y),img)
+            colorName = setNameShape("Rectangle",int(x), int(y), img)
             list.append(Image("Rectangle", int(shapeSize), colorName, int(width), int(height)))
 
     #Pentgaon
     elif len(approx) == 5 :
-        colorName = setNameShape("Pentagon",int(x), int(y),img)
+        colorName = setNameShape("Pentagon",int(x), int(y), img)
         list.append(Image("Pentagon", int(shapeSize), colorName, int(width), int(height)))
 
     #Star
     elif len(approx) == 10 :
-        colorName = setNameShape("Star",int(x), int(y),img)
+        colorName = setNameShape("Star",int(x), int(y), img)
         list.append(Image("Star", int(shapeSize), colorName, int(width), int(height)))
-        
+
     #Circle
     else:
         colorName = setNameShape("Circle",int(x), int(y),img)
