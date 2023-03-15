@@ -106,15 +106,33 @@ def get_coordinates_transform_points(image, verbosity_level=0):
     corners = sorted(numpy.concatenate(corners).tolist())
     if (verbosity_level > 0): print(f'Corners: {corners}')
     
+
+    # Rearrange the order of the corners to: top-left, top-right, bottom-right, bottom-left
+    # A B
+    # D C
+    rect = numpy.zeros((4, 2), dtype='float32')
+    corners_sorted = numpy.array(corners)
+    s = corners_sorted.sum(axis=1)
+    # Top-left point will have the smallest sum.
+    rect[0] = corners_sorted[numpy.argmin(s)]
+    # Bottom-right point will have the largest sum.
+    rect[2] = corners_sorted[numpy.argmax(s)]
+ 
+    diff = numpy.diff(corners_sorted, axis=1)
+    # Top-right point will have the smallest difference.
+    rect[1] = corners_sorted[numpy.argmin(diff)]
+    # Bottom-left will have the largest difference.
+    rect[3] = corners_sorted[numpy.argmax(diff)]
+    corners_sorted = rect.astype('int').tolist()
+    if (verbosity_level > 0): print(f'Sorted corners: {corners_sorted}')
+    
     # Displaying the corners.
     if (verbosity_level > 1): 
-        for index, c in enumerate(corners):
+        image_corners_sorted = image_contours
+        for index, c in enumerate(corners_sorted):
             character = chr(65 + index)
-            cv2.putText(image_contours, character, tuple(c), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
-        cv2.imshow(f'Contours2',cv2.resize(image_contours, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
-    
-
-
+            cv2.putText(image_corners_sorted, character, tuple(c), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
+        cv2.imshow(f'Contours with sorted corners',cv2.resize(image_corners_sorted, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
 
 
     # raise NotImplementedError # NOTE: This is a placeholder
@@ -141,42 +159,6 @@ if __name__ == "__main__":
 
     # Find the whiteboard coordinates
     get_coordinates_transform_points(image=img, verbosity_level=2)
-
-    # def order_points(pts):
-    #     '''Rearrange coordinates to order:
-    #     top-left, top-right, bottom-right, bottom-left'''
-    #     rect = numpy.zeros((4, 2), dtype='float32')
-    #     pts = numpy.array(pts)
-    #     s = pts.sum(axis=1)
-    #     # Top-left point will have the smallest sum.
-    #     rect[0] = pts[numpy.argmin(s)]
-    #     # Bottom-right point will have the largest sum.
-    #     rect[2] = pts[numpy.argmax(s)]
-    
-    #     diff = numpy.diff(pts, axis=1)
-    #     # Top-right point will have the smallest difference.
-    #     rect[1] = pts[numpy.argmin(diff)]
-    #     # Bottom-left will have the largest difference.
-    #     rect[3] = pts[numpy.argmax(diff)]
-    #     # Return the ordered coordinates.
-    #     return rect.astype('int').tolist()
-    # def find_dest(pts):
-    #     (tl, tr, br, bl) = pts
-    #     # Finding the maximum width.
-    #     widthA = numpy.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
-    #     widthB = numpy.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
-    #     maxWidth = max(int(widthA), int(widthB))
-    
-    #     # Finding the maximum height.
-    #     heightA = numpy.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
-    #     heightB = numpy.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
-    #     maxHeight = max(int(heightA), int(heightB))
-    #     # Final destination co-ordinates.
-    #     destination_corners = [[0, 0], [maxWidth, 0], [maxWidth, maxHeight], [0, maxHeight]]
-    #     return order_points(destination_corners)
-    # destination_coordinates_points = find_dest(corners)
-    # print(destination_coordinates_points)
-
 
     # Wait so we can visually validate
     cv2.waitKey(delay=300000) # 5 minutes
