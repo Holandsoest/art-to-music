@@ -1,30 +1,35 @@
+"""
+Image perspective is a library to turn a photo of a trapezium into a rectangle.
+
+Use the `warp_perspective()` function to get started...
+"""
+
 import common.location
 import cv2
 import numpy
 import os
 import time
 
-res_image_processing = common.location.Pos(x=1920, y=1080)
-
 # Based upon the following works:
 # https://learnopencv.com/automatic-document-scanner-using-opencv/  
 
-def get_coordinates_transform_points(image, verbosity_level=0):
+
+
+def get_coordinates_transform_points(image: cv2.Mat, verbosity_level=0) -> list[list[int,int], list[int,int], list[int,int], list[int,int]]:
     """This expensive function checks the image and does multiple checks to find a trapezium that is inside 5px's of the image boarders.
     Use this function to calibrate the positional-transform (moving the camera into the correct perspective)
     
     ## Parameters
     @param image the image to check for rectangle (works with openCV image or TODO:camera_frame)
     @param verbosity_level 0-2 wherein [   nothing(default),   prints info,   opens images for intermediate steps   ]
-    TODO: @returns tuple with 4 common.location.Pos in the order TopLeft,TopRight,BottomLeft,BottomRight
+    @returns list [Top-Left, Top-Right, Bottom-Right, Bottom-Left]. Where each has a list of [x, y] int
     
     ## Limitations
-    - This function does not handle it well if the rectangle is not within 5px of the image edges.  
-    - This function does not handle it well if the rectangle is not within 5px of the image edges.  
+    - This function does not handle it if the rectangle is not within 5px of the image edges.  
+    - The whiteboard should be the largest object in view
 
     ## TODO & BUG
     - TODO works with camera_frame
-    - TODO work out interface
     - BUG problems with .png
     - BUG problems with .bmp
     """
@@ -148,6 +153,23 @@ def get_coordinates_transform_points(image, verbosity_level=0):
 
     if (verbosity_level > 0): print(f'Corner Top-Left:\t{corners_sorted[0]}\nCorner Top-Right:\t{corners_sorted[1]}\nCorner Bottom-Right:\t{corners_sorted[2]}\nCorner Bottom-Left:\t{corners_sorted[3]}')
     return corners_sorted
+def get_whiteboard_dimensions(coordinates_transform_points: list[list[int,int], list[int,int], list[int,int], list[int,int]]) -> list[int,int]:
+    """"""
+def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
+    """"""
+    # Check input
+    assert verbosity_level is not int or verbosity_level < 0 or verbosity_level > 2, "verbosity_level out_of_bounds expected an int in range of (0 - 2)"
+    assert image is not None, "I got no input at all, check if you got the correct path"
+
+    # Define sizes
+    screen_size = common.location.get_screensize()
+    image_size = common.location.Pos(x=image.shape[1], y=image.shape[0])
+    crop_modifier = min(1, min(screen_size.x / image_size.x, screen_size.y / image_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
+
+    transform_points = get_coordinates_transform_points(image=image, verbosity_level=verbosity_level)
+    whiteboard_dimensions = get_whiteboard_dimensions(transform_points)
+
+
 
 
 
@@ -174,6 +196,17 @@ if __name__ == "__main__":
     print(readout[1])
     print(readout[2])
     print(readout[3])
+
+    img_size = common.location.Pos(x=img.shape[1],y=img.shape[0])
+    screen_size = common.location.get_screensize()
+    crop_modifier = min(1, min(screen_size.x / img_size.x, screen_size.y / img_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
+
+    destination_corners = [[0,0],[img_size.x,0],[img_size.x,img_size.y],[0,img_size.y]]
+    homography = cv2.getPerspectiveTransform(numpy.float32(readout), numpy.float32(destination_corners))
+
+    warped_img = cv2.warpPerspective(img, homography, (img_size.x,img_size.y), flags=cv2.INTER_LINEAR)
+    cv2.imshow(f'Final transform',cv2.resize(warped_img, (int(img_size.x * crop_modifier),int(img_size.y * crop_modifier))))
+    # Hashtag unhappy with stretched result
 
     # Wait so we can visually validate
     cv2.waitKey(delay=300000) # 5 minutes
