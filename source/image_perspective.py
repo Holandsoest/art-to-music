@@ -101,6 +101,7 @@ def get_coordinates_transform_points(image, verbosity_level=0):
             break
     cv2.drawContours(image_contours, c, -1, (0, 255, 255), 3)
     cv2.drawContours(image_contours, corners, -1, (0, 255, 0), 10)
+    if (verbosity_level > 1): cv2.imshow(f'Contours',cv2.resize(image_contours, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
 
     # Sorting the corners and converting them to desired shape.
     corners = sorted(numpy.concatenate(corners).tolist())
@@ -135,8 +136,24 @@ def get_coordinates_transform_points(image, verbosity_level=0):
         cv2.imshow(f'Contours with sorted corners',cv2.resize(image_corners_sorted, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
 
 
-    # raise NotImplementedError # NOTE: This is a placeholder
-    return (common.location.Pos(),common.location.Pos(),common.location.Pos(),common.location.Pos())
+    # Return coordinates of corners
+    output = (common.location.Pos(
+            x= int((corners_sorted[0][0] * image_size.x) / image_scaled_size.x),
+            y= int((corners_sorted[0][1] * image_size.y) / image_scaled_size.y)
+        ),common.location.Pos(
+            x= int((corners_sorted[1][0] * image_size.x) / image_scaled_size.x),
+            y= int((corners_sorted[1][1] * image_size.y) / image_scaled_size.y)
+        ),common.location.Pos(
+            x= int((corners_sorted[2][0] * image_size.x) / image_scaled_size.x),
+            y= int((corners_sorted[2][1] * image_size.y) / image_scaled_size.y)
+        ),common.location.Pos(
+            x= int((corners_sorted[3][0] * image_size.x) / image_scaled_size.x),
+            y= int((corners_sorted[3][1] * image_size.y) / image_scaled_size.y)
+        )
+    )
+    if (verbosity_level > 0): print(f'Corner Top-Left:\t{output[0]}\nCorner Top-Right:\t{output[1]}\nCorner Bottom-Right:\t{output[2]}\nCorner Bottom-Left:\t{output[3]}')
+
+    return tuple(output)
 
 
 
@@ -158,7 +175,11 @@ if __name__ == "__main__":
     img = cv2.imread(absolute_path, 1)
 
     # Find the whiteboard coordinates
-    get_coordinates_transform_points(image=img, verbosity_level=2)
+    readout = get_coordinates_transform_points(image=img, verbosity_level=2)
+    print(readout[0])
+    print(readout[1])
+    print(readout[2])
+    print(readout[3])
 
     # Wait so we can visually validate
     cv2.waitKey(delay=300000) # 5 minutes

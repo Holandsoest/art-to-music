@@ -11,8 +11,6 @@ class Pos:
             self.y = y
     def __str__(self) -> str:
         return f'x:{self.x}, y:{self.y}'
-    def tuple(self):
-        return tuple(self.x,self.y)
     
     # Basic math functions
     def min(self) -> int | float:
