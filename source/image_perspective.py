@@ -137,23 +137,17 @@ def get_coordinates_transform_points(image, verbosity_level=0):
 
 
     # Return coordinates of corners
-    output = (common.location.Pos(
-            x= int((corners_sorted[0][0] * image_size.x) / image_scaled_size.x),
-            y= int((corners_sorted[0][1] * image_size.y) / image_scaled_size.y)
-        ),common.location.Pos(
-            x= int((corners_sorted[1][0] * image_size.x) / image_scaled_size.x),
-            y= int((corners_sorted[1][1] * image_size.y) / image_scaled_size.y)
-        ),common.location.Pos(
-            x= int((corners_sorted[2][0] * image_size.x) / image_scaled_size.x),
-            y= int((corners_sorted[2][1] * image_size.y) / image_scaled_size.y)
-        ),common.location.Pos(
-            x= int((corners_sorted[3][0] * image_size.x) / image_scaled_size.x),
-            y= int((corners_sorted[3][1] * image_size.y) / image_scaled_size.y)
-        )
-    )
-    if (verbosity_level > 0): print(f'Corner Top-Left:\t{output[0]}\nCorner Top-Right:\t{output[1]}\nCorner Bottom-Right:\t{output[2]}\nCorner Bottom-Left:\t{output[3]}')
+    corners_sorted[0][0] = int((corners_sorted[0][0] * image_size.x) / image_scaled_size.x)
+    corners_sorted[0][1] = int((corners_sorted[0][1] * image_size.y) / image_scaled_size.y)
+    corners_sorted[1][0] = int((corners_sorted[1][0] * image_size.x) / image_scaled_size.x)
+    corners_sorted[1][1] = int((corners_sorted[1][1] * image_size.y) / image_scaled_size.y)
+    corners_sorted[2][0] = int((corners_sorted[2][0] * image_size.x) / image_scaled_size.x)
+    corners_sorted[2][1] = int((corners_sorted[2][1] * image_size.y) / image_scaled_size.y)
+    corners_sorted[3][0] = int((corners_sorted[3][0] * image_size.x) / image_scaled_size.x)
+    corners_sorted[3][1] = int((corners_sorted[3][1] * image_size.y) / image_scaled_size.y)
 
-    return tuple(output)
+    if (verbosity_level > 0): print(f'Corner Top-Left:\t{corners_sorted[0]}\nCorner Top-Right:\t{corners_sorted[1]}\nCorner Bottom-Right:\t{corners_sorted[2]}\nCorner Bottom-Left:\t{corners_sorted[3]}')
+    return corners_sorted
 
 
 
