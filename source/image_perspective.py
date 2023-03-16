@@ -232,26 +232,28 @@ def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
 if __name__ == "__main__":
     print ('Running demo image_perspective\nThis demo is about how to find the corners of an transformed rectangle fully automatically.\nDue to its GIRTH it is advised to only do it per user request or as part of a first time setup.')
 
-    # 'Generate' an image
+    # open an image
     absolute_path = os.path.join(os.getcwd(), 'source', 'haw.jpg')
     # absolute_path = os.path.join(os.getcwd(), 'source', '20230314_100721.jpg')
     # absolute_path = os.path.join(os.getcwd(), 'source', '20230314_100721.png')
     # absolute_path = os.path.join(os.getcwd(), 'source', 'Trapesium.bmp')
     print(f'Opening ({absolute_path}) as an image.')
     img = cv2.imread(absolute_path, 1)
+    
 
-    # Find the whiteboard coordinates
+    # Using another useful function that make the given image fit inside the current screen
+    img_size = common.location.Pos(x=img.shape[1], y=img.shape[0])
+    cv2.imshow(f'Input of demo ( width:{img_size.x}, height:{img_size.y} )',resize_image_to_fit_screen(img))
+    
+
+    # Using the function
     output_img = warp_perspective(image=img, verbosity_level=2)
 
-    # Scale the image so it fits on the screen
-    screen_size = common.location.get_screensize()
-    output_img_size = common.location.Pos(x=output_img.shape[1], y=output_img.shape[0])
-    crop_modifier = min(1, min(screen_size.x / output_img_size.x, screen_size.y / output_img_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
 
-    cv2.imshow(f'Final transform',cv2.resize(output_img, (int(output_img_size.x * crop_modifier),int(output_img_size.y * crop_modifier))))
+    # Using another usefull function that make the given image fit inside the current screen
+    output_img_size = common.location.Pos(x=output_img.shape[1], y=output_img.shape[0])
+    cv2.imshow(f'Output of demo ( width:{output_img_size.x}, height:{output_img_size.y} )',resize_image_to_fit_screen(output_img))
     
-    # cv2.imshow(f'Final transform',cv2.resize(warped_img, (int(img_size.x * crop_modifier),int(img_size.y * crop_modifier))))
-    # Hashtag unhappy with stretched result
 
     # Wait so we can visually validate
-    cv2.waitKey(delay=300000) # 5 minutes
+    cv2.waitKey(delay=300000) # 5 minutes max
