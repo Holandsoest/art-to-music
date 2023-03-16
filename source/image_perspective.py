@@ -21,7 +21,12 @@ import time
 # https://learnopencv.com/automatic-document-scanner-using-opencv/  
 
 
-
+def resize_image_to_fit_screen(image :cv2.Mat) -> cv2.Mat:
+    """Grabs the resolution of the **Primary** screen and resizes the image to fit both demotions"""
+    screen_size = common.location.get_screensize()
+    image_size = common.location.Pos(x=image.shape[1], y=image.shape[0])
+    crop_modifier = min(1, min(screen_size.x / image_size.x, screen_size.y / image_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
+    return cv2.resize(image, (int(image_size.x * crop_modifier),int(image_size.y * crop_modifier)))
 def get_coordinates_transform_points(image: cv2.Mat, verbosity_level=0) -> list[list[int,int], list[int,int], list[int,int], list[int,int]]:
     """This expensive function checks the image and does multiple checks to find a trapezium that is inside 5px's of the image boarders.
     Use this function to calibrate the positional-transform (moving the camera into the correct perspective)
@@ -240,7 +245,7 @@ if __name__ == "__main__":
 
     # Scale the image so it fits on the screen
     screen_size = common.location.get_screensize()
-    output_img_size = common.location.Pos(x=screen_size[0], y=screen_size[1])
+    output_img_size = common.location.Pos(x=output_img.shape[1], y=output_img.shape[0])
     crop_modifier = min(1, min(screen_size.x / output_img_size.x, screen_size.y / output_img_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
 
     cv2.imshow(f'Final transform',cv2.resize(output_img, (int(output_img_size.x * crop_modifier),int(output_img_size.y * crop_modifier))))
