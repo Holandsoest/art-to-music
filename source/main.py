@@ -2,6 +2,8 @@
 import cv2
 import pandas as pd
 import os
+from midiutil.MidiFile import MIDIFile
+import pygame
 
 #Declaring global variables
 r = g = b = 0
@@ -9,11 +11,11 @@ r = g = b = 0
 #Declaring class
 class Image:
     def __init__(shape, name, size, color, x_axis, y_axis):
-        shape.name = name  #instrument
-        shape.size = size  #volume
-        shape.color = color #bpm
-        shape.width = x_axis #duration of note
-        shape.height = y_axis #pitch
+        shape.instrument = name  #instrument
+        shape.volume = size  #volume
+        shape.bpm = color #bpm
+        shape.duration = x_axis #duration of note
+        shape.pitch = y_axis #pitch
 
 #Create shape listOfShapes
 listOfShapes = []
@@ -77,7 +79,9 @@ for contour in contours:
         colorName = setNameShape("Triangle", int(x), int(y), img)
 
         #Appending instances to listOfShapes
-        listOfShapes.append(Image("Triangle", int(shapeSize), colorName, int(width), int(height)))
+        #Triangle = Guitar sound = number 30
+        #listOfShapes.append(Image("Triangle", int(shapeSize), colorName, int(width), int(height)))
+        listOfShapes.append(Image(30, int(shapeSize), 120, 1, 50))
 
     #Square or rectangle
     elif len(approx) == 4 : 
@@ -85,32 +89,35 @@ for contour in contours:
         aspectRatio = float(w)/h
         if aspectRatio >= 0.95 and aspectRatio < 1.05:
             colorName = setNameShape("Square",int(x), int(y), img)
-            listOfShapes.append(Image("Square", int(shapeSize), colorName, int(width), int(height)))
+            #Square = Drum = number 119
+            listOfShapes.append(Image(119, int(shapeSize), 60, 2, 200))
         else:
             colorName = setNameShape("Rectangle",int(x), int(y), img)
-            listOfShapes.append(Image("Rectangle", int(shapeSize), colorName, int(width), int(height)))
+            #Rectangle = half circle = flute = number 74
+            listOfShapes.append(Image(74, int(shapeSize), 30, 1, 240))
 
     #Pentgaon
     elif len(approx) == 5 :
         colorName = setNameShape("Pentagon",int(x), int(y), img)
-        listOfShapes.append(Image("Pentagon", int(shapeSize), colorName, int(width), int(height)))
+        #Pentagon = Heartshape = piano = 2
+        listOfShapes.append(Image(3, int(shapeSize), 240, 2, 100))
 
     #Star
     elif len(approx) == 10 :
         colorName = setNameShape("Star",int(x), int(y), img)
-        listOfShapes.append(Image("Star", int(shapeSize), colorName, int(width), int(height)))
+        #Star = Cello = 43
+        listOfShapes.append(Image(43, int(shapeSize), 90, 1, 150))
 
     #Circle
     else:
         colorName = setNameShape("Circle",int(x), int(y),img)
-        listOfShapes.append(Image("Circle", int(shapeSize), colorName, int(width), int(height)))
+        #Circle = lead 1 = 81
+        listOfShapes.append(Image(81, int(shapeSize), 120, 1, 200))
 
 # Accessing object value using a for loop
 for shape in listOfShapes:
-    print(shape.name, shape.size, shape.color, shape.height, shape.width, sep=' ')
+    print("instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
     
-
-
 while(1):
     cv2.imshow("image",img)
 
@@ -119,3 +126,44 @@ while(1):
         break
     
 cv2.destroyAllWindows()
+
+def MakeSong(list):
+    #pitch, bpm, duration, volume, instrument, amount
+    amount_of_instruments = len(list)
+    for shape in list:
+
+        # create MIDIFile object
+        midi = MIDIFile(amount_of_instruments, removeDuplicates=False)
+
+        # add tracks
+        track1 = 0
+        time = 0
+        channel = 0 
+        instruments = 0
+
+        while instruments < amount_of_instruments:
+        # create ass many tracks as instruments        
+            midi.addTrackName(instruments, time, f"Track{instruments}")
+            midi.addTempo(instruments, time, shape.bpm)
+            midi.addProgramChange(instruments, 0, time, shape.instrument)
+
+            midi.addNote(track1, channel, shape.pitch, time, shape.duration, shape.volume)
+            time = +2
+            instruments +=1
+
+        with open("output.mid", "wb") as output_file:
+            midi.writeFile(output_file)
+        
+        pygame.mixer.init()
+        #load MIDI file
+        pygame.mixer.music.load("output.mid")
+        # play MIDI file
+        pygame.mixer.music.play()
+        # wait for music to finish playing
+        while pygame.mixer.music.get_busy():
+            continue
+
+MakeSong(listOfShapes)
+
+
+
