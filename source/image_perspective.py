@@ -233,10 +233,9 @@ if __name__ == "__main__":
     print ('Running demo image_perspective\nThis demo is about how to find the corners of an transformed rectangle fully automatically.\nDue to its GIRTH it is advised to only do it per user request or as part of a first time setup.')
 
     # open an image
-    absolute_path = os.path.join(os.getcwd(), 'source', 'haw.jpg')
-    # absolute_path = os.path.join(os.getcwd(), 'source', '20230314_100721.jpg')
-    # absolute_path = os.path.join(os.getcwd(), 'source', '20230314_100721.png')
-    # absolute_path = os.path.join(os.getcwd(), 'source', 'Trapesium.bmp')
+    absolute_path = os.path.join(os.getcwd(), 'files', 'image_perspective', 'whiteboard.jpg')
+    # absolute_path = os.path.join(os.getcwd(), 'files', 'image_perspective', 'paper.jpg')
+    # absolute_path = os.path.join(os.getcwd(), 'files', 'image_perspective', 'paper.png') BUG
     print(f'Opening ({absolute_path}) as an image.')
     img = cv2.imread(absolute_path, 1)
     
