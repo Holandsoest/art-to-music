@@ -39,6 +39,16 @@ index=["color","color_name","hex","R","G","B"]
 absolute_path = os.path.join(os.getcwd(), 'datasets', 'colors.csv')
 csv = pd.read_csv(absolute_path, names=index, header=None)
 
+def fancyMap(array, low, high):
+    array = [int(numeric_string) for numeric_string in array]
+    minimum = min(array)
+    maximum = max(array)
+
+    diff = maximum - minimum
+    diffScale = high - low
+
+    return map ( lambda x: int((int(x)-minimum)*(float(diffScale)/diff)+low), array)
+
 #Function to set the name and color to the shape
 def setNameShape(nameShape, x, y, img):
     #Function to calculate minimum distance from all colors and get the most matching color
