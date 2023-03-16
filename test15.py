@@ -2,7 +2,6 @@ from midiutil.MidiFile import MIDIFile
 import pygame
 
 def MakeSong(pitch, bpm, duration, volume, instrument, amount_of_instruments):
-
     # create MIDIFile object
     midi = MIDIFile(amount_of_instruments, removeDuplicates=False)
 
@@ -11,18 +10,12 @@ def MakeSong(pitch, bpm, duration, volume, instrument, amount_of_instruments):
     instruments = 0
 
     while instruments < amount_of_instruments:
-    # create ass many tracks as instruments
+        # create ass many tracks as instruments
         midi.addTrackName(instruments, time, f"Track{instruments}")
         midi.addTempo(instruments, time, bpm)
         midi.addProgramChange(instruments, 0, time, instrument)
 
-        for i in range(4):
-            time = i * duration
-            midi.addNote(instruments, channel, pitch, time, duration, volume)
-            midi.addNote(instruments, channel, pitch, time+2, duration, volume)
-            midi.addNote(instruments, channel, pitch, time+4, duration, volume)
-            time = i * duration
-
+        midi.addNote(instruments, channel, pitch, time, duration, volume)
         instruments +=1
 
     with open("output.mid", "wb") as output_file:
@@ -52,4 +45,4 @@ p2 = object(50, 120, 2, 40, 30)
 p3 = object(25, 120, 2, 30, 40)
 amount_of_instruments = 1
 
-MakeSong(p1.pitch, p1.bpm, p1.duration, p1.volume, p1.instrument, amount_of_instruments)
+MakeSong()
