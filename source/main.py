@@ -9,14 +9,14 @@ r = g = b = 0
 #Declaring class
 class Image:
     def __init__(shape, name, size, color, x_axis, y_axis):
-        shape.name = name
-        shape.size = size
-        shape.color = color
-        shape.width = x_axis
-        shape.height = y_axis
+        shape.name = name  #instrument
+        shape.size = size  #volume
+        shape.color = color #bpm
+        shape.width = x_axis #duration of note
+        shape.height = y_axis #pitch
 
-#Create shape list
-list = []
+#Create shape listOfShapes
+listOfShapes = []
 
 #Reading the image with opencv
 img = cv2.imread('imageExample\ExampleShapes6.png')
@@ -76,8 +76,8 @@ for contour in contours:
     if len(approx) == 3:
         colorName = setNameShape("Triangle", int(x), int(y), img)
 
-        #Appending instances to list
-        list.append(Image("Triangle", int(shapeSize), colorName, int(width), int(height)))
+        #Appending instances to listOfShapes
+        listOfShapes.append(Image("Triangle", int(shapeSize), colorName, int(width), int(height)))
 
     #Square or rectangle
     elif len(approx) == 4 : 
@@ -85,29 +85,31 @@ for contour in contours:
         aspectRatio = float(w)/h
         if aspectRatio >= 0.95 and aspectRatio < 1.05:
             colorName = setNameShape("Square",int(x), int(y), img)
-            list.append(Image("Square", int(shapeSize), colorName, int(width), int(height)))
+            listOfShapes.append(Image("Square", int(shapeSize), colorName, int(width), int(height)))
         else:
             colorName = setNameShape("Rectangle",int(x), int(y), img)
-            list.append(Image("Rectangle", int(shapeSize), colorName, int(width), int(height)))
+            listOfShapes.append(Image("Rectangle", int(shapeSize), colorName, int(width), int(height)))
 
     #Pentgaon
     elif len(approx) == 5 :
         colorName = setNameShape("Pentagon",int(x), int(y), img)
-        list.append(Image("Pentagon", int(shapeSize), colorName, int(width), int(height)))
+        listOfShapes.append(Image("Pentagon", int(shapeSize), colorName, int(width), int(height)))
 
     #Star
     elif len(approx) == 10 :
         colorName = setNameShape("Star",int(x), int(y), img)
-        list.append(Image("Star", int(shapeSize), colorName, int(width), int(height)))
+        listOfShapes.append(Image("Star", int(shapeSize), colorName, int(width), int(height)))
 
     #Circle
     else:
         colorName = setNameShape("Circle",int(x), int(y),img)
-        list.append(Image("Circle", int(shapeSize), colorName, int(width), int(height)))
+        listOfShapes.append(Image("Circle", int(shapeSize), colorName, int(width), int(height)))
 
 # Accessing object value using a for loop
-for obj in list:
-    print(obj.name, obj.size, obj.color, obj.height, obj.width, sep=' ')
+for shape in listOfShapes:
+    print(shape.name, shape.size, shape.color, shape.height, shape.width, sep=' ')
+    
+
 
 while(1):
     cv2.imshow("image",img)
