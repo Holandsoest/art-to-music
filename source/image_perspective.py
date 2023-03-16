@@ -1,8 +1,15 @@
-"""
-Image perspective is a library to turn a photo of a trapezium into a rectangle.
+"""Image perspective is a library to turn a photo of a trapezium into a rectangle.
 
-Use the `warp_perspective()` function to get started...
-"""
+*Use the `warp_perspective()` function to get started...*
+
+Works well with .jpg for now
+
+## BUG & TODO
+---
+- TODO test `get_whiteboard_dimensions` for weird angles
+- BUG `get_whiteboard_dimensions` gives the wrong dimensions
+- BUG `get_coordinates_transform_points` works different for .png .bmp. ***(JPG is tested)***
+- TODO `get_coordinates_transform_points` add support for `cv2`'s camera frames"""
 
 import common.location
 import cv2
@@ -31,8 +38,7 @@ def get_coordinates_transform_points(image: cv2.Mat, verbosity_level=0) -> list[
     ## TODO & BUG
     - TODO works with camera_frame
     - BUG problems with .png
-    - BUG problems with .bmp
-    """
+    - BUG problems with .bmp"""
     # Check input
     assert verbosity_level is not int or verbosity_level < 0 or verbosity_level > 2, "verbosity_level out_of_bounds expected an int in range of (0 - 2)"
     assert image is not None, "I got no input at all, check if you got the correct path"
@@ -154,7 +160,7 @@ def get_coordinates_transform_points(image: cv2.Mat, verbosity_level=0) -> list[
     if (verbosity_level > 0): print(f'Corner Top-Left:\t{corners_sorted[0]}\nCorner Top-Right:\t{corners_sorted[1]}\nCorner Bottom-Right:\t{corners_sorted[2]}\nCorner Bottom-Left:\t{corners_sorted[3]}')
     return corners_sorted
 def get_whiteboard_dimensions(coordinates_transform_points: list[list[int,int], list[int,int], list[int,int], list[int,int]], accept_image_loss=False, verbosity_level=0) -> list[int,int]:
-    """TODO Retrace if this works"""
+    """TODO This """
     import math
 
     top_left, top_right, bottom_right, bottom_left = coordinates_transform_points
@@ -237,7 +243,7 @@ if __name__ == "__main__":
     output_img_size = common.location.Pos(x=screen_size[0], y=screen_size[1])
     crop_modifier = min(1, min(screen_size.x / output_img_size.x, screen_size.y / output_img_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
 
-    cv2.imshow(f'Final transform',cv2.resize(output_img, (int(whiteboard_size.x * crop_modifier),int(whiteboard_size.y * crop_modifier))))
+    cv2.imshow(f'Final transform',cv2.resize(output_img, (int(output_img_size.x * crop_modifier),int(output_img_size.y * crop_modifier))))
     
     # cv2.imshow(f'Final transform',cv2.resize(warped_img, (int(img_size.x * crop_modifier),int(img_size.y * crop_modifier))))
     # Hashtag unhappy with stretched result
