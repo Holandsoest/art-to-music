@@ -72,7 +72,7 @@ for contour in contours:
     #It will create a rectangle around the shapes
     box = cv2.minAreaRect(contour)
     (x, y), (width, height), angle = box
-    shapeSize = (((width*height)+(imgSize*0.2))/imgSize)*100
+    shapeSize = (((width*height)+(imgSize*1))/imgSize)*100
 
     #Triangle
     if len(approx) == 3:
@@ -136,20 +136,18 @@ def MakeSong(list):
         midi = MIDIFile(amount_of_instruments, removeDuplicates=False)
 
         # add tracks
-        track1 = 0
         time = 0
         channel = 0 
         instruments = 0
 
-        while instruments < amount_of_instruments:
         # create ass many tracks as instruments        
-            midi.addTrackName(instruments, time, f"Track{instruments}")
-            midi.addTempo(instruments, time, shape.bpm)
-            midi.addProgramChange(instruments, 0, time, shape.instrument)
+        midi.addTrackName(instruments, time, f"Track{instruments}")
+        midi.addTempo(instruments, time, shape.bpm)
+        midi.addProgramChange(instruments, 0, time, shape.instrument)
 
-            midi.addNote(track1, channel, shape.pitch, time, shape.duration, shape.volume)
-            time = +2
-            instruments +=1
+        midi.addNote(instruments, channel, shape.pitch, time, shape.duration, shape.volume)
+        time = +2
+        instruments +=1
 
         with open("output.mid", "wb") as output_file:
             midi.writeFile(output_file)
