@@ -1,3 +1,7 @@
+"""TODO
+- add method overloading
+- add Size class == Pos"""
+
 class Pos:
     """A simple class that can be used to store an x & y variables as a position or as a size."""
 

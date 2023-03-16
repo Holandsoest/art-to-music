@@ -165,26 +165,27 @@ def get_whiteboard_dimensions(coordinates_transform_points: list[list[int,int], 
     # Calculate the width of the board
     dx = difference(top_left[0], top_right[0])
     dy = difference(top_left[1], top_right[1])
-    width1 = int(math.sqrt(dx**2 + dy**2))
+    width_top = int(math.sqrt(dx**2 + dy**2))
     dx = difference(bottom_left[0], bottom_right[0])
     dy = difference(bottom_left[1], bottom_right[1])
-    width2 = int(math.sqrt(dx**2 + dy**2))
+    width_bottom = int(math.sqrt(dx**2 + dy**2))
 
     # Calculate the height of the board
     dx3 = difference(top_left[0], bottom_left[0])
     dy3 = difference(top_left[1], bottom_left[1])
-    height1 = int(math.sqrt(dx**2 + dy**2))
+    height_left = int(math.sqrt(dx**2 + dy**2))
     dx3 = difference(top_right[0], bottom_right[0])
     dy3 = difference(top_right[1], bottom_right[1])
-    height2 = int(math.sqrt(dx**2 + dy**2))
+    height_right = int(math.sqrt(dx**2 + dy**2))
 
 
-    if (verbosity_level > 0): print(f'Whiteboard size:\n  min:{[min(width1,width2),min(height1,height2)]}\n  max:{[max(width1,width2),max(height1,height2)]}')
+    if (verbosity_level > 0): print(f'Whiteboard size:\n  min:{[min(width_top,width_bottom),min(height_left,height_right)]}\n  max:{[max(width_top,width_bottom),max(height_left,height_right)]}')
 
 
+    # TODO Fix. solution does not correctly adjust the pixel size
     if accept_image_loss:
-        return [min(width1,width2),min(height1,height2)]
-    return [max(width1,width2),max(height1,height2)]
+        return [min(width_top,width_bottom),min(height_left,height_right)]
+    return [max(width_top,width_bottom),max(height_left,height_right)]
 def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
     """"""
     # Check input
@@ -196,10 +197,18 @@ def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
     image_size = common.location.Pos(x=image.shape[1], y=image.shape[0])
     crop_modifier = min(1, min(screen_size.x / image_size.x, screen_size.y / image_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
 
+    # Define transform
     transform_points = get_coordinates_transform_points(image=image, verbosity_level=verbosity_level)
     whiteboard_dimensions = get_whiteboard_dimensions(transform_points, accept_image_loss=False, verbosity_level=verbosity_level)
 
-    print('end')
+    whiteboard_size = common.location.Pos(x=whiteboard_dimensions[0], y=whiteboard_dimensions[1])
+    crop_modifier = min(1, min(screen_size.x / whiteboard_size.x, screen_size.y / whiteboard_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
+
+    destination_corners = [[0,0],[whiteboard_size.x,0],[whiteboard_size.x,whiteboard_size.y],[0,whiteboard_size.y]]
+    homography = cv2.getPerspectiveTransform(numpy.float32(transform_points), numpy.float32(destination_corners))
+
+    output_img = cv2.warpPerspective(image, homography, (whiteboard_size.x,whiteboard_size.y), flags=cv2.INTER_LINEAR)
+    cv2.imshow(f'Final transform',cv2.resize(output_img, (int(whiteboard_size.x * crop_modifier),int(whiteboard_size.y * crop_modifier))))
 
 
 
@@ -221,21 +230,16 @@ if __name__ == "__main__":
     img = cv2.imread(absolute_path, 1)
 
     # Find the whiteboard coordinates
-    readout = warp_perspective(image=img, verbosity_level=2)
-    print(readout[0])
-    print(readout[1])
-    print(readout[2])
-    print(readout[3])
+    output_img = warp_perspective(image=img, verbosity_level=2)
 
-    img_size = common.location.Pos(x=img.shape[1],y=img.shape[0])
+    # Scale the image so it fits on the screen
     screen_size = common.location.get_screensize()
-    crop_modifier = min(1, min(screen_size.x / img_size.x, screen_size.y / img_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
+    output_img_size = common.location.Pos(x=screen_size[0], y=screen_size[1])
+    crop_modifier = min(1, min(screen_size.x / output_img_size.x, screen_size.y / output_img_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
 
-    destination_corners = [[0,0],[img_size.x,0],[img_size.x,img_size.y],[0,img_size.y]]
-    homography = cv2.getPerspectiveTransform(numpy.float32(readout), numpy.float32(destination_corners))
-
-    warped_img = cv2.warpPerspective(img, homography, (img_size.x,img_size.y), flags=cv2.INTER_LINEAR)
-    cv2.imshow(f'Final transform',cv2.resize(warped_img, (int(img_size.x * crop_modifier),int(img_size.y * crop_modifier))))
+    cv2.imshow(f'Final transform',cv2.resize(output_img, (int(whiteboard_size.x * crop_modifier),int(whiteboard_size.y * crop_modifier))))
+    
+    # cv2.imshow(f'Final transform',cv2.resize(warped_img, (int(img_size.x * crop_modifier),int(img_size.y * crop_modifier))))
     # Hashtag unhappy with stretched result
 
     # Wait so we can visually validate
