@@ -11,17 +11,23 @@ r = g = b = 0
 #Declaring class
 class Image:
     def __init__(shape, name, size, color, x_axis, y_axis):
-        shape.instrument = name  #instrument
-        shape.volume = size  #volume
-        shape.bpm = color #bpm
-        shape.duration = x_axis #duration of note
-        shape.pitch = y_axis #pitch
+        #name is an integer related to instrument, 
+        #see: https://www.midi.org/specifications-old/item/gm-level-1-sound-set
+        shape.instrument = name
+        #volume is integer between 20 - 100 (change to 0 - 255)
+        shape.volume = size
+        #bpm is an int with table of 30 with a max of 240
+        shape.bpm = color
+        #duration is the x_axis middle point of the shape recalculated to an int between 1 - 4
+        shape.duration = x_axis
+        #pitch is the y_axis middle point of the shape recalculated to an int between 0 - 255
+        shape.pitch = y_axis
 
 #Create shape listOfShapes
 listOfShapes = []
 
 #Reading the image with opencv
-img = cv2.imread('imageExample\ExampleShapes6.png')
+img = cv2.imread('imageExample\ExampleShapes4.png')
 imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 #Get the height(h), width(w) and channel of the image
@@ -44,6 +50,7 @@ def setNameShape(nameShape, x, y, img):
                 minimum = d
                 cname = csv.loc[i,"color_name"]
         return cname
+    
     #Get the RGB color of the pixel in the image at (x,y)
     b,g,r = img[y,x]
     b = int(b)
@@ -52,6 +59,7 @@ def setNameShape(nameShape, x, y, img):
     colorName = getColorName(r,g,b)
     text = nameShape + "\n" + colorName
     y0, dy = y, 15
+
     for i, line in enumerate(text.split('\n')):
         y = y0 + i*dy
         if colorName == "Black":
@@ -65,7 +73,7 @@ contours , hierarchy = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_
 
 #Go through all the contours/shapes that are detected
 for contour in contours:
-    #
+    #get approx contour of shape
     approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
 
     #minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
