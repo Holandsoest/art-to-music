@@ -33,7 +33,7 @@ def resize_image_to_fit_screen(image :cv2.Mat) -> cv2.Mat:
     image_size = common.location.Pos(x=image.shape[1], y=image.shape[0])
     crop_modifier = min(1, min(screen_size.x / image_size.x, screen_size.y / image_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
     return cv2.resize(image, (int(image_size.x * crop_modifier),int(image_size.y * crop_modifier)))
-def get_coordinates_transform_points(image: cv2.Mat, verbosity_level=0) -> list[list[int,int], list[int,int], list[int,int], list[int,int]]:
+def get_coordinates_transform_points_(image: cv2.Mat, verbosity_level=0) -> list[list[int,int], list[int,int], list[int,int], list[int,int]]:
     """This expensive function checks the image and does multiple checks to find a trapezium that is inside 5px's of the image boarders.
     Use this function to calibrate the positional-transform (moving the camera into the correct perspective)
     
@@ -170,7 +170,7 @@ def get_coordinates_transform_points(image: cv2.Mat, verbosity_level=0) -> list[
 
     if (verbosity_level > 0): print(f'Corner Top-Left:\t{corners_sorted[0]}\nCorner Top-Right:\t{corners_sorted[1]}\nCorner Bottom-Right:\t{corners_sorted[2]}\nCorner Bottom-Left:\t{corners_sorted[3]}')
     return corners_sorted
-def get_whiteboard_dimensions(coordinates_transform_points: list[list[int,int], list[int,int], list[int,int], list[int,int]], accept_image_loss=False, verbosity_level=0) -> list[int,int]:
+def get_whiteboard_dimensions_(coordinates_transform_points: list[list[int,int], list[int,int], list[int,int], list[int,int]], accept_image_loss=False, verbosity_level=0) -> list[int,int]:
     """Calculates the real stretched pixel dimensions of the whiteboard.
     
     TODO This is incorrect. Should use 4D math. ex. Quaternions"""
@@ -234,13 +234,22 @@ def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
     assert verbosity_level is not int or verbosity_level < 0 or verbosity_level > 2, "verbosity_level out_of_bounds expected an int in range of (0 - 2)"
     assert image is not None, "I got no input at all, check if you got the correct path"
 
+    # Note down time for benchmarking
+    import datetime
+    start_time = datetime.datetime.now()
+
     # Use these globals as memory and quick return if the answer is already known
     global homography
     global whiteboard_size
 
     if not whiteboard_size == common.location.Pos():
-        if (verbosity_level > 0): print(f'Already had values stored.')
-        return cv2.warpPerspective(image, homography, (whiteboard_size.x,whiteboard_size.y), flags=cv2.INTER_LINEAR)
+        output_img = cv2.warpPerspective(image, homography, (whiteboard_size.x,whiteboard_size.y), flags=cv2.INTER_LINEAR)
+        if (verbosity_level > 0):
+            print(f'Already had values stored.')
+            end_time = datetime.datetime.now()
+            print(f'Time:\n\tStart:\t{start_time}\n\tEnd:\t{end_time}\n\tElapsed:\t{end_time - start_time}')
+        if (verbosity_level > 1): cv2.imshow(f'Final transform', resize_image_to_fit_screen(output_img))
+        return output_img
 
     # Define sizes
     screen_size = common.location.get_screensize()
@@ -248,8 +257,8 @@ def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
     crop_modifier = min(1, min(screen_size.x / image_size.x, screen_size.y / image_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
 
     # Define transform
-    transform_points = get_coordinates_transform_points(image=image, verbosity_level=verbosity_level)
-    whiteboard_dimensions = get_whiteboard_dimensions(transform_points, accept_image_loss=False, verbosity_level=verbosity_level)
+    transform_points = get_coordinates_transform_points_(image=image, verbosity_level=verbosity_level)
+    whiteboard_dimensions = get_whiteboard_dimensions_(transform_points, accept_image_loss=False, verbosity_level=verbosity_level)
 
     whiteboard_size = common.location.Pos(x=whiteboard_dimensions[0], y=whiteboard_dimensions[1])
     crop_modifier = min(1, min(screen_size.x / whiteboard_size.x, screen_size.y / whiteboard_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
@@ -258,8 +267,10 @@ def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
     homography = cv2.getPerspectiveTransform(numpy.float32(transform_points), numpy.float32(destination_corners))
 
     output_img = cv2.warpPerspective(image, homography, (whiteboard_size.x,whiteboard_size.y), flags=cv2.INTER_LINEAR)
+    if (verbosity_level > 0):
+        end_time = datetime.datetime.now()
+        print(f'Time:\n\tStart:\t{start_time}\n\tEnd:\t{end_time}\n\tElapsed:\t{end_time - start_time}')
     if (verbosity_level > 1): cv2.imshow(f'Final transform',cv2.resize(output_img, (int(whiteboard_size.x * crop_modifier),int(whiteboard_size.y * crop_modifier))))
-    if (verbosity_level > 0): print(f'') # TODO print time it took
     return output_img
 
 
@@ -288,8 +299,7 @@ if __name__ == "__main__":
 
     # Using the function
     output_img = warp_perspective(image=img, verbosity_level=2) # Note that a verbosity_level shows intermediate steps
-    print('done 1/2')
-    output_img2 = warp_perspective(image=img) # This is how to use my function ;P
+    output_img2 = warp_perspective(image=img, verbosity_level=1)
 
 
     # Using another usefull function that make the given image fit inside the current screen
