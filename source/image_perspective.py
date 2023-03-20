@@ -78,15 +78,15 @@ def get_coordinates_transform_points(image: cv2.Mat, verbosity_level=0) -> list[
     bgdModel = numpy.zeros((1,65),numpy.float64)
     fgdModel = numpy.zeros((1,65),numpy.float64)
     rect = (5, 5, image_scaled_size.x-10, image_scaled_size.y-10)
-    image_grabcut = image_scaled
-    cv2.grabCut(image_grabcut, mask, rect, bgdModel, fgdModel, 10, cv2.GC_INIT_WITH_RECT)
+    image_grab_cut = image_scaled
+    cv2.grabCut(image_grab_cut, mask, rect, bgdModel, fgdModel, 10, cv2.GC_INIT_WITH_RECT)
     mask2 = numpy.where((mask==2)|(mask==0),0,1).astype('uint8')
-    image_grabcut = image_grabcut * mask2[:,:,numpy.newaxis]
-    if (verbosity_level > 1): cv2.imshow(f'After GrabCut',cv2.resize(image_grabcut, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
+    image_grab_cut = image_grab_cut * mask2[:,:,numpy.newaxis]
+    if (verbosity_level > 1): cv2.imshow(f'After GrabCut',cv2.resize(image_grab_cut, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
 
 
     # Blur
-    image_gray = cv2.cvtColor(image_grabcut, cv2.COLOR_BGR2GRAY)
+    image_gray = cv2.cvtColor(image_grab_cut, cv2.COLOR_BGR2GRAY)
     image_gray = cv2.GaussianBlur(image_gray, (11, 11), 0)
     if (verbosity_level > 1): cv2.imshow(f'After Grayscale and Blur',cv2.resize(image_gray, (int(image_scaled_size.x * crop_modifier),int(image_scaled_size.y * crop_modifier))))
     
@@ -165,7 +165,9 @@ def get_coordinates_transform_points(image: cv2.Mat, verbosity_level=0) -> list[
     if (verbosity_level > 0): print(f'Corner Top-Left:\t{corners_sorted[0]}\nCorner Top-Right:\t{corners_sorted[1]}\nCorner Bottom-Right:\t{corners_sorted[2]}\nCorner Bottom-Left:\t{corners_sorted[3]}')
     return corners_sorted
 def get_whiteboard_dimensions(coordinates_transform_points: list[list[int,int], list[int,int], list[int,int], list[int,int]], accept_image_loss=False, verbosity_level=0) -> list[int,int]:
-    """TODO This """
+    """Calculates the real stretched pixel dimensions of the whiteboard.
+    
+    TODO This is incorrect. Should use 4D math. ex. Quaternions"""
     import math
 
     top_left, top_right, bottom_right, bottom_left = coordinates_transform_points
@@ -197,11 +199,24 @@ def get_whiteboard_dimensions(coordinates_transform_points: list[list[int,int], 
     if accept_image_loss:
         return [min(width_top,width_bottom),min(height_left,height_right)]
     return [max(width_top,width_bottom),max(height_left,height_right)]
+
+# Used for memory
+# homography = [0.1,0.1,0.1] # Random values
+whiteboard_size = common.location.Pos()
+
 def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
     """"""
     # Check input
     assert verbosity_level is not int or verbosity_level < 0 or verbosity_level > 2, "verbosity_level out_of_bounds expected an int in range of (0 - 2)"
     assert image is not None, "I got no input at all, check if you got the correct path"
+
+    # Use these globals as memory and quick return if the answer is already known
+    # global homography
+    global whiteboard_size
+
+    # if whiteboard_size != common.location.Pos():
+    #     if (verbosity_level > 0): print(f'Already had values stored.')
+    #     return cv2.warpPerspective(image, homography, (whiteboard_size.x,whiteboard_size.y), flags=cv2.INTER_LINEAR)
 
     # Define sizes
     screen_size = common.location.get_screensize()
@@ -219,7 +234,9 @@ def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
     homography = cv2.getPerspectiveTransform(numpy.float32(transform_points), numpy.float32(destination_corners))
 
     output_img = cv2.warpPerspective(image, homography, (whiteboard_size.x,whiteboard_size.y), flags=cv2.INTER_LINEAR)
-    cv2.imshow(f'Final transform',cv2.resize(output_img, (int(whiteboard_size.x * crop_modifier),int(whiteboard_size.y * crop_modifier))))
+    if (verbosity_level > 1): cv2.imshow(f'Final transform',cv2.resize(output_img, (int(whiteboard_size.x * crop_modifier),int(whiteboard_size.y * crop_modifier))))
+    if (verbosity_level > 0): print(f'') # TODO print time it took
+    return output_img
 
 
 

@@ -12,4 +12,10 @@
     "editor.detectIndentation": false,
     "git.autofetch": "all",
     "git.autofetchPeriod": 600,
+    "cSpell.words": [
+        "argmax",
+        "argmin",
+        "astype",
+        "homography"
+    ],
 }
