@@ -15,6 +15,10 @@ class Pos:
             self.y = y
     def __str__(self) -> str:
         return f'x:{self.x}, y:{self.y}'
+    def __eq__(self, other) -> bool:
+        if (self.x != other.x): return False
+        if (self.y != other.y): return False
+        return True
     
     # Basic math functions
     def min(self) -> int | float:

@@ -22,7 +22,13 @@ import time
 
 
 def resize_image_to_fit_screen(image :cv2.Mat) -> cv2.Mat:
-    """Grabs the resolution of the **Primary** screen and resizes the image to fit both demotions"""
+    """Grabs the resolution of the **Primary** screen and resizes the image to fit both demotions
+    ## interface
+    ---
+    ### image
+    The input image to display
+    ### returns
+    A scaled version of the input image so it fits both horizontally & vertically in your primary screen"""
     screen_size = common.location.get_screensize()
     image_size = common.location.Pos(x=image.shape[1], y=image.shape[0])
     crop_modifier = min(1, min(screen_size.x / image_size.x, screen_size.y / image_size.y)) # [0 - 1], modifier, to scale image so it fits on the screen
@@ -201,22 +207,40 @@ def get_whiteboard_dimensions(coordinates_transform_points: list[list[int,int], 
     return [max(width_top,width_bottom),max(height_left,height_right)]
 
 # Used for memory
-# homography = [0.1,0.1,0.1] # Random values
+homography = [0.1,0.1,0.1] # Random values
 whiteboard_size = common.location.Pos()
 
 def warp_perspective(image: cv2.Mat, verbosity_level=0) -> cv2.Mat:
-    """"""
+    """Warps the perspective of the given image.
+    - finds the biggest rectangle in the image (the rectangle must be fully within the image boarders)
+    - gets the coordinates of those corners
+    - creates a homography back to a valid resolution *Yes this function may change the resolution !*
+    - saves the homography in global memory and returns the image when transformed
+    
+    ## interface
+    ---
+    Tested only with `.jpg`.
+    TODO should be tested to work with `cv2` camera frame, `.png`. 
+    ### image
+    The image that the function should find a large rectangle in
+    ### verbosity_level (optional)
+    int 0 to 2. Wherein 0 does not print any information and 2 also displays all intermediate steps. It is useful to use when debugging
+    ### returns
+    an image with possibly a different resolution
+    ### raises exceptions
+    If it cannot find a rectangle with 4 edges"""
+
     # Check input
     assert verbosity_level is not int or verbosity_level < 0 or verbosity_level > 2, "verbosity_level out_of_bounds expected an int in range of (0 - 2)"
     assert image is not None, "I got no input at all, check if you got the correct path"
 
     # Use these globals as memory and quick return if the answer is already known
-    # global homography
+    global homography
     global whiteboard_size
 
-    # if whiteboard_size != common.location.Pos():
-    #     if (verbosity_level > 0): print(f'Already had values stored.')
-    #     return cv2.warpPerspective(image, homography, (whiteboard_size.x,whiteboard_size.y), flags=cv2.INTER_LINEAR)
+    if not whiteboard_size == common.location.Pos():
+        if (verbosity_level > 0): print(f'Already had values stored.')
+        return cv2.warpPerspective(image, homography, (whiteboard_size.x,whiteboard_size.y), flags=cv2.INTER_LINEAR)
 
     # Define sizes
     screen_size = common.location.get_screensize()
@@ -263,12 +287,15 @@ if __name__ == "__main__":
     
 
     # Using the function
-    output_img = warp_perspective(image=img, verbosity_level=2)
+    output_img = warp_perspective(image=img, verbosity_level=2) # Note that a verbosity_level shows intermediate steps
+    print('done 1/2')
+    output_img2 = warp_perspective(image=img) # This is how to use my function ;P
 
 
     # Using another usefull function that make the given image fit inside the current screen
     output_img_size = common.location.Pos(x=output_img.shape[1], y=output_img.shape[0])
     cv2.imshow(f'Output of demo ( width:{output_img_size.x}, height:{output_img_size.y} )',resize_image_to_fit_screen(output_img))
+    cv2.imshow(f'Output of demo 2 ( width:{output_img_size.x}, height:{output_img_size.y} )',resize_image_to_fit_screen(output_img2))
     
 
     # Wait so we can visually validate
