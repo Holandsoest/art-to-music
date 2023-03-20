@@ -1,82 +1,95 @@
-############################### Shape, color and size detection #####################################
 import cv2
 import pandas as pd
 import os
 from midiutil.MidiFile import MIDIFile
 import pygame
+import common.imageProperties as ip
 
 #Declaring global variables
 r = g = b = 0
-
-#Declaring class
-class Image:
-    def __init__(shape, name, size, color, x_axis, y_axis):
-        #name is an integer related to instrument, 
-        #see: https://www.midi.org/specifications-old/item/gm-level-1-sound-set
-        shape.instrument = name
-        #volume is integer between 20 - 100 (change to 0 - 255)
-        shape.volume = size
-        #bpm is an int with table of 30 with a max of 240
-        shape.bpm = color
-        #duration is the x_axis middle point of the shape recalculated to an int between 1 - 4
-        shape.duration = x_axis
-        #pitch is the y_axis middle point of the shape recalculated to an int between 0 - 255
-        shape.pitch = y_axis
 
 #Create shape listOfShapes
 listOfShapes = []
 
 #Reading the image with opencv
-img = cv2.imread('imageExample\ExampleShapes4.png')
+img = cv2.imread('imageExample\ExampleShapes6.png')
 imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-#Get the height(h), width(w) and channel of the image
-h, w, c = img.shape
-imgSize = h*w
+#Get the height, width and channel of the image
+img_height, img_width, channel = img.shape
+imgSize = img_height*img_width
 
 #Reading csv file with pandas and giving names to each column
 index=["color","color_name","hex","R","G","B"]
 absolute_path = os.path.join(os.getcwd(), 'datasets', 'colors.csv')
 csv = pd.read_csv(absolute_path, names=index, header=None)
 
-def fancyMap(array, low, high):
-    array = [int(numeric_string) for numeric_string in array]
-    minimum = min(array)
-    maximum = max(array)
-
-    diff = maximum - minimum
-    diffScale = high - low
-
-    return map ( lambda x: int((int(x)-minimum)*(float(diffScale)/diff)+low), array)
-
-#Function to set the name and color to the shape
-def setNameShape(nameShape, x, y, img):
-    #Function to calculate minimum distance from all colors and get the most matching color
-    def getColorName(R,G,B):
-        minimum = 10000
-        for i in range(len(csv)):
-            d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
-            if(d<=minimum):
-                minimum = d
-                cname = csv.loc[i,"color_name"]
-        return cname
+def getBpmFromColor(x_axis, y_axis, image):
+    """
+    This function gets the RGB values of a pixel on the (x,y)-coordinates of an image and scales this to a number of the table of 30.
+    It takes three arguments:
+    - x_axis: the x axis coordinate of the pixel
+    - y_axis: the y axis coordinate of the pixel
+    - image:  the image that will be scanned for the pixel
     
-    #Get the RGB color of the pixel in the image at (x,y)
-    b,g,r = img[y,x]
+    It returns a scaled value of the table of 30. This number will represent the beats per minute(BPM) of the instrument.
+    """
+    b, g, r = image[y_axis, x_axis]
     b = int(b)
     g = int(g)
     r = int(r)
-    colorName = getColorName(r,g,b)
-    text = nameShape + "\n" + colorName
-    y0, dy = y, 15
 
-    for i, line in enumerate(text.split('\n')):
-        y = y0 + i*dy
-        if colorName == "Black":
-            cv2.putText( img, line, (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255) )
-        else:
-            cv2.putText( img, line, (x, y), cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 0, 0) )
-    return colorName
+    # For now the rgb colorcode will represent a bpm match, but later on we will probably work with colorname to bpm
+    # def getShapeColor(R,G,B):
+    #     minimum = 10000
+    #     for i in range(len(csv)):
+    #         d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
+    #         if(d<=minimum):
+    #             minimum = d
+    #             cname = csv.loc[i,"color_name"]
+    #     return cname
+    
+    # colorName = getShapeColor(r,g,b)
+
+    def round_up_to_30(number):
+        return min(((number + 29) // 30) * 30, 240)
+    
+    bpm = round_up_to_30((b + g + r) / 3)
+    if bpm < 30:
+        return 30
+    else:
+        return bpm
+
+def getDurationFromWidth(obj_width, img_width):
+    """
+    This function scales the width of an object in an image relative to the width of the entire image.
+    It takes two arguments:
+    - obj_width: the width of the object in pixels
+    - img_width: the width of the entire image in pixels
+    
+    It returns a scaled value between 1 and 4 based on the ratio of obj_width to img_width.
+    """
+    ratio = obj_width / img_width
+    if ratio < 0.25:
+        return 1
+    elif ratio < 0.5:
+        return 2
+    elif ratio < 0.75:
+        return 3
+    else:
+        return 4
+
+def getVolumeFromSize(obj_size, img_size):
+    """
+    This function scales the size of an object in an image relative to the size of the entire image.
+    It takes two arguments:
+    - obj_size: the size of the object in pixels
+    - img_size: the size of the entire image in pixels
+    
+    It returns a scaled value between 20 - 255 based on the ratio of obj_size to img_size.
+    It starts at 20 because otherwise the smaller objects wouldnt even make a sound.
+    """
+    return min((((obj_size)+(img_size*0.2))/img_size)*255, 255)
 
 ret , thrash = cv2.threshold(imgGray, 240 , 255, cv2.CHAIN_APPROX_NONE)
 contours , hierarchy = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
@@ -90,47 +103,40 @@ for contour in contours:
     #It will create a rectangle around the shapes
     box = cv2.minAreaRect(contour)
     (x, y), (width, height), angle = box
-    shapeSize = (((width*height)+(imgSize*0.2))/imgSize)*100
+    #shapeSizeToVolume = (((width*height)+(imgSize*0.2))/imgSize)*255
+    shapeSizeToVolume = getVolumeFromSize(width*height, imgSize)
+    shapeColorCodeToBpm = getBpmFromColor(int(x),int(y),img)
+    shapeWidthToDuration = getDurationFromWidth(width, img_width)
+    shapeHeightToPitch = getVolumeFromSize(height, img_height)
+    shape = ip.Image(0, int(shapeSizeToVolume), int(shapeColorCodeToBpm), int(shapeWidthToDuration), int(shapeHeightToPitch))
 
-    #Triangle
     if len(approx) == 3:
-        colorName = setNameShape("Triangle", int(x), int(y), img)
-
-        #Appending instances to listOfShapes
         #Triangle = Guitar sound = number 30
-        #listOfShapes.append(Image("Triangle", int(shapeSize), colorName, int(width), int(height)))
-        listOfShapes.append(Image(30, int(shapeSize), 120, 1, 50))
+        shape.instrument = 30
 
-    #Square or rectangle
     elif len(approx) == 4 : 
         x2, y2 , w, h = cv2.boundingRect(approx)
         aspectRatio = float(w)/h
         if aspectRatio >= 0.95 and aspectRatio < 1.05:
-            colorName = setNameShape("Square",int(x), int(y), img)
             #Square = Drum = number 119
-            listOfShapes.append(Image(119, int(shapeSize), 60, 2, 200))
+            shape.instrument = 119
         else:
-            colorName = setNameShape("Rectangle",int(x), int(y), img)
-            #Rectangle = half circle = flute = number 74
-            listOfShapes.append(Image(74, int(shapeSize), 30, 1, 240))
+            # #Rectangle (representing a half circle) = flute = number 74
+            shape.instrument = 74
 
-    #Pentgaon
     elif len(approx) == 5 :
-        colorName = setNameShape("Pentagon",int(x), int(y), img)
-        #Pentagon = Heartshape = piano = 2
-        listOfShapes.append(Image(3, int(shapeSize), 240, 2, 100))
+        #Pentagon (representing a heartshape) = piano = 2
+        shape.instrument = 2
 
-    #Star
     elif len(approx) == 10 :
-        colorName = setNameShape("Star",int(x), int(y), img)
         #Star = Cello = 43
-        listOfShapes.append(Image(43, int(shapeSize), 90, 1, 150))
+        shape.instrument = 43
 
-    #Circle
     else:
-        colorName = setNameShape("Circle",int(x), int(y),img)
         #Circle = lead 1 = 81
-        listOfShapes.append(Image(81, int(shapeSize), 120, 1, 200))
+        shape.instrument = 81
+    
+    listOfShapes.append(shape)
 
 # Accessing object value using a for loop
 for shape in listOfShapes:
@@ -164,7 +170,6 @@ def MakeSong(list):
             midi.addTrackName(instruments, time, f"Track{instruments}")
             midi.addTempo(instruments, time, shape.bpm)
             midi.addProgramChange(instruments, 0, time, shape.instrument)
-
             midi.addNote(track1, channel, shape.pitch, time, shape.duration, shape.volume)
             time = +2
             instruments +=1
