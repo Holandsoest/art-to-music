@@ -1,7 +1,7 @@
 import cv2
 import pandas as pd
 import os
-import common.image_properties as img_proc
+import common.image_properties as ip
 
 def get_bpm_from_color(x_axis, y_axis, image):
     """
@@ -90,7 +90,7 @@ def readImage(image):
 
     #Reading csv file with pandas and giving names to each column
     index=["color","color_name","hex","R","G","B"]
-    absolute_path = os.path.join(os.getcwd(), 'datasets', 'colors.csv')
+    absolute_path = os.path.join(os.getcwd(), 'files','image_processing', 'colors.csv')
     csv = pd.read_csv(absolute_path, names=index, header=None)
 
     ret , thrash = cv2.threshold(img_grayscaled, 240 , 255, cv2.CHAIN_APPROX_NONE)
@@ -109,7 +109,7 @@ def readImage(image):
         shape_colorcode_to_bpm = get_bpm_from_color(int(x),int(y),image)
         shape_width_to_duration = get_duration_from_width(width, img_width)
         shape_height_to_pitch = get_volume_from_size(height, img_height)
-        shape = img_proc.Image(0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), int(shape_height_to_pitch))
+        shape = ip.Image(0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), int(shape_height_to_pitch))
 
         if len(approx) == 3:
             #Triangle = Guitar sound = number 30

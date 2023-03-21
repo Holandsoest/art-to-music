@@ -1,9 +1,9 @@
 import cv2
-import common.image_processing as img_proc
+import image_processing as img_proc
 import common.midi_creation as mc
 
 if __name__ == "__main__":
-    img = cv2.imread('imageExample\ExampleShapes6.png')
+    img = cv2.imread('files\image_processing\ExampleShapes6.png')
 
     list_of_shapes = img_proc.readImage(img)
 

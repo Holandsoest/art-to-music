@@ -21,7 +21,7 @@ def MakeSong(list):
             midi.addTempo(instruments, time, shape.bpm)
             midi.addProgramChange(instruments, 0, time, shape.instrument)
             midi.addNote(track1, channel, shape.pitch, time, shape.duration, shape.volume)
-            time = +2
+            time += 2
             instruments +=1
 
         with open("output.mid", "wb") as output_file:
