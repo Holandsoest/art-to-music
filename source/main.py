@@ -128,40 +128,67 @@ while(1):
 cv2.destroyAllWindows()
 
 def MakeSong(list):
-    #pitch, bpm, duration, volume, instrument, amount
     amount_of_instruments = len(list)
+    instruments = 0
+
+    # create MIDIFile object
+    midi = MIDIFile(amount_of_instruments, removeDuplicates=False)
     for shape in list:
-
-        # create MIDIFile object
-        midi = MIDIFile(amount_of_instruments, removeDuplicates=False)
-
-        # add tracks
+       
         time = 0
         channel = 0 
-        instruments = 0
-
         # create ass many tracks as instruments        
         midi.addTrackName(instruments, time, f"Track{instruments}")
         midi.addTempo(instruments, time, shape.bpm)
         midi.addProgramChange(instruments, 0, time, shape.instrument)
+         # add tracks
+        if shape.instrument == 43:
+            midi.addNote(instruments, channel, shape.pitch, time, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+2, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+4, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+6, shape.duration, shape.volume)
 
-        midi.addNote(instruments, channel, shape.pitch, time, shape.duration, shape.volume)
-        time = +2
+        if shape.instrument == 30:
+            midi.addNote(instruments, channel, shape.pitch, time, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+1, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+3, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+5, shape.duration, shape.volume)
+        
+        if shape.instrument == 119:
+            midi.addNote(instruments, channel, shape.pitch, time+1, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+2, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+3, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+4, shape.duration, shape.volume)
+
+        if shape.instrument == 74:
+            midi.addNote(instruments, channel, shape.pitch, time+1, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+3, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+5, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+2, shape.duration, shape.volume)
+   
+        if shape.instrument == 3:
+            midi.addNote(instruments, channel, shape.pitch, time+2, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+3, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+4, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+5, shape.duration, shape.volume)
+
+        if shape.instrument == 81:
+            midi.addNote(instruments, channel, shape.pitch, time+2, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+3, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+4, shape.duration, shape.volume)
+            midi.addNote(instruments, channel, shape.pitch, time+5, shape.duration, shape.volume)
         instruments +=1
 
-        with open("output.mid", "wb") as output_file:
-            midi.writeFile(output_file)
-        
-        pygame.mixer.init()
-        #load MIDI file
-        pygame.mixer.music.load("output.mid")
-        # play MIDI file
-        pygame.mixer.music.play()
-        # wait for music to finish playing
-        while pygame.mixer.music.get_busy():
-            continue
+    with open("output.mid", "wb") as output_file:
+        midi.writeFile(output_file)
+
+    pygame.mixer.init()
+    #load MIDI file
+    pygame.mixer.music.load("output.mid")
+    # play MIDI file
+    pygame.mixer.music.play()
+    # wait for music to finish playing
+    while pygame.mixer.music.get_busy():
+        continue
 
 MakeSong(listOfShapes)
-
-
-
