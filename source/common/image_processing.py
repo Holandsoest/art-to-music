@@ -1,9 +1,9 @@
 import cv2
 import pandas as pd
 import os
-import common.image_properties as ip
+import common.image_properties as img_proc
 
-def getBpmFromColor(x_axis, y_axis, image):
+def get_bpm_from_color(x_axis, y_axis, image):
     """
     This function gets the RGB values of a pixel on the (x,y)-coordinates of an image and scales this to a number of the table of 30.
     It takes three arguments:
@@ -39,7 +39,7 @@ def getBpmFromColor(x_axis, y_axis, image):
     else:
         return bpm
 
-def getDurationFromWidth(obj_width, img_width):
+def get_duration_from_width(obj_width, img_width):
     """
     This function scales the width of an object in an image relative to the width of the entire image.
     It takes two arguments:
@@ -58,63 +58,58 @@ def getDurationFromWidth(obj_width, img_width):
     else:
         return 4
 
-def getVolumeFromSize(obj_size, img_size):
+def get_volume_from_size(obj_size, img_size):
     """
-    This function scales the size of an object in an image relative to the size of the entire image.
+    This function scales the size of an object in an image relative to the size of the entire image.img_size
     It takes two arguments:
     - obj_size: the size of the object in pixels
     - img_size: the size of the entire image in pixels
     
     It returns a scaled value between 20 - 255 based on the ratio of obj_size to img_size.
-    It starts at 20 because otherwise the smaller objects wouldnt even make a sound.
+    It starts at 20 otherwise the smaller objects wouldn't even make a sound.
     """
     return min((((obj_size)+(img_size*0.2))/img_size)*255, 255)
 
 def readImage(image):
     """
-    This function reads an image and scans the image for shapes this is done with the hough transform
-    - image: is an image read with opencv2
-    
-    It returns a list containing all the values needed to create a midi file
-    """
-    
-    #Declaring global variables
-    r = g = b = 0
+    This function reads an image using the OpenCV library and detects shapes in the image using the Hough transform algorithm. 
+    It takes one argument:
+    - image: an image read with OpenCV library.
 
-    #Create shape listOfShapes
-    listOfShapes = []
+    The function returns a list of Image objects, each representing a shape in the image with properties such as volume, pitch, duration, and beats per minute (BPM).
+    """
+    #Create shape list_of_shapes
+    list_of_shapes = []
 
     #Reading the image with opencv
-    
-    imgGray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    img_grayscaled = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     #Get the height, width and channel of the image
     img_height, img_width, channel = image.shape
-    imgSize = img_height*img_width
+    img_size = img_height*img_width
 
     #Reading csv file with pandas and giving names to each column
     index=["color","color_name","hex","R","G","B"]
     absolute_path = os.path.join(os.getcwd(), 'datasets', 'colors.csv')
     csv = pd.read_csv(absolute_path, names=index, header=None)
 
-    ret , thrash = cv2.threshold(imgGray, 240 , 255, cv2.CHAIN_APPROX_NONE)
+    ret , thrash = cv2.threshold(img_grayscaled, 240 , 255, cv2.CHAIN_APPROX_NONE)
     contours , hierarchy = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
     #Go through all the contours/shapes that are detected
     for contour in contours:
-        #get approx contour of shape
+        #Get approx contour of shape
         approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
 
         #minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
         #It will create a rectangle around the shapes
         box = cv2.minAreaRect(contour)
         (x, y), (width, height), angle = box
-        #shapeSizeToVolume = (((width*height)+(imgSize*0.2))/imgSize)*255
-        shapeSizeToVolume = getVolumeFromSize(width*height, imgSize)
-        shapeColorCodeToBpm = getBpmFromColor(int(x),int(y),image)
-        shapeWidthToDuration = getDurationFromWidth(width, img_width)
-        shapeHeightToPitch = getVolumeFromSize(height, img_height)
-        shape = ip.Image(0, int(shapeSizeToVolume), int(shapeColorCodeToBpm), int(shapeWidthToDuration), int(shapeHeightToPitch))
+        shape_size_to_volume = get_volume_from_size(width*height, img_size)
+        shape_colorcode_to_bpm = get_bpm_from_color(int(x),int(y),image)
+        shape_width_to_duration = get_duration_from_width(width, img_width)
+        shape_height_to_pitch = get_volume_from_size(height, img_height)
+        shape = img_proc.Image(0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), int(shape_height_to_pitch))
 
         if len(approx) == 3:
             #Triangle = Guitar sound = number 30
@@ -122,8 +117,8 @@ def readImage(image):
 
         elif len(approx) == 4 : 
             x2, y2 , w, h = cv2.boundingRect(approx)
-            aspectRatio = float(w)/h
-            if aspectRatio >= 0.95 and aspectRatio < 1.05:
+            aspect_ratio = float(w)/h
+            if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
                 #Square = Drum = number 119
                 shape.instrument = 119
             else:
@@ -142,13 +137,13 @@ def readImage(image):
             #Circle = lead 1 = 81
             shape.instrument = 81
         
-        listOfShapes.append(shape)
+        list_of_shapes.append(shape)
 
     # Accessing object value using a for loop
-    for shape in listOfShapes:
+    for shape in list_of_shapes:
         print("instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
 
-    return listOfShapes
+    return list_of_shapes
 
 
 
