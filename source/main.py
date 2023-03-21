@@ -27,7 +27,7 @@ class Image:
 listOfShapes = []
 
 #Reading the image with opencv
-img = cv2.imread('imageExample\ExampleShapes4.png')
+img = cv2.imread('files\image_processing\ExampleShapes2.png')
 imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 #Get the height(h), width(w) and channel of the image
@@ -36,7 +36,7 @@ imgSize = h*w
 
 #Reading csv file with pandas and giving names to each column
 index=["color","color_name","hex","R","G","B"]
-absolute_path = os.path.join(os.getcwd(), 'datasets', 'colors.csv')
+absolute_path = os.path.join(os.getcwd(), 'files', 'image_processing', 'colors.csv')
 csv = pd.read_csv(absolute_path, names=index, header=None)
 
 #Function to set the name and color to the shape
