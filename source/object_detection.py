@@ -3,15 +3,19 @@
 # This code contains code for activating webcam. Everything commented out is code for object class detection
 # Yet to be added processing for the color, the object size size..
 
+# Things to add. Color to BPM
+# Add MIDI playback capability depening on Object
+
+
 from imageai.Detection import ObjectDetection # For AI object detection AI
 import cv2 # library for the webcam ( this one probably can also find color)
 import numpy as np 
 import mido
 from mido import Message
-import time
+from mido import MidiFile #for loading midi files
 
 # Function to get the color of an object in the image
-def get_dominant_color(img):
+def get_color(img):
     # Convert image to HSV color space
     hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     
@@ -102,14 +106,20 @@ if __name__ == "__main__":
             x1, y1, x2, y2 = obj["box_points"]
             obj_img = img[y1:y2, x1:x2]
             # Call function to extract color data
-            color = get_dominant_color(obj_img)
+            color = get_color(obj_img)
             obj["color"] = color
             # Color lable text
             color_label = ("Color: " + color)
-            # adding a text to the object 
-            cv2.putText(annotated_image, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            print (x1 + y1) 
-
+            # Calculate size of box
+            size = (x2 - x1) * (y2 - y1)
+            # Size label text
+            size_label = ("Size: " + str(size))
+            # Position label text
+            pos_label = ("Position: ({}, {})".format(x1, y1))
+            # adding text to the object 
+            cv2.putText(annotated_image, color_label, (x1, y1-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            cv2.putText(annotated_image, size_label, (x1, y1-25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            cv2.putText(annotated_image, pos_label, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             # Loop through detected objects and send MIDI messages
         for obj in preds:
             obj_name = obj["name"].lower()
@@ -119,7 +129,6 @@ if __name__ == "__main__":
 
 
         cv2.imshow("", annotated_image)
-        #print(color)
         # Exit loop if user presses 'q' key or 'Esc' key
         if (cv2.waitKey(1) & 0xFF == ord("q")) or (cv2.waitKey(1) == 27):
             break
