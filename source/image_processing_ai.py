@@ -83,24 +83,24 @@ def detect_shapes(img):
     # cam_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 750)
     # #-------------------------------------------------------
     trainer = DetectionModelTrainer()
-    trainer.setModelTypeAsTinyYOLOv3
-    dataset_path = os.path.join(os.getcwd(), 'datasets', 'dataset-shapes')
+    trainer.setModelTypeAsTinyYOLOv3()
+    dataset_path = os.path.join(os.getcwd(), 'datasets', 'hololens-yolo')
     trainer.setDataDirectory(data_directory=dataset_path)
-    trainer.setTrainConfig(object_names_array=["circle, half circle, square, heart, star, triangle"],
-                           batch_size=4,
-                           num_experiments=5,
-                           train_from_pretrained_model=model_path)
-    print("model: ", trainer.__model)
+    trainer.setTrainConfig(object_names_array=["circle, half circle, square, heart, star, triangle"]
+                           ,batch_size=4
+                           ,num_experiments=5
+                           ,train_from_pretrained_model=model_path
+                           )
     trainer.trainModel()
 
-    trainer = DetectionModelTrainer()
-    trainer.setModelTypeAsTinyYOLOv3()
-    trainer.setDataDirectory(data_directory=r"C:\Users\mauri\Downloads\hololens-yolo")
-    trainer.setTrainConfig(object_names_array=["circle, half circle, square, heart, star, triangle"], 
-                           batch_size=4, 
-                           num_experiments=100,
-                           train_from_pretrained_model=r"C:\Users\mauri\Documents\BeCreative_minor_GithubCode\art-to-music-1\files\image_processing_ai\tiny-yolov3.pt")
-    trainer.trainModel()
+    # trainer = DetectionModelTrainer()
+    # trainer.setModelTypeAsTinyYOLOv3()
+    # trainer.setDataDirectory(data_directory=r"C:\Users\mauri\Downloads\hololens-yolo")
+    # trainer.setTrainConfig(object_names_array=["circle, half circle, square, heart, star, triangle"], 
+    #                        batch_size=4, 
+    #                        num_experiments=100,
+    #                        train_from_pretrained_model=r"C:\Users\mauri\Documents\BeCreative_minor_GithubCode\art-to-music-1\files\image_processing_ai\tiny-yolov3.pt")
+    # trainer.trainModel()
 
     # Run camera in loop
     while True:
