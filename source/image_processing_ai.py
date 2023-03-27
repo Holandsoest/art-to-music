@@ -85,7 +85,7 @@ def detect_shapes(img):
     # #-------------------------------------------------------
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsTinyYOLOv3()
-    dataset_path = os.path.join(os.getcwd(), 'datasets', 'circles_set')
+    dataset_path = os.path.join(os.getcwd(), 'dataset')
     trainer.setDataDirectory(data_directory=dataset_path)
     trainer.setTrainConfig(object_names_array=["circle, half circle, square, heart, star, triangle"]
                            ,batch_size=4
