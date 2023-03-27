@@ -7,6 +7,7 @@ from imageai.Detection import ObjectDetection # For AI object detection AI
 import cv2 # library for the webcam ( this one probably can also find color)
 import numpy as np 
 from imageai.Detection.Custom import DetectionModelTrainer
+import os
 
 # Function to get the color of an object in the image
 def get_dominant_color(img):
@@ -72,7 +73,8 @@ def detect_shapes(img):
     obj_detect = ObjectDetection()
     #obj_detect.setModelTypeAsYOLOv3()
     obj_detect.setModelTypeAsTinyYOLOv3()
-    obj_detect.setModelPath(r"C:\Users\mauri\Documents\BeCreative_minor_GithubCode\art-to-music-1\files\image_processing_ai\tiny-yolov3.pt")
+    model_path = os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
+    obj_detect.setModelPath( model_path )
     obj_detect.loadModel()
     #-------------------------------------------------------
     # # Set webcam parameters
@@ -80,15 +82,16 @@ def detect_shapes(img):
     # cam_feed.set(cv2.CAP_PROP_FRAME_WIDTH, 650)
     # cam_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 750)
     # #-------------------------------------------------------
-    # trainer = DetectionModelTrainer()
-    # trainer.setModelTypeAsTinyYOLOv3
-    # trainer.setDataDirectory(data_directory=r"C:\Users\mauri\Documents\BeCreative_minor_GithubCode\art-to-music-1\datasets\dataset-shapes")
-    # trainer.setTrainConfig(object_names_array=["circle, half circle, square, heart, star, triangle"],
-    #                        batch_size=4,
-    #                        num_experiments=5,
-    #                        train_from_pretrained_model=r"C:\Users\mauri\Documents\BeCreative_minor_GithubCode\art-to-music-1\files\image_processing_ai\tiny-yolov3.pt")
-    # print("model: ", trainer.__model)
-    # trainer.trainModel()
+    trainer = DetectionModelTrainer()
+    trainer.setModelTypeAsTinyYOLOv3
+    dataset_path = os.path.join(os.getcwd(), 'datasets', 'dataset-shapes')
+    trainer.setDataDirectory(data_directory=dataset_path)
+    trainer.setTrainConfig(object_names_array=["circle, half circle, square, heart, star, triangle"],
+                           batch_size=4,
+                           num_experiments=5,
+                           train_from_pretrained_model=model_path)
+    print("model: ", trainer.__model)
+    trainer.trainModel()
 
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsTinyYOLOv3()
