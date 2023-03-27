@@ -4,7 +4,6 @@
 # Yet to be added processing for the color, the object size size..
 
 # Things to add. Color to BPM
-# Add MIDI playback capability depening on Object
 
 
 from imageai.Detection import ObjectDetection # For AI object detection AI
@@ -86,10 +85,10 @@ if __name__ == "__main__":
 
     # Open port and map notes to objects
     outport = mido.open_output()
-    note_map = {
-        "person": 60,   # send MIDI note 60 if person is detected
-        "cell phone": 62,      # send MIDI note 62 if cell phone is detected
-        "cup": 64,      # send MIDI note 64 if cup is detected
+    track_map = {
+        "person": "1.mid",   # send MIDI file 1 chosen
+        "cell phone": "2.mid",      # send MIDI file 2 chonsen
+        "cup": "3.mid",      # send MIDI file 3 chosen
         # This will be changed by names of shapes
     }
 
@@ -123,10 +122,11 @@ if __name__ == "__main__":
             # Loop through detected objects and send MIDI messages
         for obj in preds:
             obj_name = obj["name"].lower()
-            if obj_name in note_map:
-                note = note_map[obj_name]
-                outport.send(Message('control_change', control=note)) # Change the first attribute for different midi commands. For note 'note_on'
-
+            if obj_name in track_map:
+                file_name = track_map[obj_name]
+                mid = MidiFile(file_name)
+                for msg in mid.play():
+                    outport.send(msg)
 
         cv2.imshow("", annotated_image)
         # Exit loop if user presses 'q' key or 'Esc' key
