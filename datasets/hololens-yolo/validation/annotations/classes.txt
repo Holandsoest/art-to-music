@@ -1,6 +1,0 @@
-Circle
-Half Circle
-Heart
-Square
-Star
-Triangle

@@ -74,6 +74,7 @@ def detect_shapes(img):
     #obj_detect.setModelTypeAsYOLOv3()
     obj_detect.setModelTypeAsTinyYOLOv3()
     model_path = os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
+    # model_path = os.path.join(os.getcwd(), 'datasets', 'circles_set', 'tiny-yolov3_circles_set_last.pt')
     obj_detect.setModelPath( model_path )
     obj_detect.loadModel()
     #-------------------------------------------------------
@@ -84,11 +85,11 @@ def detect_shapes(img):
     # #-------------------------------------------------------
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsTinyYOLOv3()
-    dataset_path = os.path.join(os.getcwd(), 'datasets', 'hololens-yolo')
+    dataset_path = os.path.join(os.getcwd(), 'datasets', 'circles_set')
     trainer.setDataDirectory(data_directory=dataset_path)
     trainer.setTrainConfig(object_names_array=["circle, half circle, square, heart, star, triangle"]
                            ,batch_size=4
-                           ,num_experiments=5
+                           ,num_experiments=200
                            ,train_from_pretrained_model=model_path
                            )
     trainer.trainModel()
