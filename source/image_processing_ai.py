@@ -4,6 +4,7 @@
 #Yet to be added processing for the color, the object size size..
 
 from imageai.Detection import ObjectDetection # For AI object detection AI
+from imageai.Detection.Custom import CustomObjectDetection
 import cv2 # library for the webcam ( this one probably can also find color)
 import numpy as np 
 from imageai.Detection.Custom import DetectionModelTrainer
@@ -69,30 +70,41 @@ def get_dominant_color(img):
         return 'red'
 
 def detect_shapes(img):
-    # Initialize object detection model
-    obj_detect = ObjectDetection()
-    #obj_detect.setModelTypeAsYOLOv3()
-    obj_detect.setModelTypeAsTinyYOLOv3()
-    model_path = os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
-    # model_path = os.path.join(os.getcwd(), 'datasets', 'circles_set', 'tiny-yolov3_circles_set_last.pt')
-    obj_detect.setModelPath( model_path )
-    obj_detect.loadModel()
+    # # Initialize object detection model
+    # obj_detect = ObjectDetection()
+    # #obj_detect.setModelTypeAsYOLOv3()
+    # obj_detect.setModelTypeAsTinyYOLOv3()
+    # model_path = os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3_dataset_last.pt')
+    # jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
+    # model_path = os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.25221_epoch-3.pt')
+    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'circles_set_tiny-yolov3_detection_config.json')
+    model_path = os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_circles_set_mAP-0.99352_epoch-88.pt')
+    # obj_detect.setModelPath( model_path )
+    
+    # obj_detect.loadModel()
+
+    shape_detector = CustomObjectDetection()
+    shape_detector.setModelTypeAsTinyYOLOv3()
+    shape_detector.setModelPath(model_path)
+    shape_detector.setJsonPath(jason_path)
+    shape_detector.loadModel()
+
     #-------------------------------------------------------
     # # Set webcam parameters
     # cam_feed = cv2.VideoCapture(0)
     # cam_feed.set(cv2.CAP_PROP_FRAME_WIDTH, 650)
     # cam_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 750)
     # #-------------------------------------------------------
-    trainer = DetectionModelTrainer()
-    trainer.setModelTypeAsTinyYOLOv3()
-    dataset_path = os.path.join(os.getcwd(), 'dataset')
-    trainer.setDataDirectory(data_directory=dataset_path)
-    trainer.setTrainConfig(object_names_array=["circle, half circle, square, heart, star, triangle"]
-                           ,batch_size=4
-                           ,num_experiments=200
-                           ,train_from_pretrained_model=model_path
-                           )
-    trainer.trainModel()
+    # trainer = DetectionModelTrainer()
+    # trainer.setModelTypeAsTinyYOLOv3()
+    # dataset_path = os.path.join(os.getcwd(), 'dataset')
+    # trainer.setDataDirectory(data_directory=dataset_path)
+    # trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
+    #                        ,batch_size=4
+    #                        ,num_experiments=5
+    #                        ,train_from_pretrained_model=model_path
+    #                        )
+    # trainer.trainModel()
 
     # trainer = DetectionModelTrainer()
     # trainer.setModelTypeAsTinyYOLOv3()
@@ -108,7 +120,7 @@ def detect_shapes(img):
         # ret, img = cam_feed.read()
 
     # Object detection parametres
-        annotated_image, preds = obj_detect.detectObjectsFromImage(input_image=img, output_type="array",
+        annotated_image, preds = shape_detector.detectObjectsFromImage(input_image=img, output_type="array",
                                                                     display_percentage_probability=False,
                                                                     display_object_name=True)
 
