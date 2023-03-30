@@ -74,7 +74,7 @@ if __name__ == "__main__":
     obj_detect = ObjectDetection()
     #obj_detect.setModelTypeAsYOLOv3()
     obj_detect.setModelTypeAsTinyYOLOv3()
-    obj_detect.setModelPath(r"C:\Users\kpelj\OneDrive\Desktop\Uni\Year 4\Minor\WebCamAi\tiny-yolov3.pt")
+    obj_detect.setModelPath(r"D:\BeCreative\Music based on Art\shape\tiny-yolov3.pt")
     obj_detect.loadModel()
     #-------------------------------------------------------
 
@@ -84,13 +84,13 @@ if __name__ == "__main__":
     cam_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 750)
 
     # Open port and map notes to objects
-    outport = mido.open_output()
-    track_map = {
-        "person": "1.mid",   # send MIDI file 1 chosen
-        "cell phone": "2.mid",      # send MIDI file 2 chonsen
-        "cup": "3.mid",      # send MIDI file 3 chosen
-        # This will be changed by names of shapes
-    }
+    # outport = mido.open_output()
+    # track_map = {
+    #     "person": "1.mid",   # send MIDI file 1 chosen
+    #     "cell phone": "2.mid",      # send MIDI file 2 chonsen
+    #     "cup": "3.mid",      # send MIDI file 3 chosen
+    #     # This will be changed by names of shapes
+    # }
 
     # Run camera in loop
     while True:
@@ -120,13 +120,13 @@ if __name__ == "__main__":
             cv2.putText(annotated_image, size_label, (x1, y1-25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             cv2.putText(annotated_image, pos_label, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             # Loop through detected objects and send MIDI messages
-        for obj in preds:
-            obj_name = obj["name"].lower()
-            if obj_name in track_map:
-                file_name = track_map[obj_name]
-                mid = MidiFile(file_name)
-                for msg in mid.play():
-                    outport.send(msg)
+        # for obj in preds:
+        #     obj_name = obj["name"].lower()
+        #     if obj_name in track_map:
+        #         file_name = track_map[obj_name]
+        #         mid = MidiFile(file_name)
+        #         for msg in mid.play():
+        #             outport.send(msg)
 
         cv2.imshow("", annotated_image)
         # Exit loop if user presses 'q' key or 'Esc' key
@@ -135,5 +135,5 @@ if __name__ == "__main__":
 
     cam_feed.release()
     cv2.destroyAllWindows()
-    outport.close()
+    # outport.close()
 
