@@ -19,16 +19,22 @@ def get_bpm_from_color(x_axis, y_axis, image):
     r = int(r)
 
     # For now the rgb colorcode will represent a bpm match, but later on we will probably work with colorname to bpm
-    # def getShapeColor(R,G,B):
-    #     minimum = 10000
-    #     for i in range(len(csv)):
-    #         d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
-    #         if(d<=minimum):
-    #             minimum = d
-    #             cname = csv.loc[i,"color_name"]
-    #     return cname
+    def getShapeColor(R,G,B):
+            #Reading csv file with pandas and giving names to each column
+        index=["color","color_name","hex","R","G","B"]
+        absolute_path = os.path.join(os.getcwd(), 'files','image_processing', 'colors.csv')
+        csv = pd.read_csv(absolute_path, names=index, header=None)
+
+        minimum = 10000
+        for i in range(len(csv)):
+            d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
+            if(d<=minimum):
+                minimum = d
+                cname = csv.loc[i,"color_name"]
+        return cname
     
-    # colorName = getShapeColor(r,g,b)
+    colorName = getShapeColor(r,g,b)
+    print("color: ", colorName)
 
     def round_up_to_30(number):
         return min(((number + 29) // 30) * 30, 240)
@@ -87,11 +93,6 @@ def readImage(image):
     #Get the height, width and channel of the image
     img_height, img_width, channel = image.shape
     img_size = img_height*img_width
-
-    #Reading csv file with pandas and giving names to each column
-    index=["color","color_name","hex","R","G","B"]
-    absolute_path = os.path.join(os.getcwd(), 'files','image_processing', 'colors.csv')
-    csv = pd.read_csv(absolute_path, names=index, header=None)
 
     ret , thrash = cv2.threshold(img_grayscaled, 240 , 255, cv2.CHAIN_APPROX_NONE)
     contours , hierarchy = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)

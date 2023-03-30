@@ -71,7 +71,7 @@ def get_color(img):
 def detect_shapes(img):
     # # Custom Object Detection
     jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.87421_epoch-21.pt')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.92770_epoch-18.pt')
 
     shape_detector = CustomObjectDetection()
     shape_detector.setModelTypeAsTinyYOLOv3()
@@ -85,17 +85,17 @@ def detect_shapes(img):
     # cam_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 750)
 
     # # Trainer model
-    model_path = os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
-    trainer = DetectionModelTrainer()
-    trainer.setModelTypeAsTinyYOLOv3()
-    dataset_path = os.path.join(os.getcwd(), 'dataset')
-    trainer.setDataDirectory(data_directory=dataset_path)
-    trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
-                           ,batch_size=4
-                           ,num_experiments=100
-                           ,train_from_pretrained_model=model_path
-                           )
-    trainer.trainModel()
+    # model_path = os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
+    # trainer = DetectionModelTrainer()
+    # trainer.setModelTypeAsTinyYOLOv3()
+    # dataset_path = os.path.join(os.getcwd(), 'dataset')
+    # trainer.setDataDirectory(data_directory=dataset_path)
+    # trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
+    #                        ,batch_size=4
+    #                        ,num_experiments=100
+    #                        ,train_from_pretrained_model=model_path
+    #                        )
+    # trainer.trainModel()
 
     # Run camera in loop
     while True:
