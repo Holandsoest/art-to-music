@@ -7,19 +7,19 @@ if __name__ == "__main__":
     img_path = 'files\image_processing\ExampleShapes3.png'
     img = cv2.imread(img_path)
 
-    list_of_shapes = img_proc.readImage(img)
+    # list_of_shapes = img_proc.readImage(img)
 
-    # annotated_image = img_proc_ai.detect_shapes(img)
+    annotated_image = img_proc_ai.detect_shapes(img)
 
-    print('Press esc to continue...')   
+    # print('Press esc to continue...')   
 
-    while(1):
-        cv2.imshow("image",img)
+    # while(1):
+    #     cv2.imshow("image",img)
 
-        #Break the loop when user hits 'esc' key 
-        if cv2.waitKey(20) & 0xFF ==27:
-            print('Enjoy the music')
-            break
+    #     #Break the loop when user hits 'esc' key 
+    #     if cv2.waitKey(20) & 0xFF ==27:
+    #         print('Enjoy the music')
+    #         break
         
     cv2.destroyAllWindows()
 

@@ -107,8 +107,6 @@ def detect_shapes(img):
                                                                        display_percentage_probability=True,
                                                                        display_object_name=True)
 
-        cv2.imshow("annotated immage:",annotated_image)
-        # print( "preds: ", preds)
         # Loop through detected objects and add color information
         for obj in preds:
             x1, y1, x2, y2 = obj["box_points"]
@@ -141,7 +139,7 @@ def detect_shapes(img):
         #     cv2.putText(annotated_image, size_label, (x1, y1-25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         #     cv2.putText(annotated_image, pos_label, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 
-        cv2.imshow("", annotated_image)
+        cv2.imshow("Annotated Image", annotated_image)
         # Exit loop if user presses 'q' key or 'Esc' key
         if (cv2.waitKey(1) & 0xFF == ord("q")) or (cv2.waitKey(1) == 27):
             break
