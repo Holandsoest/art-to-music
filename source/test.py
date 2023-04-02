@@ -8,6 +8,9 @@ cap.set(3, frameWidth)
 cap.set(4, frameHeight)
 cap.set(10, 150)
 
+
+
+
 def empty(a):
     pass
 
@@ -16,6 +19,9 @@ cv2.resizeWindow("Parameters",640,240)
 cv2.createTrackbar("Threshold1","Parameters",159,255,empty)
 cv2.createTrackbar("Threshold2","Parameters",53,255,empty)
 cv2.createTrackbar("Area","Parameters",180,30000,empty)
+
+
+
 
 def stackImages(scale,imgArray):
     rows = len(imgArray)
@@ -52,39 +58,67 @@ def getContours(img, imgContour):
     contours,hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
     for cnt in contours:
-        area = cv2.contourArea(cnt)
-        print(area)
+        area = cv2.contourArea(cnt) 
+        # print(area)#oppervlakte van de figuren
         areaMin = cv2.getTrackbarPos("Area", "Parameters")
         if area>areaMin:
             cv2.drawContours(imgContour, cnt, -1, (255, 0, 0), 3)
             peri = cv2.arcLength(cnt,True)
-            #print(peri)
+            #print(peri) 
             approx = cv2.approxPolyDP(cnt,0.02*peri,True)
-            print(len(approx))
+            # print(len(approx)) #total points of ervery figure
             objCor = len(approx)
             x, y, w, h = cv2.boundingRect(approx)
+            
+            cx = int(x / 2)
+            cy = int(y / 2)
+            # Pick pixel value
+            pixel_center = hsvFrame[cy, cx]
+            hue_value = pixel_center[0]
+            color = "Undefined"
+            if hue_value < 5:
+                color = "RED"
+            elif hue_value < 22:
+                color = "ORANGE"
+            elif hue_value < 33:
+                color = "YELLOW"
+            elif hue_value < 78:
+                color = "GREEN"
+            elif hue_value < 131:
+                color = "BLUE"
+            elif hue_value < 170:
+                color = "VIOLET"
+            else:
+                color = "RED"
+            #print(color)
 
- 
-            if objCor ==3: objectType ="Tri"
-            elif objCor == 4:
-                aspRatio = w/float(h)
-                if aspRatio >0.98 and aspRatio <1.03: objectType= "Square"
-                else:objectType="Rectangle"
-            elif objCor>4: objectType= "Circles"
-            else:objectType="None"
- 
             cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
-            cv2.putText(imgContour,objectType,
-                        (x+(w//2)-10,y+(h//2)-10),cv2.FONT_HERSHEY_COMPLEX,0.7,
-                        (0,0,0),2)
+            cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.7, (0,255,0),2)
+            cv2.putText(imgContour, "color: " + str(color) ,(x + w +20, y + 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0),2)  
+    
+            # if objCor ==3: objectType ="Tri"
+            # elif objCor == 4:
+            #     aspRatio = w/float(h)
+            #     if aspRatio >0.98 and aspRatio <1.03: objectType= "Square"
+            #     else:objectType="Rectangle"
+            # elif objCor>4: objectType= "Circles"
+            # else:objectType="None"
  
+            # cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
+            # cv2.putText(imgContour,objectType,
+            #             (x+(w//2)-10,y+(h//2)-10),cv2.FONT_HERSHEY_COMPLEX,0.7,
+            #             (0,0,0),2)
  
+
+
 
 while True:
     success, img = cap.read()
     imgContour = img.copy()
     imgBlur = cv2.GaussianBlur(img,(7,7),0)
     imgGray = cv2.cvtColor(imgBlur,cv2.COLOR_BGR2GRAY)
+    _, imageFrame = cap.read()
+    hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
     
     threshold1 = cv2.getTrackbarPos("Threshold1","Parameters")
     threshold2 = cv2.getTrackbarPos("Threshold2","Parameters")
@@ -94,8 +128,8 @@ while True:
     
     getContours(imgDil,imgContour)
 
+    #imgStack = stackImages(0.8,([imgContour,imgCanny,img]))
     imgStack = stackImages(0.8,([imgContour]))
-
     cv2.imshow("Result", imgStack)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
