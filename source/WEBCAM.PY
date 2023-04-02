@@ -1,20 +1,13 @@
-# Python code for Multiple Color Detection
-  
-  
+# Python code for Multiple Color Detection  
 import numpy as np
 import cv2
   
-  
 # Capturing video through webcam
 webcam = cv2.VideoCapture(0)
-  
 # Start a while loop
 
-while(1):
-      
-    _, imageFrame = webcam.read()
-    hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
-  
+
+def kleuren():
     red_lower = np.array([136, 87, 111], np.uint8)
     red_upper = np.array([180, 255, 255], np.uint8)
     red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
@@ -32,7 +25,6 @@ while(1):
     # For red color
     red_mask = cv2.dilate(red_mask, kernel)
 
-      
     # For green color
     green_mask = cv2.dilate(green_mask, kernel)
 
@@ -40,9 +32,7 @@ while(1):
     blue_mask = cv2.dilate(blue_mask, kernel)
 
     # Creating contour to track red color
-    contours, hierarchy = cv2.findContours(red_mask,
-                                           cv2.RETR_TREE,
-                                           cv2.CHAIN_APPROX_SIMPLE)
+    contours, hierarchy = cv2.findContours(red_mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
       
     for pic, contour in enumerate(contours):
         area = cv2.contourArea(contour)
@@ -61,17 +51,21 @@ while(1):
             cv2.putText(imageFrame, "Green Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0))
   
     # Creating contour to track blue color
-    contours, hierarchy = cv2.findContours(blue_mask,
-                                           cv2.RETR_TREE,
-                                           cv2.CHAIN_APPROX_SIMPLE)
+    contours, hierarchy = cv2.findContours(blue_mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
     for pic, contour in enumerate(contours):
         area = cv2.contourArea(contour)
         if(area > 300):
             x, y, w, h = cv2.boundingRect(contour)
             #imageFrame = cv2.rectangle(imageFrame, (x, y), (x + w, y + h),(255, 0, 0), 2)
             cv2.putText(imageFrame, "Blue Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX,1.0, (255, 0, 0))
-                        
-              
+
+while(1):
+      
+    _, imageFrame = webcam.read()
+    hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
+  
+    kleuren()
     # Program Termination
     cv2.imshow("Multiple Color Detection in Real-TIme", imageFrame)
     if (cv2.waitKey(1) & 0xFF == ord("q")) or (cv2.waitKey(1) == 27):

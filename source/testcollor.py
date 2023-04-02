@@ -1,15 +1,10 @@
 import numpy as np
 import cv2
   
-  
-# Capturing video through webcam
-webcam = cv2.VideoCapture(0)
-  
-# Start a while loop
-
 while(1):
-      
     _, imageFrame = webcam.read()
+    x, y, w, h = cv2.boundingRect(contour)
+    webcam = cv2.VideoCapture(0)
     hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
 
     red_lower = np.array([136, 87, 111], np.uint8)
@@ -27,8 +22,7 @@ while(1):
     kernel = np.ones((5, 5))
     # For red color
     red_mask = cv2.dilate(red_mask, kernel)
-
-      
+ 
     # For green color
     green_mask = cv2.dilate(green_mask, kernel)
 
@@ -36,55 +30,32 @@ while(1):
     blue_mask = cv2.dilate(blue_mask, kernel)
 
     # Creating contour to track red color
-    contours, hierarchy = cv2.findContours(red_mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    contours, hierarchy = cv2.findContours(green_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contours, hierarchy = cv2.findContours(blue_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-      
-
-    for pic, contour in enumerate():
-        area = cv2.contourArea(contour)
-        if(area > 300):
-            x, y, w, h = cv2.boundingRect(contour)
-            cx = int(x / 2)
-            cy = int(y / 2)
-            # Pick pixel value
-            pixel_center = hsvFrame[cy, cx]
-            hue_value = pixel_center[0]
-            color = "Undefined"
-            if hue_value < 5:
-                color = "RED"
-            elif hue_value < 22:
-                color = "ORANGE"
-            elif hue_value < 33:
-                color = "YELLOW"
-            elif hue_value < 78:
-                color = "GREEN"
-            elif hue_value < 131:
-                color = "BLUE"
-            elif hue_value < 170:
-                color = "VIOLET"
-            else:
-                color = "RED"
-            #imageFrame = cv2.rectangle(imageFrame, (x, y), (x + w, y + h),  (0, 0, 255), 2)
-            cv2.putText(imageFrame, color , (x, y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 0, 255))    
-    
-    # Creating contour to track green color
-    
-      
-    # for pic, contour in enumerate(contours):
-    #     area = cv2.contourArea(contour)
-    #     if(area > 300):
-    #         x, y, w, h = cv2.boundingRect(contour)
-            
-  
+    contours, hierarchy = cv2.findContours(red_mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)   
 
     for pic, contour in enumerate(contours):
         area = cv2.contourArea(contour)
         if(area > 300):
-            x, y, w, h = cv2.boundingRect(contour)
             #print(contour)
-            cv2.putText(imageFrame, "Blue Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX,1.0, (255, 0, 0))
-            cv2.putText(imageFrame, "Green Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0))            
+            collor = "BLUE"
+
+    contours, hierarchy = cv2.findContours(green_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    for pic, contour in enumerate():
+        area = cv2.contourArea(contour)
+        if(area > 300):
+            # Pick pixel value
+            collor = "BLUE"
+
+            #imageFrame = cv2.rectangle(imageFrame, (x, y), (x + w, y + h),  (0, 0, 255), 2)
+
+    contours, hierarchy = cv2.findContours(blue_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    for pic, contour in enumerate():
+        area = cv2.contourArea(contour)
+        if(area > 300):
+            collor = "BLUE"
+ 
+    cv2.putText(imageFrame, collor , (x, y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 0, 255))    
               
     # Program Termination
     cv2.imshow("Multiple Color Detection in Real-TIme", imageFrame)
