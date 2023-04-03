@@ -21,70 +21,6 @@ cv2.createTrackbar("Threshold2","Parameters",53,255,empty)
 cv2.createTrackbar("Area","Parameters",180,30000,empty)
 
 
-def kleuren():
-    red_lower = np.array([136, 87, 111], np.uint8)
-    red_upper = np.array([180, 255, 255], np.uint8)
-    red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
-  
-    green_lower = np.array([25, 52, 72], np.uint8)
-    green_upper = np.array([102, 255, 255], np.uint8)
-    green_mask = cv2.inRange(hsvFrame, green_lower, green_upper)
-  
-    blue_lower = np.array([94, 80, 2], np.uint8)
-    blue_upper = np.array([120, 255, 255], np.uint8)
-    blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
-      
-    kernel = np.ones((5, 5))
-      
-    # For red color
-    red_mask = cv2.dilate(red_mask, kernel)
-
-    # For green color
-    green_mask = cv2.dilate(green_mask, kernel)
-
-    # For blue color
-    blue_mask = cv2.dilate(blue_mask, kernel)
-
-    # Creating contour to track red color
-    contours, hierarchy = cv2.findContours(red_mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-      
-    for pic, contour in enumerate(contours):
-        x, y, w, h = cv2.boundingRect(contour)
-        #imageFrame = cv2.rectangle(imageFrame, (x, y), (x + w, y + h),  (0, 0, 255), 2)
-        cv2.putText(imageFrame, "Red Colour", (x, y),cv2.FONT_HERSHEY_SIMPLEX, 1.0,(0, 0, 255))    
-  
-    # Creating contour to track green color
-    contours, hierarchy = cv2.findContours(green_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-      
-    for pic, contour in enumerate(contours):
-        x, y, w, h = cv2.boundingRect(contour)
-        cv2.putText(imageFrame, "Green Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0))
-  
-    # Creating contour to track blue color
-    contours, hierarchy = cv2.findContours(blue_mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-
-
-
-
-
-
-
-
-
-
-
-    for pic, contour in enumerate(contours):
-        area = cv2.contourArea(contour)
-        if(area > 300):
-            x, y, w, h = cv2.boundingRect(contour)
-            #imageFrame = cv2.rectangle(imageFrame, (x, y), (x + w, y + h),(255, 0, 0), 2)
-            cv2.putText(imageFrame, "Blue Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX,1.0, (255, 0, 0))
-
-
-
-
-
-
 
 
 
@@ -120,6 +56,7 @@ def stackImages(scale,imgArray):
         ver = hor
     return ver
 
+
 def getContours(img, imgContour):
     contours,hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
 
@@ -128,6 +65,8 @@ def getContours(img, imgContour):
         # print(area)#oppervlakte van de figuren
         areaMin = cv2.getTrackbarPos("Area", "Parameters")
         if area>areaMin:
+
+
             cv2.drawContours(imgContour, cnt, -1, (255, 0, 0), 3)
             peri = cv2.arcLength(cnt,True)
             #print(peri) 
@@ -136,32 +75,48 @@ def getContours(img, imgContour):
             objCor = len(approx)
             x, y, w, h = cv2.boundingRect(approx)
             
-            # cx = int(x / 2)
-            # cy = int(y / 2)
+            _, frame= cap.read()
+            hsvFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            cx = int(w / 2)
+            cy = int(h/ 2)
             # Pick pixel value
-            # pixel_center = hsvFrame[cy, cx]
-            # hue_value = pixel_center[0]
-            # color = "Undefined"
-            # if hue_value < 5:
-            #     color = "RED"
-            # elif hue_value < 22:
-            #     color = "ORANGE"
-            # elif hue_value < 33:
-            #     color = "YELLOW"
-            # elif hue_value < 78:
-            #     color = "GREEN"
-            # elif hue_value < 131:
-            #     color = "BLUE"
-            # elif hue_value < 170:
-            #     color = "VIOLET"
-            # else:
-            #     color = "RED"
-            # print(hue_value)
-            #print(color)
-            kleuren()
+            pixel_center = hsvFrame[cy, cx]
+            hue_value = pixel_center[0]
+            color = "Undefined"
+            if hue_value < 5:
+                color = "RED"
+            elif hue_value < 22:
+                color = "ORANGE"
+            elif hue_value < 33:
+                color = "YELLOW"
+            elif hue_value < 78:
+                color = "GREEN"
+            elif hue_value < 131:
+                color = "BLUE"
+            elif hue_value < 170:
+                color = "VIOLET"
+            else:
+                color = "RED"
+            print(color)
+            pixel_center_bgr = frame[cy, cx]
+            b, g, r = int(pixel_center_bgr[0]), int(pixel_center_bgr[1]), int(pixel_center_bgr[2])
+            #cv2.rectangle(frame, (cx - 220, 10), (cx + 200, 120), (255, 255, 255), -1)
+            cv2.putText(frame, color, (cx - 200, 100), 0, 3, (b, g, r), 5)
+            cv2.putText(imgContour, "Color: " + str(len("color")), (x + w +20, y + 50), cv2.FONT_HERSHEY_COMPLEX,0.7, (0,255,0),2)
+            #cv2.circle(frame, (cx, cy), 5, (25, 25, 25), 3)
+            #cv2.imshow("Frame", frame)
             cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
             cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.7, (0,255,0),2)
-            # cv2.putText(imgContour, "color: " + str(color) ,(x + w +20, y + 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0),2)  
+
+
+           
+
+
+
+
+
+            
+            #cv2.putText(imgContour, "color: " + str(color) ,(x + w +20, y + 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0),2)  
     
             # if objCor ==3: objectType ="Tri"
             # elif objCor == 4:
@@ -181,15 +136,15 @@ while True:
     _, imageFrame = cap.read()
     hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
     success, img = cap.read()
+ 
+    threshold1 = cv2.getTrackbarPos("Threshold1","Parameters")
+    threshold2 = cv2.getTrackbarPos("Threshold2","Parameters")
+
     imgContour = img.copy()
     imgBlur = cv2.GaussianBlur(img,(7,7),0)
     imgGray = cv2.cvtColor(imgBlur,cv2.COLOR_BGR2GRAY)
-    # _, imageFrame = cap.read()
-    # hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
-    
-    threshold1 = cv2.getTrackbarPos("Threshold1","Parameters")
-    threshold2 = cv2.getTrackbarPos("Threshold2","Parameters")
     imgCanny = cv2.Canny(imgGray,threshold1,threshold2)
+
     kernel = np.ones((5,5))
     imgDil = cv2.dilate(imgCanny,kernel,iterations=1)
     
@@ -200,3 +155,64 @@ while True:
     cv2.imshow("Result", imgStack)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+
+
+     # cx = int(x / 2)
+            # cy = int(y / 2)
+            # # Pick pixel value
+            # pixel_center = hsvFrame[cy, cx]
+            # # print(pixel_center)
+            # print(hsvFrame)
+            # hue_value = pixel_center[0]
+            # color = "Undefined"
+            # print(pixel_center[0])
+            # red_lower = np.array([136, 87, 111], np.uint8)
+            # red_upper = np.array([180, 255, 255], np.uint8)
+            # red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
+            # green_lower = np.array([25, 52, 72], np.uint8)
+            # green_upper = np.array([102, 255, 255], np.uint8)
+            # green_mask = cv2.inRange(hsvFrame, green_lower, green_upper)
+         
+            # blue_lower = np.array([94, 80, 2], np.uint8)
+            # blue_upper = np.array([120, 255, 255], np.uint8)
+            # blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
+            # # For red color
+
+            # kernel = np.ones((5, 5))
+            # red_mask = cv2.dilate(red_mask, kernel)
+            # green_mask = cv2.dilate(green_mask, kernel)
+            # blue_mask = cv2.dilate(blue_mask, kernel)
+
+            # contours, hierarchy = cv2.findContours(red_mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            # for pic, contour in enumerate(contours):
+            #     x, y, w, h = cv2.boundingRect(contour)
+            #     area = cv2.contourArea(contour)
+            #     color = "RED"
+            # contours, hierarchy = cv2.findContours(red_mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)    
+            # for pic, contour in enumerate(contours):
+            #     x, y, w, h = cv2.boundingRect(contour)
+            #     area = cv2.contourArea(contour)
+            #     color = "green"
+            
+            # contours, hierarchy = cv2.findContours(red_mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            # for pic, contour in enumerate(contours):
+            #     x, y, w, h = cv2.boundingRect(contour)
+            #     area = cv2.contourArea(contour)
+            #     color = "blue"
+            # if 136 < pixel_center[0] < 180 & 87 < pixel_center[1] < 255 & 111 < pixel_center[2] < 255:
+            #     color = "RED"
+            # elif 25 < pixel_center[0] < 102 & 52 < pixel_center[1] < 255 & 72 < pixel_center[2] < 255:
+            #     color = "ORANGE"
+            # elif 94 < pixel_center[0] < 120 & 80 < pixel_center[1] < 255 & 2 < pixel_center[2] < 255:
+            #     color = "YELLOW"
+            # elif hue_value < 78:
+            #     color = "GREEN"
+            # elif hue_value < 131:
+            #     color = "BLUE"
+            # elif hue_value < 170:
+            #     color = "VIOLET"
+            # else:
+            #     color = "RED"
+            # print(hue_value)
+            #print(color)
+            

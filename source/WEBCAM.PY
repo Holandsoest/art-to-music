@@ -19,7 +19,31 @@ def kleuren():
     blue_lower = np.array([94, 80, 2], np.uint8)
     blue_upper = np.array([120, 255, 255], np.uint8)
     blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
-      
+
+    # lower_orange = np.array([5, 100, 100], np.uint8)
+    # upper_orange = np.array([15, 255, 255], np.uint8)
+    # red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
+
+    # lower_green = np.array([36, 25, 25], np.uint8)
+    # upper_green = np.array([86, 255, 255], np.uint8)
+    # red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
+
+    # lower_blue = np.array([110, 50, 50], np.uint8)
+    # upper_blue = np.array([130, 255, 255], np.uint8)
+    # red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
+
+    # lower_violet = np.array([140, 50, 50], np.uint8)
+    # upper_violet = np.array([160, 255, 255], np.uint8)
+    # red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
+
+    # lower_red1 = np.array([0, 50, 50], np.uint8)
+    # upper_red1 = np.array([10, 255, 255], np.uint8)
+    # red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
+
+    # lower_red2 = np.array([170, 50, 50], np.uint8)
+    # upper_red2 = np.array([180, 255, 255], np.uint8)
+    # red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
+
     kernel = np.ones((5, 5))
       
     # For red color
