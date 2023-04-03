@@ -11,15 +11,20 @@ engine = daw.RenderEngine(SAMPLE_RATE, BUFFER_SIZE)
 synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
 #synth = engine.make_plugin_processor("my_synth", r"D:\Muziek\muziek\Fl studio plugins\Sylenth1\Sylenth1.dll")
 assert synth.get_name() == "my_synth"
-#synth.load_preset(r'D:\Muziek\muziek\Fl studio plugins\Sylenth1\Alex rome.fxp')
+#synth.load_vst3_preset(r"C:\Users\gielw\Spitfire\Spitfire Audio - BBC Symphony Orchestra\Presets\v1.5.0\Discover Strings\BBCSODi_Violins 2_All.zpreset")
+instrument = "violin"
+
+#synth.load_state(instrument + "_preset")
 
 # For some plugins, it's possible to load presets:
 #print(synth.get_parameters_description())
+#synth.set_parameter("pitButton10")
 #synth.set_parameter("/MySine/freq", 440.)  # 440 Hz
-synth.load_midi(r"C:\Users\gielw\Documents\Python\output1.mid", clear_previous=False, beats=False, all_events=False)
-
+synth.load_midi(r"MidiSound.mid", clear_previous=False, beats=False, all_events=False)
+#synth.set_parameter("basses")
 # Plugins can show their UI.
 synth.open_editor()  # Open the editor, make changes, and close
+#synth.save_state("flute_preset")
 
 engine.load_graph([
                    (synth, [])
