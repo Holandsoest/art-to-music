@@ -90,25 +90,19 @@ class ModelSelection(Enum):
     - `LATEST`          The model that was most recently made. Latest models might constantly change.  
     - `CUSTOM`          Change the paths below here to quickly test another model or json."""
     ORIGINAL_MODEL = 0
-    PREVIOUS_STABLE = 9
-    STABLE = 10
-    LATEST = 20
-    CUSTOM = 30
+    # PREVIOUS_STABLE = 1
+    STABLE = 2
+    LATEST = 3
+    CUSTOM = 4
+model_paths = {
+    ModelSelection.ORIGINAL_MODEL:  os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt'),
+    ModelSelection.STABLE:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
+    ModelSelection.LATEST:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_last.pt'),
+    ModelSelection.CUSTOM:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
+}
 def load_custom_model(model_selection:ModelSelection) -> CustomObjectDetection:
     """Loads the model and the Json and returns the `shape_detector`"""
-    json_paths = {
-        ModelSelection.ORIGINAL_MODEL:  os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json'),
-        ModelSelection.STABLE:          os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json'),
-        ModelSelection.LATEST:          os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json'),
-        ModelSelection.CUSTOM:          os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json'),
-    }
-    model_paths = {
-        ModelSelection.ORIGINAL_MODEL:  os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
-        ModelSelection.STABLE:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
-        ModelSelection.LATEST:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
-        ModelSelection.CUSTOM:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
-    }
-    json_path = json_paths[model_selection]
+    json_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
     model_custom_path = model_paths[model_selection]
 
     shape_detector = CustomObjectDetection()
@@ -117,6 +111,29 @@ def load_custom_model(model_selection:ModelSelection) -> CustomObjectDetection:
     shape_detector.setJsonPath(json_path)
     shape_detector.loadModel()
     return shape_detector
+def train_custom_model(model_selection:ModelSelection):
+    model_path = model_paths[model_selection]
+    trainer = DetectionModelTrainer()
+    trainer.setModelTypeAsTinyYOLOv3()
+    dataset_path = os.path.join(os.getcwd(), 'dataset')
+    trainer.setDataDirectory(data_directory=dataset_path)
+    trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
+                        #    ,batch_size=20
+                           ,num_experiments=100
+                           ,train_from_pretrained_model=model_path
+                           )
+    trainer.trainModel()
+def compare_all_models(img:cv2.Mat) -> None:
+    """Opens the image as it looks for each model, (and original)"""
+    cv2.imshow(f'No model',img)
+    for model_selection in ModelSelection:
+        shape_detector = load_custom_model(model_selection)
+        annotated, detected_objects = shape_detector.detectObjectsFromImage(input_image=img,
+                                                                                   output_type="array",
+                                                                                   display_percentage_probability=True,
+                                                                                   display_object_name=True)
+        annotate_detected_colors(img=annotated, detected_objects=detected_objects)
+        cv2.imshow(f'Model: "{model_selection.name}"',annotated)
 
 def detect_shapes(img): ## OLD CODE
     # Custom Object Detection
@@ -194,18 +211,13 @@ if __name__ == "__main__":
     img_path = 'files\image_processing\example_shapes (2).jpg'
     img = cv2.imread(img_path)
 
+    train_custom_model(ModelSelection.ORIGINAL_MODEL)
+
 
     # Put image into AI and color detection
-    shape_detector = load_custom_model(ModelSelection.LATEST)
-    annotated_image, detected_objects = shape_detector.detectObjectsFromImage(input_image=img,
-                                                                              output_type="array",
-                                                                              display_percentage_probability=True,
-                                                                              display_object_name=True)
-    annotate_detected_colors(img=annotated_image, detected_objects=detected_objects)
-
+    compare_all_models(img)
 
     # Display to user
     print('Press `esc` to close...')
-    while(not (cv2.waitKey(20) & 0xFF ==27)):   # Break the loop when user hits 'esc' key 
-        cv2.imshow("annotated_image",annotated_image)
+    while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
     cv2.destroyAllWindows()
