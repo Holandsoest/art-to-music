@@ -4,7 +4,7 @@ import common.midi_creation as mc
 import image_processing_ai as img_proc_ai
 
 if __name__ == "__main__":
-    img_path = 'files\image_processing\ExampleShapes3.png'
+    img_path = 'files\image_processing\example_shapes (2).jpg'
     img = cv2.imread(img_path)
 
     # list_of_shapes = img_proc.readImage(img)
