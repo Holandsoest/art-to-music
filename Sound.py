@@ -19,7 +19,7 @@ synth.load_state(instrument + "_preset")
 # For some plugins, it's possible to load presets:
 #print(synth.get_parameters_description())
 #synth.set_parameter("pitButton10")
-#synth.set_parameter("/MySine/freq", 440.)  # 440 Hz
+#synth.set_parameter("/MySine/freq", 440.)  # 440 Hz.
 synth.load_midi(r"MidiSound.mid", clear_previous=False, beats=False, all_events=False)
 
 # Plugins can show their UI.
