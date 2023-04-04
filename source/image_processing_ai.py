@@ -6,9 +6,10 @@ import cv2
 import numpy as np 
 import os
 import image_processing as ip
+from enum import Enum
 
 # Function to get the color of an object in the image
-def get_color(img):
+def get_color(img:cv2.Mat) -> str:
     """
     function to detect the most common color of an object
     It has one parameter:
@@ -67,17 +68,59 @@ def get_color(img):
         return 'violet'
     else:
         return 'red'
+def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
+    for obj in detected_objects:
+        x1, y1, x2, y2 = obj["box_points"]
+        obj_img = img[y1:y2, x1:x2]
 
-def detect_shapes(img):
-    # # Custom Object Detection
-    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt')
+        # Call function to extract color data
+        color = get_color(obj_img)
+        obj["color"] = color
+        
+        # Color label text
+        color_label = ("Color: " + color)
+        # adding a text to the object 
+        cv2.putText(img, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+class ModelSelection(Enum):
+    """An enum of different choices.  
+    - `ORIGINAL_MODEL`  Is the downloaded `tiny-yolov3` model. It can detect kites.  
+    - `PREVIOUS_STABLE` A model is stable when the trainer person has validated that it is the current best; this is the previous one.  
+    - `STABLE`          A model is stable when the trainer person has validated that it is the current best.  
+    - `LATEST`          The model that was most recently made. Latest models might constantly change.  
+    - `CUSTOM`          Change the paths below here to quickly test another model or json."""
+    ORIGINAL_MODEL = 0
+    PREVIOUS_STABLE = 9
+    STABLE = 10
+    LATEST = 20
+    CUSTOM = 30
+def load_custom_model(model_selection:ModelSelection) -> CustomObjectDetection:
+    """Loads the model and the Json and returns the `shape_detector`"""
+    json_paths = {
+        ModelSelection.ORIGINAL_MODEL:  os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json'),
+        ModelSelection.STABLE:          os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json'),
+        ModelSelection.LATEST:          os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json'),
+        ModelSelection.CUSTOM:          os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json'),
+    }
+    model_paths = {
+        ModelSelection.ORIGINAL_MODEL:  os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
+        ModelSelection.STABLE:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
+        ModelSelection.LATEST:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
+        ModelSelection.CUSTOM:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
+    }
+    json_path = json_paths[model_selection]
+    model_custom_path = model_paths[model_selection]
 
     shape_detector = CustomObjectDetection()
     shape_detector.setModelTypeAsTinyYOLOv3()
     shape_detector.setModelPath(model_custom_path)
-    shape_detector.setJsonPath(jason_path)
+    shape_detector.setJsonPath(json_path)
     shape_detector.loadModel()
+    return shape_detector
+
+def detect_shapes(img): ## OLD CODE
+    # Custom Object Detection
+    shape_detector = load_custom_model(ModelSelection.LATEST)
 
     # # Set webcam parameters
     # cam_feed = cv2.VideoCapture(0)
@@ -102,13 +145,13 @@ def detect_shapes(img):
         # ret, img = cam_feed.read()
 
     # Object detection parametres
-        annotated_image, preds = shape_detector.detectObjectsFromImage(input_image=img, 
+        annotated_image, detected_objects = shape_detector.detectObjectsFromImage(input_image=img, 
                                                                        output_type="array",
                                                                        display_percentage_probability=True,
                                                                        display_object_name=True)
 
         # Loop through detected objects and add color information
-        for obj in preds:
+        for obj in detected_objects:
             x1, y1, x2, y2 = obj["box_points"]
             obj_img = img[y1:y2, x1:x2]
             # ip.readImage(obj_img)
@@ -120,7 +163,7 @@ def detect_shapes(img):
             # adding a text to the object 
             cv2.putText(annotated_image, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-        # for obj in preds:
+        # for obj in detected_objects:
         #     x1, y1, x2, y2 = obj["box_points"]
         #     obj_img = img[y1:y2, x1:x2]
         #     # Call function to extract color data
@@ -139,10 +182,30 @@ def detect_shapes(img):
         #     cv2.putText(annotated_image, size_label, (x1, y1-25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         #     cv2.putText(annotated_image, pos_label, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 
-        cv2.imshow("Annotated Image", annotated_image)
-        # Exit loop if user presses 'q' key or 'Esc' key
-        if (cv2.waitKey(1) & 0xFF == ord("q")) or (cv2.waitKey(1) == 27):
-            break
+        # cv2.imshow("Annotated Image", annotated_image)
+        # # Exit loop if user presses 'q' key or 'Esc' key
+        # if (cv2.waitKey(1) & 0xFF == ord("q")) or (cv2.waitKey(1) == 27):
+        #     break
 
     # # cam_feed.release()
     # cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    img_path = 'files\image_processing\example_shapes (2).jpg'
+    img = cv2.imread(img_path)
+
+
+    # Put image into AI and color detection
+    shape_detector = load_custom_model(ModelSelection.LATEST)
+    annotated_image, detected_objects = shape_detector.detectObjectsFromImage(input_image=img,
+                                                                              output_type="array",
+                                                                              display_percentage_probability=True,
+                                                                              display_object_name=True)
+    annotate_detected_colors(img=annotated_image, detected_objects=detected_objects)
+
+
+    # Display to user
+    print('Press `esc` to close...')
+    while(not (cv2.waitKey(20) & 0xFF ==27)):   # Break the loop when user hits 'esc' key 
+        cv2.imshow("annotated_image",annotated_image)
+    cv2.destroyAllWindows()
