@@ -66,21 +66,20 @@ def getContours(img, imgContour):
         areaMin = cv2.getTrackbarPos("Area", "Parameters")
         if area>areaMin:
 
-
             cv2.drawContours(imgContour, cnt, -1, (255, 0, 0), 3)
             peri = cv2.arcLength(cnt,True)
             #print(peri) 
             approx = cv2.approxPolyDP(cnt,0.02*peri,True)
             # print(len(approx)) #total points of ervery figure
             objCor = len(approx)
-            x, y, w, h = cv2.boundingRect(approx)
-            
-            _, frame= cap.read()
-            hsvFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            cx = int(w / 2)
-            cy = int(h/ 2)
+            x, y, w, h = cv2.boundingRect(cnt)
+            # cv2.putText(imageFrame, "Green Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0))
+
+            _, area= cap.read()
+            hsvFrame = cv2.cvtColor(area, cv2.COLOR_BGR2HSV)
+
             # Pick pixel value
-            pixel_center = hsvFrame[cy, cx]
+            pixel_center = hsvFrame[x, y]
             hue_value = pixel_center[0]
             color = "Undefined"
             if hue_value < 5:
@@ -97,14 +96,19 @@ def getContours(img, imgContour):
                 color = "VIOLET"
             else:
                 color = "RED"
-            print(color)
-            pixel_center_bgr = frame[cy, cx]
-            b, g, r = int(pixel_center_bgr[0]), int(pixel_center_bgr[1]), int(pixel_center_bgr[2])
+            # print(color)
+
+
+            #pixel_center_bgr = frame[cy, cx]
+            #b, g, r = int(pixel_center_bgr[0]), int(pixel_center_bgr[1]), int(pixel_center_bgr[2])
+            
+
             #cv2.rectangle(frame, (cx - 220, 10), (cx + 200, 120), (255, 255, 255), -1)
-            cv2.putText(frame, color, (cx - 200, 100), 0, 3, (b, g, r), 5)
+            #cv2.putText(frame, color, (cx - 200, 100), 0, 3, (b, g, r), 5)
             cv2.putText(imgContour, "Color: " + str(len("color")), (x + w +20, y + 50), cv2.FONT_HERSHEY_COMPLEX,0.7, (0,255,0),2)
-            #cv2.circle(frame, (cx, cy), 5, (25, 25, 25), 3)
+            cv2.circle(imgContour, (x, y), 5, (25, 25, 25), 3)
             #cv2.imshow("Frame", frame)
+            # cv2.circle(imgContour, (x, y),5, (x+w,y+h), (25, 25, 25), 2)
             cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
             cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.7, (0,255,0),2)
 
