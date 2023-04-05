@@ -75,12 +75,13 @@ def getContours(img, imgContour):
 
             #possitions
             x, y, w, h = cv2.boundingRect(cnt)
-            pos_label = ("Position: ({}, {})".format(x, y))
+            cy = int(y+h/2)
+            cx = int(x+w/2)
+            pos_label = ("Position: ({}, {})".format(cx, cy))
             
 
             #color
-            cy = int(y+h/2)
-            cx = int(x+w/2)
+
             _, frame = cap.read()
             hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             if cy > 479 :
@@ -116,7 +117,7 @@ def getContours(img, imgContour):
             # cv2.circle(imgContour, (x, y),5, (x+w,y+h), (25, 25, 25), 2)
 
             cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
-            cv2.putText(imgContour, "position: " + pos_label, (x + w +20, y + 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            cv2.putText(imgContour, pos_label, (x + w +20, y + 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             cv2.putText(imgContour, "color: " +  color, (x + w +20, y + 40), 0, 0.5, (0,255,0), 2)
             cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
             cv2.putText(imgContour, "Area: " + str(int(area)), (x + w +20, y + 80), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)

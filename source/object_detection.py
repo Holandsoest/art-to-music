@@ -130,11 +130,11 @@ if __name__ == "__main__":
             x, y, w, h = obj["box_points"]
 
 
-            pos_label = ("Position: ({}, {})".format(x, y))
-            cv2.putText(annotated_image, pos_label, (x + w +20, y + 80), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-
             cy = int(y+h/2)
             cx = int(x+w/2)
+            pos_label = ("Position: ({}, {})".format(cx, cy))
+            
+
             _, frame = cam_feed.read()
             
             hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -166,11 +166,12 @@ if __name__ == "__main__":
             # cv2.putText(annotated_image, color, (x + w +20, y + 50), 0, 0.5, (0,255,0), 2)
             cv2.putText(annotated_image, color, (x, y-40), cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 0, 255), 2)
 
-            pos_label = ("Position: ({}, {})".format(x, y))
+            
             # adding text to the object 
             #cv2.putText(annotated_image, color_label, (x1, y1-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             # cv2.putText(annotated_image, size_label, (x1, y1-25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            cv2.putText(annotated_image, pos_label, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            #position
+            cv2.putText(annotated_image, pos_label, (x , y - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             # Loop through detected objects and send MIDI messages
         # for obj in preds:
         #     obj_name = obj["name"].lower()
