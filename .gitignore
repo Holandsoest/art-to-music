@@ -80,6 +80,12 @@ target/
 # Output
 output.mid
 
+# Stuff for training the AI, Way to big...
+dataset/train/annotations/
+dataset/train/images/
+dataset/validation/annotations/
+dataset/validation/images/
+
 # IPython
 profile_default/
 ipython_config.py

@@ -89,16 +89,16 @@ class ModelSelection(Enum):
     - `STABLE`          A model is stable when the trainer person has validated that it is the current best.  
     - `LATEST`          The model that was most recently made. Latest models might constantly change.  
     - `CUSTOM`          Change the paths below here to quickly test another model or json."""
-    ORIGINAL_MODEL = 0
+    # ORIGINAL_MODEL = 0
     # PREVIOUS_STABLE = 1
-    STABLE = 2
+    # STABLE = 2
     LATEST = 3
     CUSTOM = 4
 model_paths = {
-    ModelSelection.ORIGINAL_MODEL:  os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt'),
-    ModelSelection.STABLE:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
+    # ModelSelection.ORIGINAL_MODEL:  os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt'),
+    # ModelSelection.STABLE:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
     ModelSelection.LATEST:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_last.pt'),
-    ModelSelection.CUSTOM:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
+    ModelSelection.CUSTOM:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.85113_epoch-7.pt'),
 }
 def load_custom_model(model_selection:ModelSelection) -> CustomObjectDetection:
     """Loads the model and the Json and returns the `shape_detector`"""
@@ -111,16 +111,15 @@ def load_custom_model(model_selection:ModelSelection) -> CustomObjectDetection:
     shape_detector.setJsonPath(json_path)
     shape_detector.loadModel()
     return shape_detector
-def train_custom_model(model_selection:ModelSelection):
-    model_path = model_paths[model_selection]
+def train_custom_model():
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsTinyYOLOv3()
     dataset_path = os.path.join(os.getcwd(), 'dataset')
     trainer.setDataDirectory(data_directory=dataset_path)
     trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
-                        #    ,batch_size=20
-                           ,num_experiments=100
-                           ,train_from_pretrained_model=model_path
+                           ,batch_size=2
+                           ,num_experiments=30
+                           ,train_from_pretrained_model=os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
                            )
     trainer.trainModel()
 def compare_all_models(img:cv2.Mat) -> None:
@@ -211,11 +210,18 @@ if __name__ == "__main__":
     img_path = 'files\image_processing\example_shapes (2).jpg'
     img = cv2.imread(img_path)
 
-    train_custom_model(ModelSelection.ORIGINAL_MODEL)
-
+    train_custom_model()
+    compare_all_models(img)
 
     # Put image into AI and color detection
-    compare_all_models(img)
+    # shape_detector = load_custom_model(ModelSelection.LATEST)
+    # annotated, detected_objects = shape_detector.detectObjectsFromImage(input_image=img,
+    #                                                                             output_type="array",
+    #                                                                             display_percentage_probability=True,
+    #                                                                             display_object_name=True)
+    # annotate_detected_colors(img=annotated, detected_objects=detected_objects)
+    # cv2.imshow(f'Model: ',annotated)
+
 
     # Display to user
     print('Press `esc` to close...')
