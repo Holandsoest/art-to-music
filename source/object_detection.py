@@ -14,80 +14,80 @@ from mido import Message
 from mido import MidiFile #for loading midi files
 
 # Function to get the color of an object in the image
-def get_color(img):
-    # Convert image to HSV color space
-    # hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+# def get_color(img):
+#     # Convert image to HSV color space
+#     # hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     
-    # Define color range for red, green, and blue
-    # lower_yellow = np.array([20, 100, 100], np.uint8)
-    # upper_yellow = np.array([30, 255, 255], np.uint8)
-    # yellow_mask = cv2.inRange(hsv_img, lower_yellow, upper_yellow)
-    # yellow_mask = cv2.dilate(yellow_mask, kernel)
-    # print(hsv_img)
+#     # Define color range for red, green, and blue
+#     # lower_yellow = np.array([20, 100, 100], np.uint8)
+#     # upper_yellow = np.array([30, 255, 255], np.uint8)
+#     # yellow_mask = cv2.inRange(hsv_img, lower_yellow, upper_yellow)
+#     # yellow_mask = cv2.dilate(yellow_mask, kernel)
+#     # print(hsv_img)
 
 
-    # lower_orange = np.array([5, 100, 100], np.uint8)
-    # upper_orange = np.array([15, 255, 255], np.uint8)
+#     # lower_orange = np.array([5, 100, 100], np.uint8)
+#     # upper_orange = np.array([15, 255, 255], np.uint8)
 
-    # lower_green = np.array([36, 25, 25])
-    # upper_green = np.array([86, 255, 255])
+#     # lower_green = np.array([36, 25, 25])
+#     # upper_green = np.array([86, 255, 255])
 
-    # lower_blue = np.array([110, 50, 50])
-    # upper_blue = np.array([130, 255, 255])
+#     # lower_blue = np.array([110, 50, 50])
+#     # upper_blue = np.array([130, 255, 255])
 
-    # lower_violet = np.array([140, 50, 50])
-    # upper_violet = np.array([160, 255, 255])
+#     # lower_violet = np.array([140, 50, 50])
+#     # upper_violet = np.array([160, 255, 255])
 
-    # lower_red1 = np.array([0, 50, 50])
-    # upper_red1 = np.array([10, 255, 255])
+#     # lower_red1 = np.array([0, 50, 50])
+#     # upper_red1 = np.array([10, 255, 255])
 
-    # lower_red2 = np.array([170, 50, 50])
-    # upper_red2 = np.array([180, 255, 255])
-    red_lower = np.array([136, 87, 111], np.uint8)
-    red_upper = np.array([180, 255, 255], np.uint8)
-    red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
+#     # lower_red2 = np.array([170, 50, 50])
+#     # upper_red2 = np.array([180, 255, 255])
+#     red_lower = np.array([136, 87, 111], np.uint8)
+#     red_upper = np.array([180, 255, 255], np.uint8)
+#     red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
   
-    green_lower = np.array([25, 52, 72], np.uint8)
-    green_upper = np.array([102, 255, 255], np.uint8)
-    green_mask = cv2.inRange(hsvFrame, green_lower, green_upper)
+#     green_lower = np.array([25, 52, 72], np.uint8)
+#     green_upper = np.array([102, 255, 255], np.uint8)
+#     green_mask = cv2.inRange(hsvFrame, green_lower, green_upper)
   
-    blue_lower = np.array([94, 80, 2], np.uint8)
-    blue_upper = np.array([120, 255, 255], np.uint8)
-    blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
+#     blue_lower = np.array([94, 80, 2], np.uint8)
+#     blue_upper = np.array([120, 255, 255], np.uint8)
+#     blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
 
-    kernel = np.ones((5, 5))      
-    # Create masks for each color range
+#     kernel = np.ones((5, 5))      
+#     # Create masks for each color range
 
-    # orange_mask = cv2.inRange(hsv_img, lower_orange, upper_orange)
-    # green_mask = cv2.inRange(hsv_img, lower_green, upper_green)
-    # blue_mask = cv2.inRange(hsv_img, lower_blue, upper_blue)
-    # violet_mask = cv2.inRange(hsv_img, lower_violet, upper_violet)
-    # red_mask1 = cv2.inRange(hsv_img, lower_red1, upper_red1)
-    # red_mask2 = cv2.inRange(hsv_img, lower_red2, upper_red2)
-    # red_mask = cv2.bitwise_or(red_mask1, red_mask2)
+#     # orange_mask = cv2.inRange(hsv_img, lower_orange, upper_orange)
+#     # green_mask = cv2.inRange(hsv_img, lower_green, upper_green)
+#     # blue_mask = cv2.inRange(hsv_img, lower_blue, upper_blue)
+#     # violet_mask = cv2.inRange(hsv_img, lower_violet, upper_violet)
+#     # red_mask1 = cv2.inRange(hsv_img, lower_red1, upper_red1)
+#     # red_mask2 = cv2.inRange(hsv_img, lower_red2, upper_red2)
+#     # red_mask = cv2.bitwise_or(red_mask1, red_mask2)
 
   
-    # Count the number of pixels in each mask
-    red_pixels = cv2.dilate(red_mask, kernel)
-    green_pixels = cv2.dilate(green_mask, kernel)
-    blue_pixels = cv2.dilate(blue_mask, kernel)
-    # blue_pixels = cv2.countNonZero(blue_mask)
-    # violet_pixels = cv2.countNonZero(violet_mask)
-    # red_pixels = cv2.countNonZero(red_mask)
+#     # Count the number of pixels in each mask
+#     red_pixels = cv2.dilate(red_mask, kernel)
+#     green_pixels = cv2.dilate(green_mask, kernel)
+#     blue_pixels = cv2.dilate(blue_mask, kernel)
+#     # blue_pixels = cv2.countNonZero(blue_mask)
+#     # violet_pixels = cv2.countNonZero(violet_mask)
+#     # red_pixels = cv2.countNonZero(red_mask)
     
-    # Determine the dominant color based on the number of pixels
-    if red_pixels():
-        return 'red'
-    elif green_pixels():
-        return 'orange'
-    elif blue_pixels():
-        return 'green'
-    # elif blue_pixels > yellow_pixels and blue_pixels > orange_pixels and blue_pixels > green_pixels and blue_pixels > violet_pixels and blue_pixels > red_pixels:
-    #     return 'blue'
-    # elif violet_pixels > yellow_pixels and violet_pixels > orange_pixels and violet_pixels > green_pixels and violet_pixels > blue_pixels and violet_pixels > red_pixels:
-    #     return 'violet'
-    # else:
-    #     return 'red'
+#     # Determine the dominant color based on the number of pixels
+#     if red_pixels():
+#         return 'red'
+#     elif green_pixels():
+#         return 'orange'
+#     elif blue_pixels():
+#         return 'green'
+#     # elif blue_pixels > yellow_pixels and blue_pixels > orange_pixels and blue_pixels > green_pixels and blue_pixels > violet_pixels and blue_pixels > red_pixels:
+#     #     return 'blue'
+#     # elif violet_pixels > yellow_pixels and violet_pixels > orange_pixels and violet_pixels > green_pixels and violet_pixels > blue_pixels and violet_pixels > red_pixels:
+#     #     return 'violet'
+#     # else:
+#     #     return 'red'
 
 
 if __name__ == "__main__":
@@ -118,8 +118,8 @@ if __name__ == "__main__":
     # Run camera in loop
     while True:
         ret, img = cam_feed.read()
-        _, imageFrame = cam_feed.read()
-        hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
+        # _, imageFrame = cam_feed.read()
+        # hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
         # Object detection parametres
         annotated_image, preds = obj_detect.detectObjectsFromImage(input_image=img, output_type="array",
                                                                    display_percentage_probability=False,
@@ -127,21 +127,21 @@ if __name__ == "__main__":
         # Loop through detected objects and add color information
         for obj in preds:
             x1, y1, x2, y2 = obj["box_points"]
-            obj_img = img[y1:y2, x1:x2]
+            # obj_img = img[y1:y2, x1:x2]
             # Call function to extract color data
-            color = get_color(obj_img)
-            obj["color"] = color
+            #color = get_color(obj_img)
+            #obj["color"] = color
             # Color lable text
-            color_label = ("Color: " + color)
+            #color_label = ("Color: " + color)
             # Calculate size of box
-            size = (x2 - x1) * (y2 - y1)
+            # size = (x2 - x1) * (y2 - y1)
             # Size label text
-            size_label = ("Size: " + str(size))
+            # size_label = ("Size: " + str(size))
             # Position label text
             pos_label = ("Position: ({}, {})".format(x1, y1))
             # adding text to the object 
-            cv2.putText(annotated_image, color_label, (x1, y1-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            cv2.putText(annotated_image, size_label, (x1, y1-25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            #cv2.putText(annotated_image, color_label, (x1, y1-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            # cv2.putText(annotated_image, size_label, (x1, y1-25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             cv2.putText(annotated_image, pos_label, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             # Loop through detected objects and send MIDI messages
         # for obj in preds:

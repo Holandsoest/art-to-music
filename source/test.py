@@ -18,7 +18,7 @@ cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters",640,240)
 cv2.createTrackbar("Threshold1","Parameters",159,255,empty)
 cv2.createTrackbar("Threshold2","Parameters",53,255,empty)
-cv2.createTrackbar("Area","Parameters",180,30000,empty)
+cv2.createTrackbar("Area","Parameters",1111,30000,empty)
 
 
 
@@ -59,28 +59,32 @@ def stackImages(scale,imgArray):
 
 def getContours(img, imgContour):
     contours,hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-
+    
     for cnt in contours:
         area = cv2.contourArea(cnt) 
         # print(area)#oppervlakte van de figuren
         areaMin = cv2.getTrackbarPos("Area", "Parameters")
         if area>areaMin:
-
+            
+            #total points of ervery figure
             cv2.drawContours(imgContour, cnt, -1, (255, 0, 0), 3)
             peri = cv2.arcLength(cnt,True)
-            #print(peri) 
             approx = cv2.approxPolyDP(cnt,0.02*peri,True)
-            # print(len(approx)) #total points of ervery figure
-            objCor = len(approx)
+
+
+
+            #possitions
             x, y, w, h = cv2.boundingRect(cnt)
-            # cv2.putText(imageFrame, "Green Colour", (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0))
+            pos_label = ("Position: ({}, {})".format(x, y))
+            cv2.putText(imgContour, pos_label, (x + w +20, y + 80), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-            _, area= cap.read()
-            hsvFrame = cv2.cvtColor(area, cv2.COLOR_BGR2HSV)
 
-            # Pick pixel value
-            pixel_center = hsvFrame[x, y]
+            #color
+            _, frame = cap.read()
+            hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            pixel_center = hsv_frame[y+30, x+30]
             hue_value = pixel_center[0]
+
             color = "Undefined"
             if hue_value < 5:
                 color = "RED"
@@ -96,44 +100,18 @@ def getContours(img, imgContour):
                 color = "VIOLET"
             else:
                 color = "RED"
-            # print(color)
 
+            cv2.putText(imgContour, color, (x + w +20, y + 50), 0, 0.7, (0,255,0), 3)
 
             #pixel_center_bgr = frame[cy, cx]
             #b, g, r = int(pixel_center_bgr[0]), int(pixel_center_bgr[1]), int(pixel_center_bgr[2])
-            
-
             #cv2.rectangle(frame, (cx - 220, 10), (cx + 200, 120), (255, 255, 255), -1)
             #cv2.putText(frame, color, (cx - 200, 100), 0, 3, (b, g, r), 5)
-            cv2.putText(imgContour, "Color: " + str(len("color")), (x + w +20, y + 50), cv2.FONT_HERSHEY_COMPLEX,0.7, (0,255,0),2)
-            cv2.circle(imgContour, (x, y), 5, (25, 25, 25), 3)
-            #cv2.imshow("Frame", frame)
             # cv2.circle(imgContour, (x, y),5, (x+w,y+h), (25, 25, 25), 2)
+
             cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
             cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.7, (0,255,0),2)
 
-
-           
-
-
-
-
-
-            
-            #cv2.putText(imgContour, "color: " + str(color) ,(x + w +20, y + 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0),2)  
-    
-            # if objCor ==3: objectType ="Tri"
-            # elif objCor == 4:
-            #     aspRatio = w/float(h)
-            #     if aspRatio >0.98 and aspRatio <1.03: objectType= "Square"
-            #     else:objectType="Rectangle"
-            # elif objCor>4: objectType= "Circles"
-            # else:objectType="None"
- 
-            # cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
-            # cv2.putText(imgContour,objectType,
-            #             (x+(w//2)-10,y+(h//2)-10),cv2.FONT_HERSHEY_COMPLEX,0.7,
-            #             (0,0,0),2)
 
 
 while True:
@@ -158,65 +136,4 @@ while True:
     imgStack = stackImages(0.8,([imgContour]))
     cv2.imshow("Result", imgStack)
     if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-
-     # cx = int(x / 2)
-            # cy = int(y / 2)
-            # # Pick pixel value
-            # pixel_center = hsvFrame[cy, cx]
-            # # print(pixel_center)
-            # print(hsvFrame)
-            # hue_value = pixel_center[0]
-            # color = "Undefined"
-            # print(pixel_center[0])
-            # red_lower = np.array([136, 87, 111], np.uint8)
-            # red_upper = np.array([180, 255, 255], np.uint8)
-            # red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
-            # green_lower = np.array([25, 52, 72], np.uint8)
-            # green_upper = np.array([102, 255, 255], np.uint8)
-            # green_mask = cv2.inRange(hsvFrame, green_lower, green_upper)
-         
-            # blue_lower = np.array([94, 80, 2], np.uint8)
-            # blue_upper = np.array([120, 255, 255], np.uint8)
-            # blue_mask = cv2.inRange(hsvFrame, blue_lower, blue_upper)
-            # # For red color
-
-            # kernel = np.ones((5, 5))
-            # red_mask = cv2.dilate(red_mask, kernel)
-            # green_mask = cv2.dilate(green_mask, kernel)
-            # blue_mask = cv2.dilate(blue_mask, kernel)
-
-            # contours, hierarchy = cv2.findContours(red_mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            # for pic, contour in enumerate(contours):
-            #     x, y, w, h = cv2.boundingRect(contour)
-            #     area = cv2.contourArea(contour)
-            #     color = "RED"
-            # contours, hierarchy = cv2.findContours(red_mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)    
-            # for pic, contour in enumerate(contours):
-            #     x, y, w, h = cv2.boundingRect(contour)
-            #     area = cv2.contourArea(contour)
-            #     color = "green"
-            
-            # contours, hierarchy = cv2.findContours(red_mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-            # for pic, contour in enumerate(contours):
-            #     x, y, w, h = cv2.boundingRect(contour)
-            #     area = cv2.contourArea(contour)
-            #     color = "blue"
-            # if 136 < pixel_center[0] < 180 & 87 < pixel_center[1] < 255 & 111 < pixel_center[2] < 255:
-            #     color = "RED"
-            # elif 25 < pixel_center[0] < 102 & 52 < pixel_center[1] < 255 & 72 < pixel_center[2] < 255:
-            #     color = "ORANGE"
-            # elif 94 < pixel_center[0] < 120 & 80 < pixel_center[1] < 255 & 2 < pixel_center[2] < 255:
-            #     color = "YELLOW"
-            # elif hue_value < 78:
-            #     color = "GREEN"
-            # elif hue_value < 131:
-            #     color = "BLUE"
-            # elif hue_value < 170:
-            #     color = "VIOLET"
-            # else:
-            #     color = "RED"
-            # print(hue_value)
-            #print(color)
-            
+        break            
