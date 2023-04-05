@@ -103,8 +103,9 @@ if __name__ == "__main__":
 
     # Set webcam parameters
     cam_feed = cv2.VideoCapture(0)
-    cam_feed.set(cv2.CAP_PROP_FRAME_WIDTH, 650)
-    cam_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 750)
+    cam_feed.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cam_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
 
     # Open port and map notes to objects
     # outport = mido.open_output()
@@ -126,23 +127,50 @@ if __name__ == "__main__":
                                                                    display_object_name=True)
         # Loop through detected objects and add color information
         for obj in preds:
-            x1, y1, x2, y2 = obj["box_points"]
-            # obj_img = img[y1:y2, x1:x2]
-            # Call function to extract color data
-            #color = get_color(obj_img)
-            #obj["color"] = color
-            # Color lable text
-            #color_label = ("Color: " + color)
-            # Calculate size of box
-            # size = (x2 - x1) * (y2 - y1)
-            # Size label text
-            # size_label = ("Size: " + str(size))
-            # Position label text
-            pos_label = ("Position: ({}, {})".format(x1, y1))
+            x, y, w, h = obj["box_points"]
+
+
+            pos_label = ("Position: ({}, {})".format(x, y))
+            cv2.putText(annotated_image, pos_label, (x + w +20, y + 80), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+            cy = int(y+h/2)
+            cx = int(x+w/2)
+            _, frame = cam_feed.read()
+            
+            hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            if cy > 479 :
+                cy = 479
+
+            if cx > 639:
+                cx = 639
+
+            pixel_center = hsv_frame[cy, cx]
+            hue_value = pixel_center[0]
+            #type of colors
+            color = "Undefined"
+            if hue_value < 5:
+                color = "RED"
+            elif hue_value < 22:
+                color = "ORANGE"
+            elif hue_value < 33:
+                color = "YELLOW"
+            elif hue_value < 78:
+                color = "GREEN"
+            elif hue_value < 131:
+                color = "BLUE"
+            elif hue_value < 170:
+                color = "VIOLET"
+            else:
+                color = "RED"
+
+            # cv2.putText(annotated_image, color, (x + w +20, y + 50), 0, 0.5, (0,255,0), 2)
+            cv2.putText(annotated_image, color, (x, y-40), cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 0, 255), 2)
+
+            pos_label = ("Position: ({}, {})".format(x, y))
             # adding text to the object 
             #cv2.putText(annotated_image, color_label, (x1, y1-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             # cv2.putText(annotated_image, size_label, (x1, y1-25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            cv2.putText(annotated_image, pos_label, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            cv2.putText(annotated_image, pos_label, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             # Loop through detected objects and send MIDI messages
         # for obj in preds:
         #     obj_name = obj["name"].lower()

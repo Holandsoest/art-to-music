@@ -76,13 +76,19 @@ def getContours(img, imgContour):
             #possitions
             x, y, w, h = cv2.boundingRect(cnt)
             pos_label = ("Position: ({}, {})".format(x, y))
-            cv2.putText(imgContour, pos_label, (x + w +20, y + 80), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-
+            
 
             #color
+            cy = int(y+h/2)
+            cx = int(x+w/2)
             _, frame = cap.read()
             hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            pixel_center = hsv_frame[y+30, x+30]
+            if cy > 479 :
+                cy = 479
+
+            if cx > 639:
+                cx = 639
+            pixel_center = hsv_frame[cy, cx]
             hue_value = pixel_center[0]
             #type of colors
             color = "Undefined"
@@ -101,8 +107,8 @@ def getContours(img, imgContour):
             else:
                 color = "RED"
 
-            cv2.putText(imgContour, color, (x + w +20, y + 50), 0, 0.7, (0,255,0), 3)
-
+            
+            #extra parts
             #pixel_center_bgr = frame[cy, cx]
             #b, g, r = int(pixel_center_bgr[0]), int(pixel_center_bgr[1]), int(pixel_center_bgr[2])
             #cv2.rectangle(frame, (cx - 220, 10), (cx + 200, 120), (255, 255, 255), -1)
@@ -110,7 +116,10 @@ def getContours(img, imgContour):
             # cv2.circle(imgContour, (x, y),5, (x+w,y+h), (25, 25, 25), 2)
 
             cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
-            cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.7, (0,255,0),2)
+            cv2.putText(imgContour, "position: " + pos_label, (x + w +20, y + 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            cv2.putText(imgContour, "color: " +  color, (x + w +20, y + 40), 0, 0.5, (0,255,0), 2)
+            cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+            cv2.putText(imgContour, "Area: " + str(int(area)), (x + w +20, y + 80), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
 
 
 

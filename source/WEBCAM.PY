@@ -130,7 +130,7 @@ def kleur():
     cx = int(width / 2)
     cy = int(height / 2)
     # Pick pixel value
-    print(cx,cy)
+
     pixel_center = hsv_frame[cy, cx]
 
     hue_value = pixel_center[0]
