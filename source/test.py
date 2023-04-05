@@ -84,7 +84,7 @@ def getContours(img, imgContour):
             hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
             pixel_center = hsv_frame[y+30, x+30]
             hue_value = pixel_center[0]
-
+            #type of colors
             color = "Undefined"
             if hue_value < 5:
                 color = "RED"
