@@ -1,7 +1,8 @@
 # Python code for Multiple Color Detection  
 import numpy as np
 import cv2
-  
+import pandas as pd
+import os  
 # # Capturing video through webcam
 # webcam = cv2.VideoCapture(0)
 # # Start a while loop
@@ -110,6 +111,23 @@ import cv2
 # cv2.waitKey(0)
 
 
+# def getShapeColor(R,G,B):
+#          #Reading csv file with pandas and giving names to each column
+#     index=["color","color_name","hex","R","G","B"]
+#     absolute_path = os.path.join(os.getcwd(), 'files','image_processing', 'colors.csv')
+#     csv = pd.read_csv(absolute_path, names=index, header=None)
+
+#     minimum = 10000
+#     for i in range(len(csv)):
+#         d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
+#     if(d<=minimum):
+#         minimum = d
+#         cname = csv.loc[i,"color_name"]
+#     return cname
+
+# colorName = getShapeColor(r,g,b)
+
+
 frameWidth = 640
 frameHeight = 480
 cap = cv2.VideoCapture(0)
@@ -121,47 +139,75 @@ cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
-def kleur():
+
+
+
+# def kleur():
+
+
+
+def getShapeColor():
     _, frame = cap.read()
     hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
     height, width, _ = frame.shape
 
+
     cx = int(width / 2)
     cy = int(height / 2)
     # Pick pixel value
 
-    pixel_center = hsv_frame[cy, cx]
 
-    hue_value = pixel_center[0]
-    print(hue_value)
+    b,g,r, = hsv_frame[cy, cx]
+    b = int(b)
+    g = int(g)
+    r = int(r)
+    # print(b,g,r)
 
-    color = "Undefined"
-    if hue_value < 5:
-        color = "RED"
-    elif hue_value < 22:
-        color = "ORANGE"
-    elif hue_value < 33:
-        color = "YELLOW"
-    elif hue_value < 78:
-        color = "GREEN"
-    elif hue_value < 131:
-        color = "BLUE"
-    elif hue_value < 170:
-        color = "VIOLET"
-    else:
-        color = "RED"
 
-    pixel_center_bgr = frame[cy, cx]
-    b, g, r = int(pixel_center_bgr[0]), int(pixel_center_bgr[1]), int(pixel_center_bgr[2])
+         #Reading csv file with pandas and giving names to each column
+    index=["color","color_name","hex","R","G","B"]
+    absolute_path = os.path.join(os.getcwd(), 'colors (1).csv')
+    csv = pd.read_csv(absolute_path, names=index, header=None)
+
+    minimum = 10000
+    for i in range(len(csv)):
+        d = abs(r- int(csv.loc[i,"R"])) + abs(g- int(csv.loc[i,"G"]))+ abs(b- int(csv.loc[i,"B"]))
+        if(d<=minimum):
+            minimum = d
+            cname = csv.loc[i,"color_name"]
+        print(d)
+    
+    
+    # hue_value = pixel_center[0]
+    # #print(hue_value)
+
+    # color = "Undefined"
+    # if hue_value < 5:
+    #     color = "RED"
+    # elif hue_value < 22:
+    #     color = "ORANGE"
+    # elif hue_value < 33:
+    #     color = "YELLOW"
+    # elif hue_value < 78:
+    #     color = "GREEN"
+    # elif hue_value < 131:
+    #     color = "BLUE"
+    # elif hue_value < 170:
+    #     color = "VIOLET"
+    # else:
+    #     color = "RED"
+
+    # pixel_center_bgr = frame[cy, cx]
+    # b, g, r = int(pixel_center_bgr[0]), int(pixel_center_bgr[1]), int(pixel_center_bgr[2])
 
     cv2.rectangle(frame, (cx - 220, 10), (cx + 200, 120), (255, 255, 255), -1)
-    cv2.putText(frame, color, (cx - 200, 100), 0, 3, (b, g, r), 5)
+    cv2.putText(frame, cname, (cx - 200, 100), 0, 3, (b, g, r), 5)
     cv2.circle(frame, (cx, cy), 5, (25, 25, 25), 3)
     cv2.imshow("Frame", frame)
 
 while True:
-    kleur()
+    getShapeColor()
     key = cv2.waitKey(1)
     if key == 27:
         break
