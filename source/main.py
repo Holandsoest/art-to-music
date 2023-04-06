@@ -81,7 +81,7 @@ for contour in contours:
         #Appending instances to listOfShapes
         #Triangle = Guitar sound = number 30
         #listOfShapes.append(Image("Triangle", int(shapeSize), colorName, int(width), int(height)))
-        listOfShapes.append(Image(30, int(shapeSize), 120, 1, 50))
+        listOfShapes.append(Image("Guitar", int(shapeSize), 120, 1, 50))
 
     #Square or rectangle
     elif len(approx) == 4 : 
@@ -90,34 +90,34 @@ for contour in contours:
         if aspectRatio >= 0.95 and aspectRatio < 1.05:
             colorName = setNameShape("Square",int(x), int(y), img)
             #Square = Drum = number 119
-            listOfShapes.append(Image(119, int(shapeSize), 60, 2, 200))
+            listOfShapes.append(Image("Drum", int(shapeSize), 60, 2, 200))
         else:
             colorName = setNameShape("Rectangle",int(x), int(y), img)
             #Rectangle = half circle = flute = number 74
-            listOfShapes.append(Image(74, int(shapeSize), 30, 1, 240))
+            listOfShapes.append(Image("Flute", int(shapeSize), 30, 1, 240))
 
     #Pentgaon
     elif len(approx) == 5 :
         colorName = setNameShape("Pentagon",int(x), int(y), img)
         #Pentagon = Heartshape = piano = 2
-        listOfShapes.append(Image(3, int(shapeSize), 240, 2, 100))
+        listOfShapes.append(Image("Piano", int(shapeSize), 240, 2, 100))
 
     #Star
     elif len(approx) == 10 :
         colorName = setNameShape("Star",int(x), int(y), img)
         #Star = Cello = 43
-        listOfShapes.append(Image(43, int(shapeSize), 90, 1, 150))
+        listOfShapes.append(Image("Cello", int(shapeSize), 90, 1, 150))
 
     #Circle
     else:
         colorName = setNameShape("Circle",int(x), int(y),img)
         #Circle = lead 1 = 81
-        listOfShapes.append(Image(81, int(shapeSize), 120, 1, 200))
+        listOfShapes.append(Image("Violin", int(shapeSize), 120, 1, 200))
 
 # Accessing object value using a for loop
 for shape in listOfShapes:
     print("instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
-    
+
 while(1):
     cv2.imshow("image",img)
 
@@ -129,38 +129,80 @@ cv2.destroyAllWindows()
 
 def MakeSong(list):
     #pitch, bpm, duration, volume, instrument, amount
-    amount_of_instruments = len(list)
+    amountOfInstruments = len(list) # number of different insturments
+    
+    # define variables amount
+    amountOfPiano = 0
+    amountOfDrum = 0
+    amountOfGuitar = 0
+    amountOfFlute = 0
+    amountOfViolin = 0
+    amountOfCello = 0
+
+    objectPiano = 0
+    objectDrum = 0
+    objectGuitar = 0
+    objectFlute = 0
+    objectViolin = 0
+    objectCello = 0
+
+    iteration = 0
+
+    #determen the amound of shapes woth the same instrument
+    for shape in listOfShapes:
+        if shape.instrument == "Piano":
+            amountOfPiano += 1
+        if shape.instrument == "Drum":
+            amountOfDrum += 1    
+        if shape.instrument == "Guitar":
+            amountOfGuitar += 1
+        if shape.instrument == "Flute":
+            amountOfFlute += 1
+        if shape.instrument == "Violin":
+            amountOfViolin += 1
+        if shape.instrument == "Cello":
+            amountOfCello += 1
+
+    # make midi file for every instrument
+    midiPiano = MIDIFile(amountOfPiano, removeDuplicates=False)
+    midiDrum = MIDIFile(amountOfDrum, removeDuplicates=False)    
+    midiGuitar = MIDIFile(amountOfGuitar, removeDuplicates=False)
+    midiFlute = MIDIFile(amountOfFlute, removeDuplicates=False)
+    midiViolin = MIDIFile(amountOfViolin, removeDuplicates=False)
+    midiCello = MIDIFile(amountOfCello, removeDuplicates=False)
+
     for shape in list:
-
-        # create MIDIFile object
-        midi = MIDIFile(amount_of_instruments, removeDuplicates=False)
-
-        # add tracks
-        time = 0
-        channel = 0 
-        instruments = 0
-
-        # create ass many tracks as instruments        
-        midi.addTrackName(instruments, time, f"Track{instruments}")
-        midi.addTempo(instruments, time, shape.bpm)
-        midi.addProgramChange(instruments, 0, time, shape.instrument)
-
-        midi.addNote(instruments, channel, shape.pitch, time, shape.duration, shape.volume)
-        time = +2
-        instruments +=1
-
-        with open("output.mid", "wb") as output_file:
-            midi.writeFile(output_file)
         
-        pygame.mixer.init()
-        #load MIDI file
-        pygame.mixer.music.load("output.mid")
-        # play MIDI file
-        pygame.mixer.music.play()
-        # wait for music to finish playing
-        while pygame.mixer.music.get_busy():
-            continue
+        if amountOfPiano > 0 and shape.instrument == "Piano":
+            # add tracks
+            timePiano = 0 # time to zero
+            channelPiano = 0 #channel to zero
 
+            # create ass many tracks as objects on the board    
+            midiPiano.addTrackName(objectPiano, timePiano, f"TrackPiano{objectPiano}") # giva track a name
+            midiPiano.addTempo(objectPiano, timePiano, shape.bpm) # set bpm
+            midiPiano.addProgramChange(objectPiano, 0, timePiano, shape.instrument) # add insturment
+            midiPiano.addNote(objectPiano, channelPiano, shape.pitch, timePiano, shape.duration, shape.volume) # make a note
+            
+            objectPiano +=1
+        
+        if amountOfInstruments == iteration:
+            #write all the midi files
+            with open("PianoOutput.mid", "wb") as output_file:
+                midiPiano.writeFile(output_file)
+            with open("DrumOutput.mid", "wb") as output_file:
+                midiDrum.writeFile(output_file)
+            with open("GuitarOutput.mid", "wb") as output_file:
+                midiGuitar.writeFile(output_file)
+            with open("FluteOutput.mid", "wb") as output_file:
+                midiFlute.writeFile(output_file)
+            with open("ViolinOutput.mid", "wb") as output_file:
+                midiViolin.writeFile(output_file)
+            with open("CelloOutput.mid", "wb") as output_file:
+                midiCello.writeFile(output_file)
+            
+        iteration += 1
+   
 MakeSong(listOfShapes)
 
 
