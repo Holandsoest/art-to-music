@@ -48,14 +48,14 @@ def MakeSong(list):
         
         if amount_of_piano > 0 and shape.instrument == "Piano":
             # add tracks
-            timePiano = 0 # time to zero
-            channelPiano = 0 #channel to zero
+            time_piano = 0 # time to zero
+            channel_piano = 0 #channel to zero
 
             # create ass many tracks as objects on the board    
-            midi_piano.addTrackName(object_piano, timePiano, f"TrackPiano{object_piano}") # giva track a name
-            midi_piano.addTempo(object_piano, timePiano, shape.bpm) # set bpm
-            midi_piano.addProgramChange(object_piano, 0, timePiano, shape.instrument) # add insturment
-            midi_piano.addNote(object_piano, channelPiano, shape.pitch, timePiano, shape.duration, shape.volume) # make a note
+            midi_piano.addTrackName(object_piano, time_piano, f"TrackPiano{object_piano}") # giva track a name
+            midi_piano.addTempo(object_piano, time_piano, shape.bpm) # set bpm
+            midi_piano.addProgramChange(object_piano, 0, time_piano, shape.instrument) # add insturment
+            midi_piano.addNote(object_piano, channel_piano, shape.pitch, time_piano, shape.duration, shape.volume) # make a note
             
             object_piano +=1
         
