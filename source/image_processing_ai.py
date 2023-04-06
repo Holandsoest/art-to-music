@@ -82,24 +82,6 @@ def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
         # adding a text to the object 
         cv2.putText(img, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-class ModelSelection(Enum):
-    """An enum of different choices.  
-    - `ORIGINAL_MODEL`  Is the downloaded `tiny-yolov3` model. It can detect kites.  
-    - `PREVIOUS_STABLE` A model is stable when the trainer person has validated that it is the current best; this is the previous one.  
-    - `STABLE`          A model is stable when the trainer person has validated that it is the current best.  
-    - `LATEST`          The model that was most recently made. Latest models might constantly change.  
-    - `CUSTOM`          Change the paths below here to quickly test another model or json."""
-    # ORIGINAL_MODEL = 0
-    # PREVIOUS_STABLE = 1
-    # STABLE = 2
-    LATEST = 3
-    CUSTOM = 4
-model_paths = {
-    # ModelSelection.ORIGINAL_MODEL:  os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt'),
-    # ModelSelection.STABLE:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
-    ModelSelection.LATEST:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_last.pt'),
-    ModelSelection.CUSTOM:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.85113_epoch-7.pt'),
-}
 def load_custom_model(path) -> CustomObjectDetection:
     """Loads the model and the Json and returns the `shape_detector`"""
     json_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
