@@ -23,18 +23,14 @@ def MakeSong(list):
 
     # determine the amount of shapes with the same instrument
     for shape in listOfShapes:
-        if shape.instrument == "Piano":
-            amount_of_piano += 1
-        if shape.instrument == "Drum":
-            amount_of_drum += 1    
-        if shape.instrument == "Guitar":
-            amount_of_guitar += 1
-        if shape.instrument == "Flute":
-            amount_of_flute += 1
-        if shape.instrument == "Violin":
-            amount_of_violin += 1
-        if shape.instrument == "Cello":
-            amount_ofcello += 1
+        match shape.instrument:
+            case 'Piano':   amount_of_piano += 1
+            case 'Drum':    amount_of_drum += 1
+            case 'Guitar':  amount_of_guitar += 1
+            case 'Flute':   amount_of_flute += 1
+            case 'Violin':  amount_of_violin += 1
+            case 'Cello':   amount_of_cello += 1
+            case _: pass
 
     # make midi file for every instrument
     midi_piano = MIDIFile(amount_of_piano, removeDuplicates=False)
