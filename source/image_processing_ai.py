@@ -100,14 +100,14 @@ model_paths = {
     ModelSelection.LATEST:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_last.pt'),
     ModelSelection.CUSTOM:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.85113_epoch-7.pt'),
 }
-def load_custom_model(model_selection:ModelSelection) -> CustomObjectDetection:
+def load_custom_model(path) -> CustomObjectDetection:
     """Loads the model and the Json and returns the `shape_detector`"""
     json_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = model_paths[model_selection]
+    model_path = path
 
     shape_detector = CustomObjectDetection()
     shape_detector.setModelTypeAsTinyYOLOv3()
-    shape_detector.setModelPath(model_custom_path)
+    shape_detector.setModelPath(model_path)
     shape_detector.setJsonPath(json_path)
     shape_detector.loadModel()
     return shape_detector
@@ -122,17 +122,36 @@ def train_custom_model():
                            ,train_from_pretrained_model=os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
                            )
     trainer.trainModel()
-def compare_all_models(img:cv2.Mat) -> None:
-    """Opens the image as it looks for each model, (and original)"""
-    cv2.imshow(f'No model',img)
-    for model_selection in ModelSelection:
-        shape_detector = load_custom_model(model_selection)
-        annotated, detected_objects = shape_detector.detectObjectsFromImage(input_image=img,
-                                                                                   output_type="array",
-                                                                                   display_percentage_probability=True,
-                                                                                   display_object_name=True)
-        annotate_detected_colors(img=annotated, detected_objects=detected_objects)
-        cv2.imshow(f'Model: "{model_selection.name}"',annotated)
+def compare_all_models(img:cv2.Mat|None, path:str|None) -> None:
+    """Opens the image as it looks for each model, (and original), can also give a path to a folder with pictures instead and it will do all the pictures"""
+    
+    # Make a list with all images
+    images = []
+    if isinstance(img, cv2.Mat): images.append(img)
+    if os.path.exists(path):
+        for file in os.listdir(path):
+            if file.find('.jpg') == -1: continue
+            images.append(cv2.imread(os.path.join(path,file)))
+    if len(images) < 1: raise FileExistsError("Told me to compare models with images, but you gave me no valid images.") 
+
+    # Make a list with all models
+    model_paths = []
+    for file in os.listdir(os.path.join(os.getcwd(),'dataset','models')):
+        if file.find('.pt') == -1: continue
+        model_paths.append(os.path.join(os.getcwd(),'dataset','models',file))
+
+    for image in images:
+        cv2.imshow(f'No model',image)
+        for model_path in model_paths:
+            shape_detector = load_custom_model(model_path)
+            annotated, detected_objects = shape_detector.detectObjectsFromImage(input_image=image,
+                                                                                    output_type="array",
+                                                                                    display_percentage_probability=True,
+                                                                                    display_object_name=True)
+            annotate_detected_colors(img=annotated, detected_objects=detected_objects)
+            cv2.imshow(f'Model: "{os.path.split(model_path)[1]}"',annotated)
+        print('Press `esc` for the next')
+        while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
 
 def detect_shapes(img): ## OLD CODE
     # Custom Object Detection
@@ -209,9 +228,8 @@ def detect_shapes(img): ## OLD CODE
 if __name__ == "__main__":
     img_path = 'files\image_processing\example_shapes (2).jpg'
     img = cv2.imread(img_path)
-
-    train_custom_model()
-    compare_all_models(img)
+    # train_custom_model()
+    compare_all_models(img=None, path=os.path.join(os.getcwd(),'files','image_processing'))
 
     # Put image into AI and color detection
     # shape_detector = load_custom_model(ModelSelection.LATEST)
