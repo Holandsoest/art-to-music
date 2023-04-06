@@ -2,76 +2,76 @@ from midiutil.MidiFile import MIDIFile
 
 def MakeSong(list):
     #pitch, bpm, duration, volume, instrument, amount
-    amountOfInstruments = len(list) # number of object on the screen 
+    amount_of_instruments = len(list) # number of object on the screen 
     
     # define variables amount
-    amountOfPiano = 0
-    amountOfDrum = 0
-    amountOfGuitar = 0
-    amountOfFlute = 0
-    amountOfViolin = 0
-    amountOfCello = 0
+    amount_of_piano = 0
+    amount_of_drum = 0
+    amount_of_guitar = 0
+    amount_of_flute = 0
+    amount_of_violin = 0
+    amount_ofcello = 0
 
-    objectPiano = 0
-    objectDrum = 0
-    objectGuitar = 0
-    objectFlute = 0
-    objectViolin = 0
-    objectCello = 0
+    object_piano = 0
+    object_drum = 0
+    object_guitar = 0
+    object_flute = 0
+    object_violin = 0
+    object_cello = 0
 
     iteration = 0
 
     #determen the amound of shapes woth the same instrument
     for shape in listOfShapes:
         if shape.instrument == "Piano":
-            amountOfPiano += 1
+            amount_of_piano += 1
         if shape.instrument == "Drum":
-            amountOfDrum += 1    
+            amount_of_drum += 1    
         if shape.instrument == "Guitar":
-            amountOfGuitar += 1
+            amount_of_guitar += 1
         if shape.instrument == "Flute":
-            amountOfFlute += 1
+            amount_of_flute += 1
         if shape.instrument == "Violin":
-            amountOfViolin += 1
+            amount_of_violin += 1
         if shape.instrument == "Cello":
-            amountOfCello += 1
+            amount_ofcello += 1
 
     # make midi file for every instrument
-    midiPiano = MIDIFile(amountOfPiano, removeDuplicates=False)
-    midiDrum = MIDIFile(amountOfDrum, removeDuplicates=False)    
-    midiGuitar = MIDIFile(amountOfGuitar, removeDuplicates=False)
-    midiFlute = MIDIFile(amountOfFlute, removeDuplicates=False)
-    midiViolin = MIDIFile(amountOfViolin, removeDuplicates=False)
-    midiCello = MIDIFile(amountOfCello, removeDuplicates=False)
+    midi_piano = MIDIFile(amount_of_piano, removeDuplicates=False)
+    midi_drum = MIDIFile(amount_of_drum, removeDuplicates=False)    
+    midi_guitar = MIDIFile(amount_of_guitar, removeDuplicates=False)
+    midi_flute = MIDIFile(amount_of_flute, removeDuplicates=False)
+    midi_violin = MIDIFile(amount_of_violin, removeDuplicates=False)
+    midi_cello = MIDIFile(amount_ofcello, removeDuplicates=False)
 
     for shape in list:
         
-        if amountOfPiano > 0 and shape.instrument == "Piano":
+        if amount_of_piano > 0 and shape.instrument == "Piano":
             # add tracks
             timePiano = 0 # time to zero
             channelPiano = 0 #channel to zero
 
             # create ass many tracks as objects on the board    
-            midiPiano.addTrackName(objectPiano, timePiano, f"TrackPiano{objectPiano}") # giva track a name
-            midiPiano.addTempo(objectPiano, timePiano, shape.bpm) # set bpm
-            midiPiano.addProgramChange(objectPiano, 0, timePiano, shape.instrument) # add insturment
-            midiPiano.addNote(objectPiano, channelPiano, shape.pitch, timePiano, shape.duration, shape.volume) # make a note
+            midi_piano.addTrackName(object_piano, timePiano, f"TrackPiano{object_piano}") # giva track a name
+            midi_piano.addTempo(object_piano, timePiano, shape.bpm) # set bpm
+            midi_piano.addProgramChange(object_piano, 0, timePiano, shape.instrument) # add insturment
+            midi_piano.addNote(object_piano, channelPiano, shape.pitch, timePiano, shape.duration, shape.volume) # make a note
             
-            objectPiano +=1
+            object_piano +=1
         
-        if amountOfInstruments == iteration:
+        if amount_of_instruments == iteration:
             #write all the midi files
             with open("PianoOutput.mid", "wb") as output_file:
-                midiPiano.writeFile(output_file)
+                midi_piano.writeFile(output_file)
             with open("DrumOutput.mid", "wb") as output_file:
-                midiDrum.writeFile(output_file)
+                midi_drum.writeFile(output_file)
             with open("GuitarOutput.mid", "wb") as output_file:
-                midiGuitar.writeFile(output_file)
+                midi_guitar.writeFile(output_file)
             with open("FluteOutput.mid", "wb") as output_file:
-                midiFlute.writeFile(output_file)
+                midi_flute.writeFile(output_file)
             with open("ViolinOutput.mid", "wb") as output_file:
-                midiViolin.writeFile(output_file)
+                midi_violin.writeFile(output_file)
             with open("CelloOutput.mid", "wb") as output_file:
-                midiCello.writeFile(output_file)
+                midi_cello.writeFile(output_file)
             
         iteration += 1
