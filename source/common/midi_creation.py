@@ -10,7 +10,7 @@ def MakeSong(list):
     amount_of_guitar = 0
     amount_of_flute = 0
     amount_of_violin = 0
-    amount_ofcello = 0
+    amount_of_cello = 0
 
     object_piano = 0
     object_drum = 0
@@ -21,7 +21,7 @@ def MakeSong(list):
 
     iteration = 0
 
-    #determen the amound of shapes woth the same instrument
+    # determine the amount of shapes with the same instrument
     for shape in listOfShapes:
         if shape.instrument == "Piano":
             amount_of_piano += 1
@@ -42,7 +42,7 @@ def MakeSong(list):
     midi_guitar = MIDIFile(amount_of_guitar, removeDuplicates=False)
     midi_flute = MIDIFile(amount_of_flute, removeDuplicates=False)
     midi_violin = MIDIFile(amount_of_violin, removeDuplicates=False)
-    midi_cello = MIDIFile(amount_ofcello, removeDuplicates=False)
+    midi_cello = MIDIFile(amount_of_cello, removeDuplicates=False)
 
     for shape in list:
         
@@ -52,9 +52,9 @@ def MakeSong(list):
             channel_piano = 0 #channel to zero
 
             # create ass many tracks as objects on the board    
-            midi_piano.addTrackName(object_piano, time_piano, f"TrackPiano{object_piano}") # giva track a name
+            midi_piano.addTrackName(object_piano, time_piano, f"TrackPiano{object_piano}") # give track a name
             midi_piano.addTempo(object_piano, time_piano, shape.bpm) # set bpm
-            midi_piano.addProgramChange(object_piano, 0, time_piano, shape.instrument) # add insturment
+            midi_piano.addProgramChange(object_piano, 0, time_piano, shape.instrument) # add instrument
             midi_piano.addNote(object_piano, channel_piano, shape.pitch, time_piano, shape.duration, shape.volume) # make a note
             
             object_piano +=1
