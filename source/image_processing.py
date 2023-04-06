@@ -34,7 +34,6 @@ def get_bpm_from_color(x_axis, y_axis, image):
         return cname
     
     colorName = getShapeColor(r,g,b)
-    print("color: ", colorName)
 
     def round_up_to_30(number):
         return min(((number + 29) // 30) * 30, 240)
@@ -76,7 +75,24 @@ def get_volume_from_size(obj_size, img_size):
     """
     return min((((obj_size)+(img_size*0.2))/img_size)*255, 255)
 
-def readImage(image):
+def get_contour_from_image(image):
+    """
+    This function reads an image using the OpenCV library and detects contours in the image using the Hough transform algorithm. 
+    It takes one argument:
+    - image: an image read with OpenCV library.
+
+    The function returns a all the contours detected in the image
+    """
+    #Reading the image with opencv
+    img_grayscaled = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    ret , thrash = cv2.threshold(img_grayscaled, 240 , 255, cv2.CHAIN_APPROX_NONE)
+    contours , hierarchy = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+
+    return contours
+
+
+def read_image(image):
     """
     This function reads an image using the OpenCV library and detects shapes in the image using the Hough transform algorithm. 
     It takes one argument:
@@ -144,7 +160,7 @@ def readImage(image):
     for shape in list_of_shapes:
         print("instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
 
-    return list_of_shapes
+    return list_of_shapes, contours
 
 
 

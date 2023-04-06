@@ -6,6 +6,7 @@ import cv2
 import numpy as np 
 import os
 import image_processing as ip
+import common.image_properties as i_prop
 
 # Function to get the color of an object in the image
 def get_color(img):
@@ -67,8 +68,100 @@ def get_color(img):
         return 'violet'
     else:
         return 'red'
+    
+def detect_shapes_with_contour(contours, image):
+    """
+    This function goes over all contours that have been read with cv2 
+    and will detect all the shapes that would have otherwise been marked as a 'circle'.
+    - contours: all contours read with cv2.contours
 
-def detect_shapes(img):
+    The function returns nothing.
+    """
+    #Create shape list_of_shapes
+    list_of_shapes = []
+
+    # # Custom Object Detection
+    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt')
+
+    shape_detector = CustomObjectDetection()
+    shape_detector.setModelTypeAsTinyYOLOv3()
+    shape_detector.setModelPath(model_custom_path)
+    shape_detector.setJsonPath(jason_path)
+    shape_detector.loadModel()
+
+    def get_image_from_box(c, img):
+        x,y,w,h = cv2.boundingRect(c) 
+        if w>50 and h>50: 
+            return img[y:y+h,x:x+w] 
+        else:
+            return 0
+
+    def detect_shape(box):
+        if isinstance(box, int):
+            return "empty"
+        img, obj = shape_detector.detectObjectsFromImage(input_image=box, 
+                                                        output_type="array",
+                                                        display_percentage_probability=True,
+                                                        display_object_name=True)
+        if not obj:
+            return "empty"
+        else:
+            cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            return obj[0]["name"]
+
+    for contour in contours:
+        # Get approx contour of shape
+        approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
+
+        # minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
+        # It will create a rectangle around the shapes
+        box = cv2.minAreaRect(contour)
+        shape = i_prop.Image(0, 0, 0, 0, 0)
+
+        (x, y), (width, height), angle = box
+        if len(approx) == 3:
+            # Shape is a triangle
+            shape.instrument = "triangle"
+
+        elif len(approx) == 4 : 
+            x2, y2 , w, h = cv2.boundingRect(approx)
+            aspect_ratio = float(w)/h
+            if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
+                shape.instrument = "square"
+                # Shape is a square
+            else:
+                shape.instrument = "rectangle"
+                # Shape is a rectangle
+
+        elif len(approx) == 10 :
+            # Shape is a star
+            shape.instrument = "star"
+
+        else:
+            # Shape is half circle, circle or heart
+            shape_name = detect_shape(get_image_from_box(contour, image))
+            if shape_name == "empty":
+                continue
+            else: 
+                shape.instrument = shape_name
+            # Run camera in loop
+
+        list_of_shapes.append(shape)
+
+    for shape in list_of_shapes:
+        print("instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
+
+            
+
+
+def detect_shapes_with_ai(img):
+    """
+    This function reads an image using AI with the Yolov3 library
+    - image: an image read with OpenCV library.
+
+    The function returns nothing.
+    """
     # # Custom Object Detection
     jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
     model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt')
@@ -119,25 +212,6 @@ def detect_shapes(img):
             color_label = ("Color: " + color)
             # adding a text to the object 
             cv2.putText(annotated_image, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-
-        # for obj in preds:
-        #     x1, y1, x2, y2 = obj["box_points"]
-        #     obj_img = img[y1:y2, x1:x2]
-        #     # Call function to extract color data
-        #     color = get_color(obj_img)
-        #     obj["color"] = color
-        #     # Color lable text
-        #     color_label = ("Color: " + color)
-        #     # Calculate size of box
-        #     size = (x2 - x1) * (y2 - y1)
-        #     # Size label text
-        #     size_label = ("Size: " + str(size))
-        #     # Position label text
-        #     pos_label = ("Position: ({}, {})".format(x1, y1))
-        #     # adding text to the object 
-        #     cv2.putText(annotated_image, color_label, (x1, y1-40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-        #     cv2.putText(annotated_image, size_label, (x1, y1-25), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-        #     cv2.putText(annotated_image, pos_label, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 
         cv2.imshow("Annotated Image", annotated_image)
         # Exit loop if user presses 'q' key or 'Esc' key
