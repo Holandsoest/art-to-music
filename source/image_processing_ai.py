@@ -208,9 +208,8 @@ def detect_shapes(img): ## OLD CODE
     # cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    img_path = 'files\image_processing\example_shapes (2).jpg'
-    img = cv2.imread(img_path)
-    # train_custom_model()
+    
+    train_custom_model()
     compare_all_models(img=None, path=os.path.join(os.getcwd(),'files','image_processing'))
 
     # Put image into AI and color detection
