@@ -1,22 +1,17 @@
 import dawdreamer as daw
-import numpy as np
 from scipy.io import wavfile
 from pydub import AudioSegment
 
 def AudiRenderPlugin(list):
-    SAMPLE_RATE = 44100
-    BUFFER_SIZE = 128
+    sample_rate = 44100
+    buffer_size = 128
 
     for instrument in list:
-        engine = daw.RenderEngine(SAMPLE_RATE, BUFFER_SIZE)
+        engine = daw.RenderEngine(sample_rate, buffer_size)
         synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
         assert synth.get_name() == "my_synth"
         synth.load_state(instrument + "_preset")
         synth.load_midi(instrument +".mid", clear_previous=False, beats=False, all_events=False)
-
-        # Plugins can show their UI.
-        #synth.open_editor()  # Open the editor, make changes, and close
-        #synth.save_state("flute_preset")
 
         engine.load_graph([
                         (synth,[])
@@ -25,12 +20,9 @@ def AudiRenderPlugin(list):
         engine.set_bpm(120)
         engine.render(16)  
         audio = engine.get_audio()  
-        wavfile.write(instrument + '.wav', SAMPLE_RATE, audio.transpose()) # Don't forget to transpose!
+        wavfile.write(instrument + '.wav', sample_rate, audio.transpose()) # Don't forget to transpose!
 
 def AudioWriting():
-    # Load the WAV file
-    #SAMPLE_RATE1, audio = wavfile.read('violin.wav')
-
     # Load the first MP3 file
     sound1 = AudioSegment.from_file("flute.wav", format="wav")
     sound2 = AudioSegment.from_file("drum.wav", format="wav")
