@@ -3,11 +3,11 @@ import numpy as np
 from scipy.io import wavfile
 from pydub import AudioSegment
 
-def AudiRenderPlugin(instrumentlist):
+def AudiRenderPlugin(list):
     SAMPLE_RATE = 44100
     BUFFER_SIZE = 128
 
-    for instrument in instrumentlist:
+    for instrument in list:
         engine = daw.RenderEngine(SAMPLE_RATE, BUFFER_SIZE)
         synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
         assert synth.get_name() == "my_synth"
@@ -29,7 +29,7 @@ def AudiRenderPlugin(instrumentlist):
 
 def AudioWriting():
     # Load the WAV file
-    SAMPLE_RATE1, audio = wavfile.read('violin.wav')
+    #SAMPLE_RATE1, audio = wavfile.read('violin.wav')
 
     # Load the first MP3 file
     sound1 = AudioSegment.from_file("flute.wav", format="wav")
