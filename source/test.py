@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+import pandas as pd
+import os
 
 frameWidth = 640
 frameHeight = 480
@@ -55,6 +57,29 @@ def stackImages(scale,imgArray):
         hor= np.hstack(imgArray)
         ver = hor
     return ver
+
+# b, g, r = image[y_axis, x_axis]
+# b = int(b)
+# g = int(g)
+# r = int(r)
+
+# # For now the rgb colorcode will represent a bpm match, but later on we will probably work with colorname to bpm
+# def getShapeColor(R,G,B):
+#          #Reading csv file with pandas and giving names to each column
+#     index=["color","color_name","hex","R","G","B"]
+#     absolute_path = os.path.join(os.getcwd(), 'files','image_processing', 'colors.csv')
+#     csv = pd.read_csv(absolute_path, names=index, header=None)
+
+#     minimum = 10000
+#     for i in range(len(csv)):
+#         d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
+#     if(d<=minimum):
+#         minimum = d
+#         cname = csv.loc[i,"color_name"]
+#     return cname
+
+# colorName = getShapeColor(r,g,b)
+
 
 
 def getContours(img, imgContour):
@@ -142,7 +167,7 @@ while True:
     
     getContours(imgDil,imgContour)
 
-    # imgStack = stackImages(0.8,([img,imgCanny,imgCanny],[imgContour,imgContour,imgContour]))
+    #imgStack = stackImages(0.8,([img,imgCanny,imgCanny],[imgContour,imgContour,imgContour]))
     imgStack = stackImages(0.8,([imgContour]))
     cv2.imshow("Result", imgStack)
     if cv2.waitKey(1) & 0xFF == ord('q'):

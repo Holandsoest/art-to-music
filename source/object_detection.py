@@ -90,6 +90,7 @@ from mido import MidiFile #for loading midi files
 #     #     return 'red'
 
 
+
 if __name__ == "__main__":
     #----------- AI OBJECT DETECTION --------------------
 
