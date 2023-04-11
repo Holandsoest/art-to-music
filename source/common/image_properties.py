@@ -12,6 +12,7 @@ class Image:
         #pitch is the y_axis middle point of the shape recalculated to an int between 0 - 255
         shape.pitch = y_axis
 
+    
     def get_instrument(shape):
         return shape.instrument
     
