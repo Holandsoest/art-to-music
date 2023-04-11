@@ -1,5 +1,5 @@
-#Follow this guide: https://imageai.readthedocs.io/en/latest/ 
-#This is for processing while using webcam https://wellsr.com/python/object-detection-from-webcams-with-yolo/
+# Follow this guide: https://imageai.readthedocs.io/en/latest/ 
+# This is for processing while using webcam https://wellsr.com/python/object-detection-from-webcams-with-yolo/
 from imageai.Detection.Custom import CustomObjectDetection
 from imageai.Detection.Custom import DetectionModelTrainer
 import cv2 
@@ -78,12 +78,16 @@ def detect_shapes_with_contour(contours, image):
 
     The function returns nothing.
     """
-    #Create shape list_of_shapes
+    # Create shape list_of_shapes
     list_of_shapes = []
 
     # # Custom Object Detection
     jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.66102_epoch-1.pt')
+
+    #Get the height, width and channel of the image
+    img_height, img_width, channel = image.shape
+    img_size = img_height*img_width
 
     shape_detector = CustomObjectDetection()
     shape_detector.setModelTypeAsTinyYOLOv3()
@@ -91,16 +95,12 @@ def detect_shapes_with_contour(contours, image):
     shape_detector.setJsonPath(jason_path)
     shape_detector.loadModel()
 
-    def get_image_from_box(c, img):
-        x,y,w,h = cv2.boundingRect(c) 
-        if w>50 and h>50: 
-            return img[y:y+h,x:x+w] 
-        else:
-            return 0
+    def get_image_from_box(contour, img):
+        x,y,w,h = cv2.boundingRect(contour)
+        return img[y:y+h,x:x+w] 
 
-    def detect_shape(box):
-        if isinstance(box, int):
-            return "empty"
+
+    def detect_shape_with_ai(box):
         img, obj = shape_detector.detectObjectsFromImage(input_image=box, 
                                                         output_type="array",
                                                         display_percentage_probability=True,
@@ -118,9 +118,13 @@ def detect_shapes_with_contour(contours, image):
         # minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
         # It will create a rectangle around the shapes
         box = cv2.minAreaRect(contour)
-        shape = i_prop.Image(0, 0, 0, 0, 0)
-
         (x, y), (width, height), angle = box
+        shape_size_to_volume = ip.get_volume_from_size(width*height, img_size)
+        shape_colorcode_to_bpm = ip.get_bpm_from_color(int(x),int(y),image)
+        shape_width_to_duration = ip.get_duration_from_width(width, img_width)
+        shape_height_to_pitch = ip.get_volume_from_size(height, img_height)
+        shape = i_prop.Image(0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), int(shape_height_to_pitch))
+
         if len(approx) == 3:
             # Shape is a triangle
             shape.instrument = "triangle"
@@ -141,7 +145,7 @@ def detect_shapes_with_contour(contours, image):
 
         else:
             # Shape is half circle, circle or heart
-            shape_name = detect_shape(get_image_from_box(contour, image))
+            shape_name = detect_shape_with_ai(get_image_from_box(contour, image))
             if shape_name == "empty":
                 continue
             else: 
@@ -153,6 +157,7 @@ def detect_shapes_with_contour(contours, image):
     for shape in list_of_shapes:
         print("instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
 
+    print("total amount of shapes detected: ", len(list_of_shapes))
 # def detect_shapes_with_ai(img):
 #     """
 #     This function reads an image using AI with the Yolov3 library
@@ -252,76 +257,76 @@ def compare_all_models(img:cv2.Mat|None, path:str|None) -> None:
         print('Press `esc` for the next')
         while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
 
-def detect_shapes(img): ## OLD CODE
-    # Custom Object Detection
-    shape_detector = load_custom_model(ModelSelection.LATEST)
+# def detect_shapes(img): ## OLD CODE
+#     # Custom Object Detection
+#     shape_detector = load_custom_model(ModelSelection.LATEST)
 
-    # # Set webcam parameters
-    # cam_feed = cv2.VideoCapture(0)
-    # cam_feed.set(cv2.CAP_PROP_FRAME_WIDTH, 650)
-    # cam_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 750)
+#     # # Set webcam parameters
+#     # cam_feed = cv2.VideoCapture(0)
+#     # cam_feed.set(cv2.CAP_PROP_FRAME_WIDTH, 650)
+#     # cam_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 750)
 
-    # # Trainer model
-    # model_path = os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
-    # trainer = DetectionModelTrainer()
-    # trainer.setModelTypeAsTinyYOLOv3()
-    # dataset_path = os.path.join(os.getcwd(), 'dataset')
-    # trainer.setDataDirectory(data_directory=dataset_path)
-    # trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
-    #                        ,batch_size=4
-    #                        ,num_experiments=100
-    #                        ,train_from_pretrained_model=model_path
-    #                        )
-    # trainer.trainModel()
+#     # # Trainer model
+#     # model_path = os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
+#     # trainer = DetectionModelTrainer()
+#     # trainer.setModelTypeAsTinyYOLOv3()
+#     # dataset_path = os.path.join(os.getcwd(), 'dataset')
+#     # trainer.setDataDirectory(data_directory=dataset_path)
+#     # trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
+#     #                        ,batch_size=4
+#     #                        ,num_experiments=100
+#     #                        ,train_from_pretrained_model=model_path
+#     #                        )
+#     # trainer.trainModel()
 
-    # Run camera in loop
-    while True:
-        # ret, img = cam_feed.read()
+#     # Run camera in loop
+#     while True:
+#         # ret, img = cam_feed.read()
 
-    # Object detection parametres
-        annotated_image, detected_objects = shape_detector.detectObjectsFromImage(input_image=img, 
-                                                                       output_type="array",
-                                                                       display_percentage_probability=True,
-                                                                       display_object_name=True)
+#     # Object detection parametres
+#         annotated_image, detected_objects = shape_detector.detectObjectsFromImage(input_image=img, 
+#                                                                        output_type="array",
+#                                                                        display_percentage_probability=True,
+#                                                                        display_object_name=True)
 
-        # Loop through detected objects and add color information
-        for obj in detected_objects:
-            x1, y1, x2, y2 = obj["box_points"]
-            obj_img = img[y1:y2, x1:x2]
-            # ip.readImage(obj_img)
-            # Call function to extract color data
-            color = get_color(obj_img)
-            obj["color"] = color
-            # Color lable text
-            color_label = ("Color: " + color)
-            # adding a text to the object 
-            cv2.putText(annotated_image, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+#         # Loop through detected objects and add color information
+#         for obj in detected_objects:
+#             x1, y1, x2, y2 = obj["box_points"]
+#             obj_img = img[y1:y2, x1:x2]
+#             # ip.readImage(obj_img)
+#             # Call function to extract color data
+#             color = get_color(obj_img)
+#             obj["color"] = color
+#             # Color lable text
+#             color_label = ("Color: " + color)
+#             # adding a text to the object 
+#             cv2.putText(annotated_image, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 
-        # cv2.imshow("Annotated Image", annotated_image)
-        # # Exit loop if user presses 'q' key or 'Esc' key
-        # if (cv2.waitKey(1) & 0xFF == ord("q")) or (cv2.waitKey(1) == 27):
-        #     break
+#         # cv2.imshow("Annotated Image", annotated_image)
+#         # # Exit loop if user presses 'q' key or 'Esc' key
+#         # if (cv2.waitKey(1) & 0xFF == ord("q")) or (cv2.waitKey(1) == 27):
+#         #     break
 
-    # # cam_feed.release()
-    # cv2.destroyAllWindows()
+#     # # cam_feed.release()
+#     # cv2.destroyAllWindows()
 
-if __name__ == "__main__":
-    img_path = 'files\image_processing\example_shapes (2).jpg'
-    img = cv2.imread(img_path)
-    # train_custom_model()
-    compare_all_models(img=None, path=os.path.join(os.getcwd(),'files','image_processing'))
+# if __name__ == "__main__":
+#     img_path = 'files\image_processing\example_shapes (2).jpg'
+#     img = cv2.imread(img_path)
+#     # train_custom_model()
+#     compare_all_models(img=None, path=os.path.join(os.getcwd(),'files','image_processing'))
 
-    # Put image into AI and color detection
-    # shape_detector = load_custom_model(ModelSelection.LATEST)
-    # annotated, detected_objects = shape_detector.detectObjectsFromImage(input_image=img,
-    #                                                                             output_type="array",
-    #                                                                             display_percentage_probability=True,
-    #                                                                             display_object_name=True)
-    # annotate_detected_colors(img=annotated, detected_objects=detected_objects)
-    # cv2.imshow(f'Model: ',annotated)
+#     # Put image into AI and color detection
+#     # shape_detector = load_custom_model(ModelSelection.LATEST)
+#     # annotated, detected_objects = shape_detector.detectObjectsFromImage(input_image=img,
+#     #                                                                             output_type="array",
+#     #                                                                             display_percentage_probability=True,
+#     #                                                                             display_object_name=True)
+#     # annotate_detected_colors(img=annotated, detected_objects=detected_objects)
+#     # cv2.imshow(f'Model: ',annotated)
 
 
-    # Display to user
-    print('Press `esc` to close...')
-    while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
-    cv2.destroyAllWindows()
+#     # Display to user
+#     print('Press `esc` to close...')
+#     while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
+#     cv2.destroyAllWindows()

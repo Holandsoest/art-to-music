@@ -11,3 +11,18 @@ class Image:
         shape.duration = x_axis
         #pitch is the y_axis middle point of the shape recalculated to an int between 0 - 255
         shape.pitch = y_axis
+
+    def get_instrument(shape):
+        return shape.instrument
+    
+    def get_volume(shape):
+        return shape.volume
+    
+    def get_bpm(shape):
+        return shape.bpm
+    
+    def get_duration(shape):
+        return shape.duration
+    
+    def get_pitch(shape):
+        return shape.pitch
