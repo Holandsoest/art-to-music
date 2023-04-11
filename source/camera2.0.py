@@ -10,12 +10,14 @@ import image_processing as ip
 import common.image_properties as i_prop
 from enum import Enum
 
+from imageai.Detection import ObjectDetection
 frameWidth = 640
 frameHeight = 480
 cap = cv2.VideoCapture(0)
 cap.set(3, frameWidth)
 cap.set(4, frameHeight)
 cap.set(10, 150)
+
 
 def empty(a):
     pass
@@ -86,8 +88,46 @@ def stackImages(scale,imgArray):
 
 
 
+        
+
+
 def getContours(img, imgContour):
+    
+    list_of_shapes = []
+
+    # # Custom Object Detection
+    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'koen-best.pt')
+    obj_detect = ObjectDetection()
+    #obj_detect.setModelTypeAsYOLOv3()
+    obj_detect.setModelTypeAsTinyYOLOv3()
+    model_path = os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
+    # model_path = os.path.join(os.getcwd(), 'datasets', 'circles_set', 'tiny-yolov3_circles_set_last.pt')
+    obj_detect.setModelPath( model_path )
+    obj_detect.loadModel()
+    # shape_detector = CustomObjectDetection()
+    # shape_detector.setModelTypeAsTinyYOLOv3()
+    # shape_detector.setModelPath(model_custom_path)
+    # shape_detector.setJsonPath(jason_path)
+    # shape_detector.loadModel()
+
+    def get_image_from_box(cnt, img):
+        x, y, w, h = cv2.boundingRect(cnt)
+        return img[y:y+h,x:x+w] 
+
+
+    def detect_shape_with_ai(box):
+        img, obj = obj_detect.detectObjectsFromImage(input_image=box, 
+                                                        output_type="array",
+                                                        display_percentage_probability=True,
+                                                        display_object_name=True)
+        if not obj:
+            return "empty"
+        else:
+            cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            return obj[0]["name"]
     contours,hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+
     
     for cnt in contours:
         area = cv2.contourArea(cnt) 
@@ -165,6 +205,15 @@ def getContours(img, imgContour):
 
             else :
                 cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+                shape_name = detect_shape_with_ai(get_image_from_box(imgContour, cap))
+                if shape_name == "empty":
+                    continue
+                else: 
+                    cv2.putText(imgContour, str(len(shape_name)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+
+
+
+
 
 while True:
     _, imageFrame = cap.read()
