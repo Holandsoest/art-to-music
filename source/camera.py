@@ -146,14 +146,21 @@ def getContours(img, imgContour):
 
             if len(approx) == 3:
                 cv2.putText(imgContour, "Triangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-            elif len(approx) == 5 :
-                #Pentagon (representing a heartshape) = piano = 2
-                cv2.putText(imgContour, "Triangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+            
+            elif len(approx) == 4 : 
+                aspect_ratio = float(w)/h
+                if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
+                    cv2.putText(imgContour, "Square", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+                else:  
+                    cv2.putText(imgContour, "Rectangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
 
+            
+            elif len(approx) == 10 :
+                # Shape is a star
+                cv2.putText(imgContour, "Star", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
 
             else :
                 cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-
 
 while True:
     _, imageFrame = cap.read()
