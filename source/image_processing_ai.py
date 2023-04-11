@@ -277,17 +277,17 @@ def load_custom_model(path) -> CustomObjectDetection:
     shape_detector.loadModel()
     return shape_detector
 
-def train_custom_model():
-    trainer = DetectionModelTrainer()
-    trainer.setModelTypeAsTinyYOLOv3()
-    dataset_path = os.path.join(os.getcwd(), 'dataset')
-    trainer.setDataDirectory(data_directory=dataset_path)
-    trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
-                           ,batch_size=2
-                           ,num_experiments=30
-                           ,train_from_pretrained_model=os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
-                           )
-    trainer.trainModel()
+# def train_custom_model():
+#     trainer = DetectionModelTrainer()
+#     trainer.setModelTypeAsTinyYOLOv3()
+#     dataset_path = os.path.join(os.getcwd(), 'dataset')
+#     trainer.setDataDirectory(data_directory=dataset_path)
+#     trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
+#                            ,batch_size=2
+#                            ,num_experiments=30
+#                            ,train_from_pretrained_model=os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
+#                            )
+#     trainer.trainModel()
     
 def compare_all_models(img:cv2.Mat|None, path:str|None) -> None:
     """Opens the image as it looks for each model, (and original), can also give a path to a folder with pictures instead and it will do all the pictures"""
