@@ -226,7 +226,7 @@ def detect_shapes(img): ## OLD CODE
 
 if __name__ == "__main__":
     
-    train_custom_model(hours=0, batch_size=100)
+    # train_custom_model(hours=0, batch_size=50)
     compare_all_models(img=None,
                        path=os.path.join(os.getcwd(),'files','image_processing'),
                        has_colors=False)
