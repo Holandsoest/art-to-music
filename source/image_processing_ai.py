@@ -7,6 +7,7 @@ import numpy as np
 import os
 import image_processing as ip
 from enum import Enum
+import time
 
 # Function to get the color of an object in the image
 def get_color(img:cv2.Mat) -> str:
@@ -93,18 +94,34 @@ def load_custom_model(path) -> CustomObjectDetection:
     shape_detector.setJsonPath(json_path)
     shape_detector.loadModel()
     return shape_detector
-def train_custom_model():
+def train_custom_model(hours:float|int, batch_size:int)->int:
+    """Trains the model with the data provided in the folders
+    ---
+    - `hours` a float (or int) of hours that the ai should train for roughly
+    - `batch_size` how many images should be run trough the ai in parallel (minimum is 2)
+    ---
+    outputs `int` `amount_of_data_per_minute` what can be used to correct the time estimation.
+    """
+    batch_size = max(2, batch_size)
+
+    dataset_path = os.path.join(os.getcwd(), 'dataset')
+
+    amount_of_data = len(os.listdir(os.path.join(dataset_path, 'train', 'annotations'))) + len(os.listdir(os.path.join(dataset_path, 'validation', 'annotations')))
+    amount_of_data_per_minute = 3740 # Applies only to Brosha (Koens desktop)
+    minutes_per_epoch = amount_of_data / amount_of_data_per_minute
+    epochs = max(2, int( hours * 60 / minutes_per_epoch ))
+
+    print(f'Start training:\n\t{time.localtime().tm_year}-{time.localtime().tm_mon}-{time.localtime().tm_mday} {time.localtime().tm_hour}:{time.localtime().tm_min}:{time.localtime().tm_sec}\n\t{epochs} epochs\t{batch_size} batch_size')
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsTinyYOLOv3()
-    dataset_path = os.path.join(os.getcwd(), 'dataset')
     trainer.setDataDirectory(data_directory=dataset_path)
     trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
-                           ,batch_size=2
-                           ,num_experiments=30
+                           ,batch_size=batch_size
+                           ,num_experiments=epochs
                            ,train_from_pretrained_model=os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
                            )
     trainer.trainModel()
-def compare_all_models(img:cv2.Mat|None, path:str|None) -> None:
+def compare_all_models(img:cv2.Mat|None, path:str|None, has_colors:bool) -> None:
     """Opens the image as it looks for each model, (and original), can also give a path to a folder with pictures instead and it will do all the pictures"""
     
     # Make a list with all images
@@ -130,10 +147,10 @@ def compare_all_models(img:cv2.Mat|None, path:str|None) -> None:
                                                                                     output_type="array",
                                                                                     display_percentage_probability=True,
                                                                                     display_object_name=True)
-            annotate_detected_colors(img=annotated, detected_objects=detected_objects)
+            if has_colors: annotate_detected_colors(img=annotated, detected_objects=detected_objects)
             cv2.imshow(f'Model: "{os.path.split(model_path)[1]}"',annotated)
         print('Press `esc` for the next')
-        while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
+        while(not (cv2.waitKey(20) & 0xFF ==27)):time.sleep(1)# Break the loop when user hits 'esc' key
 
 def detect_shapes(img): ## OLD CODE
     # Custom Object Detection
@@ -209,18 +226,10 @@ def detect_shapes(img): ## OLD CODE
 
 if __name__ == "__main__":
     
-    train_custom_model()
-    compare_all_models(img=None, path=os.path.join(os.getcwd(),'files','image_processing'))
-
-    # Put image into AI and color detection
-    # shape_detector = load_custom_model(ModelSelection.LATEST)
-    # annotated, detected_objects = shape_detector.detectObjectsFromImage(input_image=img,
-    #                                                                             output_type="array",
-    #                                                                             display_percentage_probability=True,
-    #                                                                             display_object_name=True)
-    # annotate_detected_colors(img=annotated, detected_objects=detected_objects)
-    # cv2.imshow(f'Model: ',annotated)
-
+    train_custom_model(hours=0, batch_size=100)
+    compare_all_models(img=None,
+                       path=os.path.join(os.getcwd(),'files','image_processing'),
+                       has_colors=False)
 
     # Display to user
     print('Press `esc` to close...')
