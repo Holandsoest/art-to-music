@@ -16,8 +16,8 @@
 Specialist training
 >-[x] Train with Epoch=2, Batch_size=100  
 >-[x] Train with Epoch=2, Batch_size=50  
->-[] Train with Epoch=2, Batch_size=25  
->-[] Train with Epoch=2, Batch_size=10  
+>-[x] Train with Epoch=2, Batch_size=25  
+>-[>] Train with Epoch=2, Batch_size=10  
 >-[] Train with Epoch=2, Batch_size=5  
 >-[] Train with Epoch=2, Batch_size=2  
 
