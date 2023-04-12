@@ -226,12 +226,12 @@ def detect_shapes(img): ## OLD CODE
 
 if __name__ == "__main__":
     
-    # train_custom_model(hours=0, batch_size=50)
-    compare_all_models(img=None,
-                       path=os.path.join(os.getcwd(),'files','image_processing'),
-                       has_colors=False)
+    train_custom_model(hours=0, batch_size=25)
+    # compare_all_models(img=None,
+    #                    path=os.path.join(os.getcwd(),'files','image_processing'),
+    #                    has_colors=False)
 
     # Display to user
-    print('Press `esc` to close...')
-    while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
-    cv2.destroyAllWindows()
+    # print('Press `esc` to close...')
+    # while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
+    # cv2.destroyAllWindows()
