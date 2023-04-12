@@ -202,7 +202,7 @@ def getShapeColor():
     # b, g, r = int(pixel_center_bgr[0]), int(pixel_center_bgr[1]), int(pixel_center_bgr[2])
 
     cv2.rectangle(frame, (cx - 220, 10), (cx + 200, 120), (255, 255, 255), -1)
-    cv2.putText(frame, cname, (cx - 200, 100), 0, 3, (b, g, r), 5)
+    cv2.putText(frame, cname, (cx - 200, 100), 0, 1, (b, g, r), 5)
     cv2.circle(frame, (cx, cy), 5, (25, 25, 25), 3)
     cv2.imshow("Frame", frame)
 
