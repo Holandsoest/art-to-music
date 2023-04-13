@@ -9,6 +9,7 @@ import image_processing as ip
 import common.image_properties as i_prop
 from enum import Enum
 
+cap = cv2.VideoCapture(0)
 # Function to get the color of an object in the image
 def get_color(img:cv2.Mat) -> str:
     """
@@ -109,7 +110,7 @@ def detect_shapes_with_contour(contours, image):
     list_of_shapes = []
 
     # # Custom Object Detection
-    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
+    # jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
     model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'koen-best.pt')
 
     #Get the height, width and channel of the image
@@ -117,10 +118,10 @@ def detect_shapes_with_contour(contours, image):
     img_size = img_height*img_width
 
     shape_detector = CustomObjectDetection()
-    shape_detector.setModelTypeAsTinyYOLOv3()
+    # shape_detector.setModelTypeAsTinyYOLOv3()
     shape_detector.setModelPath(model_custom_path)
-    shape_detector.setJsonPath(jason_path)
-    shape_detector.loadModel()
+    # shape_detector.setJsonPath(jason_path)
+    # shape_detector.loadModel()
 
     
 
@@ -134,6 +135,7 @@ def detect_shapes_with_contour(contours, image):
         """
         x,y,w,h = cv2.boundingRect(contour)
         s_img = img[y:y+h,x:x+w] 
+        # img_path = cap.read()
         img_path = 'files\image_processing\example_white_background.jpg'
         l_img = cv2.imread(img_path)
         x_offset=y_offset=500
@@ -278,45 +280,5 @@ def load_custom_model(path) -> CustomObjectDetection:
     shape_detector.loadModel()
     return shape_detector
 
-def train_custom_model():
-    trainer = DetectionModelTrainer()
-    trainer.setModelTypeAsTinyYOLOv3()
-    dataset_path = os.path.join(os.getcwd(), 'dataset')
-    trainer.setDataDirectory(data_directory=dataset_path)
-    trainer.setTrainConfig(object_names_array=["circle", "half circle", "square", "heart", "star", "triangle"]
-                           ,batch_size=2
-                           ,num_experiments=30
-                           ,train_from_pretrained_model=os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
-                           )
-    trainer.trainModel()
-    
-def compare_all_models(img:cv2.Mat|None, path:str|None) -> None:
-    """Opens the image as it looks for each model, (and original), can also give a path to a folder with pictures instead and it will do all the pictures"""
-    
-    # Make a list with all images
-    images = []
-    if isinstance(img, cv2.Mat): images.append(img)
-    if os.path.exists(path):
-        for file in os.listdir(path):
-            if file.find('.jpg') == -1: continue
-            images.append(cv2.imread(os.path.join(path,file)))
-    if len(images) < 1: raise FileExistsError("Told me to compare models with images, but you gave me no valid images.") 
 
-    # Make a list with all models
-    model_paths = []
-    for file in os.listdir(os.path.join(os.getcwd(),'dataset','models')):
-        if file.find('.pt') == -1: continue
-        model_paths.append(os.path.join(os.getcwd(),'dataset','models',file))
-
-    for image in images:
-        cv2.imshow(f'No model',image)
-        for model_path in model_paths:
-            shape_detector = load_custom_model(model_path)
-            annotated, detected_objects = shape_detector.detectObjectsFromImage(input_image=image,
-                                                                                    output_type="array",
-                                                                                    display_percentage_probability=True,
-                                                                                    display_object_name=True)
-            annotate_detected_colors(img=annotated, detected_objects=detected_objects)
-            cv2.imshow(f'Model: "{os.path.split(model_path)[1]}"',annotated)
-        print('Press `esc` for the next')
-        while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
+    

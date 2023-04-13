@@ -3,11 +3,10 @@ import image_processing as img_proc
 import common.midi_creation as mc
 import image_processing_ai as img_proc_ai
 from imageai.Detection import ObjectDetection
-
+import numpy as np 
 #
 cap = cv2.VideoCapture(0)
 #
-
 
 
 if __name__ == "__main__":
@@ -31,7 +30,7 @@ if __name__ == "__main__":
         img_proc_ai.detect_shapes_with_ai(imgcamm)
 
         _, imageFrame = cap.read()
-        cv2.imshow("ai", imgcamm)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break    
 

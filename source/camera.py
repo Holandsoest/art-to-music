@@ -9,19 +9,6 @@
 from imageai.Detection import ObjectDetection # For AI object detection AI
 import cv2 # library for the webcam ( this one probably can also find color)
 import numpy as np 
-import mido
-from mido import Message
-from mido import MidiFile #for loading midi files
-import pandas as pd
-import os
-
-from imageai.Detection.Custom import CustomObjectDetection
-from imageai.Detection.Custom import DetectionModelTrainer
-import image_processing as ip
-import common.image_properties as i_prop
-from enum import Enum
-
-from imageai.Detection import ObjectDetection
 
 cap = cv2.VideoCapture(0)
 
@@ -35,9 +22,21 @@ cv2.createTrackbar("Threshold2","Parameters",53,255,empty)
 cv2.createTrackbar("Area","Parameters",10000,30000,empty)
 
 
-def getContours(img, imgContour):
-    contours,hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+def getContours(imgContour):
+
+
+    threshold1 = cv2.getTrackbarPos("Threshold1","Parameters")
+    threshold2 = cv2.getTrackbarPos("Threshold2","Parameters")
+
+    imgBlur = cv2.GaussianBlur(img,(7,7),0)
+    imgGray = cv2.cvtColor(imgBlur,cv2.COLOR_BGR2GRAY)
+    imgCanny = cv2.Canny(imgGray,threshold1,threshold2)
+
+    kernel = np.ones((5,5))
+    imgDil = cv2.dilate(imgCanny,kernel,iterations=1)
     
+    contours,hierarchy = cv2.findContours(imgDil,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+    print("amount of contours: ", len(contours))
     for cnt in contours:
         area = cv2.contourArea(cnt) 
         # print(area)#oppervlakte van de figuren
@@ -187,20 +186,9 @@ if __name__ == "__main__":
 
         _, imageFrame = cap.read()
         hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
-        success, img = cap.read()
-
-        threshold1 = cv2.getTrackbarPos("Threshold1","Parameters")
-        threshold2 = cv2.getTrackbarPos("Threshold2","Parameters")
-
-        imgContour = img.copy()
-        imgBlur = cv2.GaussianBlur(img,(7,7),0)
-        imgGray = cv2.cvtColor(imgBlur,cv2.COLOR_BGR2GRAY)
-        imgCanny = cv2.Canny(imgGray,threshold1,threshold2)
-
-        kernel = np.ones((5,5))
-        imgDil = cv2.dilate(imgCanny,kernel,iterations=1)
         
-        getContours(imgDil,imgcamm)
+
+        getContours(imgcamm)
 
         
         # imgStack = stackImages(0.8,([imgContour]))
