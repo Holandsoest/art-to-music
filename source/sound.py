@@ -22,7 +22,6 @@ def AudiRenderPlugin(list):
         audio = engine.get_audio()  
         wavfile.write(instrument + '.wav', sample_rate, audio.transpose()) # Don't forget to transpose!
 
-def AudioWriting():
     # Load the first MP3 file
     sound1 = AudioSegment.from_file("flute.wav", format="wav")
     sound2 = AudioSegment.from_file("drum.wav", format="wav")
@@ -31,7 +30,7 @@ def AudioWriting():
     sound5 = AudioSegment.from_file("guitar.wav", format="wav")
 
     # Set the desired overlap time in milliseconds
-    overlap_time = 16000
+    overlap_time = 4000
 
     # Extract the overlapping part from the end of the first MP3 file
     overlap_part = sound1[-overlap_time:]
@@ -47,6 +46,3 @@ def AudioWriting():
 
     # Export the combined audio to an MP3 file
     combined_sound4.export("combined.mp3", format="mp3")
-
-    AudiRenderPlugin()
-    AudioWriting()

@@ -22,14 +22,14 @@ def MakeSong(list):
     iteration = 0
 
     # determine the amount of shapes with the same instrument
-    for shape in listOfShapes:
+    for shape in list:
         match shape.instrument:
-            case 'Piano':   amount_of_piano += 1
-            case 'Drum':    amount_of_drum += 1
-            case 'Guitar':  amount_of_guitar += 1
-            case 'Flute':   amount_of_flute += 1
-            case 'Violin':  amount_of_violin += 1
-            case 'Cello':   amount_of_cello += 1
+            case 'piano':   amount_of_piano += 1
+            case 'drum':    amount_of_drum += 1
+            case 'guitar':  amount_of_guitar += 1
+            case 'flute':   amount_of_flute += 1
+            case 'violin':  amount_of_violin += 1
+            case 'cello':   amount_of_cello += 1
             case _: pass
 
     # make midi file for every instrument
@@ -42,7 +42,7 @@ def MakeSong(list):
 
     for shape in list:
         
-        if amount_of_piano > 0 and shape.instrument == "Piano":
+        if amount_of_piano > 0 and shape.instrument == "piano":
             # add tracks
             time_piano = 0 # time to zero
             channel_piano = 0 #channel to zero
@@ -55,19 +55,19 @@ def MakeSong(list):
             
             object_piano +=1
         
-        if amount_of_instruments == iteration:
+        if amount_of_instruments -1 == iteration:
             #write all the midi files
-            with open("PianoOutput.mid", "wb") as output_file:
+            with open("piano_output.mid", "wb") as output_file:
                 midi_piano.writeFile(output_file)
-            with open("DrumOutput.mid", "wb") as output_file:
+            with open("drum_output.mid", "wb") as output_file:
                 midi_drum.writeFile(output_file)
-            with open("GuitarOutput.mid", "wb") as output_file:
+            with open("guitar_output.mid", "wb") as output_file:
                 midi_guitar.writeFile(output_file)
-            with open("FluteOutput.mid", "wb") as output_file:
+            with open("flute_output.mid", "wb") as output_file:
                 midi_flute.writeFile(output_file)
-            with open("ViolinOutput.mid", "wb") as output_file:
+            with open("violin_output.mid", "wb") as output_file:
                 midi_violin.writeFile(output_file)
-            with open("CelloOutput.mid", "wb") as output_file:
+            with open("cello_output.mid", "wb") as output_file:
                 midi_cello.writeFile(output_file)
             
         iteration += 1

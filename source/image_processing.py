@@ -113,29 +113,29 @@ def readImage(image):
 
         if len(approx) == 3:
             #Triangle = Guitar sound = number 30
-            shape.instrument = 30
+            shape.instrument = "piano"
 
         elif len(approx) == 4 : 
             x2, y2 , w, h = cv2.boundingRect(approx)
             aspect_ratio = float(w)/h
             if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
                 #Square = Drum = number 119
-                shape.instrument = 119
+                shape.instrument = "drum"
             else:
                 # #Rectangle (representing a half circle) = flute = number 74
-                shape.instrument = 74
+                shape.instrument = "violin"
 
         elif len(approx) == 5 :
             #Pentagon (representing a heartshape) = piano = 2
-            shape.instrument = 2
+            shape.instrument = "cello"
 
         elif len(approx) == 10 :
             #Star = Cello = 43
-            shape.instrument = 43
+            shape.instrument = "flute"
 
         else:
             #Circle = lead 1 = 81
-            shape.instrument = 81
+            shape.instrument = "guitar"
         
         list_of_shapes.append(shape)
 

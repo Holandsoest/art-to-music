@@ -17,6 +17,6 @@ if __name__ == "__main__":
             print('Enjoy the music')
             break
         
+    mc.MakeSong(list_of_shapes)     
     cv2.destroyAllWindows()
 
-    mc.MakeSong(list_of_shapes)
