@@ -22,6 +22,69 @@ cv2.createTrackbar("Threshold2","Parameters",53,255,empty)
 cv2.createTrackbar("Area","Parameters",10000,30000,empty)
 
 
+def points(contours, imgContour,x,y,w,h):
+    peri = cv2.arcLength(contours,True)
+    approx = cv2.approxPolyDP(contours,0.02*peri,True)
+    if len(approx) == 3:
+        cv2.putText(imgContour, "Triangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+        cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
+    elif len(approx) == 4 : 
+        aspect_ratio = float(w)/h
+        if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
+            cv2.putText(imgContour, "Square", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+            cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
+        else:  
+            cv2.putText(imgContour, "Rectangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+            cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
+
+    
+    elif len(approx) == 10 :
+        # Shape is a star
+        cv2.putText(imgContour, "Star", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+        cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
+
+    else :
+        cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+
+
+def color(imgContour, x,y,w,h,cy,cx):
+    _, frame = cap.read()
+    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    if cy > 479 :
+        cy = 479
+
+    if cx > 639:
+        cx = 639
+    pixel_center = hsv_frame[cy, cx]
+    hue_value = pixel_center[0]
+    #type of colors
+    color = "Undefined"
+    if hue_value < 5:
+        color = "RED"
+    elif hue_value < 22:
+        color = "ORANGE"
+    elif hue_value < 33:
+        color = "YELLOW"
+    elif hue_value < 78:
+        color = "GREEN"
+    elif hue_value < 131:
+        color = "BLUE"
+    elif hue_value < 170:
+        color = "VIOLET"
+    else:
+        color = "RED"
+    cv2.putText(imgContour, "color: " +  color, (x + w +20, y + 40), 0, 0.5, (0,255,0), 2)
+
+
+def posiont(imgContour,x,y,w,h):
+    cy = int(y+h/2)
+    cx = int(x+w/2)
+    pos_label = ("Position: ({}, {})".format(cx, cy))
+    cv2.putText(imgContour, pos_label, (x + w +20, y + 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    color(imgContour, x,y,w,h,cy,cx)
+
+
+
 def getContours(imgContour):
 
 
@@ -36,54 +99,24 @@ def getContours(imgContour):
     imgDil = cv2.dilate(imgCanny,kernel,iterations=1)
     
     contours,hierarchy = cv2.findContours(imgDil,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-    print("amount of contours: ", len(contours))
+    
     for cnt in contours:
         area = cv2.contourArea(cnt) 
         # print(area)#oppervlakte van de figuren
         areaMin = cv2.getTrackbarPos("Area", "Parameters")
         if area>areaMin:
-            
+            x, y, w, h = cv2.boundingRect(cnt)
             #total points of ervery figure
             
-            peri = cv2.arcLength(cnt,True)
-            approx = cv2.approxPolyDP(cnt,0.02*peri,True)
-            
+            points(cnt, imgContour,x,y,w,h)
             #possitions
-            x, y, w, h = cv2.boundingRect(cnt)
-            cy = int(y+h/2)
-            cx = int(x+w/2)
-            pos_label = ("Position: ({}, {})".format(cx, cy))
+            posiont(imgContour, x,y,w,h)
             
-
+            posiont(imgContour,x,y,w,h)
             #color
 
-            _, frame = cap.read()
-            hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            if cy > 479 :
-                cy = 479
 
-            if cx > 639:
-                cx = 639
-            pixel_center = hsv_frame[cy, cx]
-            hue_value = pixel_center[0]
-            #type of colors
-            color = "Undefined"
-            if hue_value < 5:
-                color = "RED"
-            elif hue_value < 22:
-                color = "ORANGE"
-            elif hue_value < 33:
-                color = "YELLOW"
-            elif hue_value < 78:
-                color = "GREEN"
-            elif hue_value < 131:
-                color = "BLUE"
-            elif hue_value < 170:
-                color = "VIOLET"
-            else:
-                color = "RED"
-
-            
+            cv2.putText(imgContour, "Area: " + str(int(area)), (x + w +20, y + 80), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
             #extra parts
             #pixel_center_bgr = frame[cy, cx]
             #b, g, r = int(pixel_center_bgr[0]), int(pixel_center_bgr[1]), int(pixel_center_bgr[2])
@@ -92,30 +125,7 @@ def getContours(imgContour):
             # cv2.circle(imgContour, (x, y),5, (x+w,y+h), (25, 25, 25), 2)
 
             # cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
-            cv2.putText(imgContour, pos_label, (x + w +20, y + 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            cv2.putText(imgContour, "color: " +  color, (x + w +20, y + 40), 0, 0.5, (0,255,0), 2)
-            cv2.putText(imgContour, "Area: " + str(int(area)), (x + w +20, y + 80), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
 
-            if len(approx) == 3:
-                cv2.putText(imgContour, "Triangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-                cv2.drawContours(imgContour, cnt, -1, (255, 0, 0), 3)
-            elif len(approx) == 4 : 
-                aspect_ratio = float(w)/h
-                if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
-                    cv2.putText(imgContour, "Square", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-                    cv2.drawContours(imgContour, cnt, -1, (255, 0, 0), 3)
-                else:  
-                    cv2.putText(imgContour, "Rectangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-                    cv2.drawContours(imgContour, cnt, -1, (255, 0, 0), 3)
-
-            
-            elif len(approx) == 10 :
-                # Shape is a star
-                cv2.putText(imgContour, "Star", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-                cv2.drawContours(imgContour, cnt, -1, (255, 0, 0), 3)
-
-            else :
-                cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
 
                 
 if __name__ == "__main__":
@@ -181,12 +191,7 @@ if __name__ == "__main__":
 
         #     cv2.putText(annotated_image, color, (x, y-40), cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 0, 255), 2)
         #     cv2.putText(annotated_image, pos_label, (x , y - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-
-
-
-        _, imageFrame = cap.read()
-        hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
-        
+    
 
         getContours(imgcamm)
 

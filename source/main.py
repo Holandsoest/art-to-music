@@ -8,7 +8,6 @@ import numpy as np
 cap = cv2.VideoCapture(0)
 #
 
-
 if __name__ == "__main__":
 
     obj_detect = ObjectDetection()
@@ -25,7 +24,10 @@ if __name__ == "__main__":
         imgcamm, preds = obj_detect.detectObjectsFromImage(input_image=img, output_type="array",
                                                                    display_percentage_probability=False,
                                                                    display_object_name=True)
-        shapes = img_proc.get_contours_from_image(imgcamm)
+        
+
+
+        shapes = img_proc.get_contours_from_image(imgcamm)         
         img_proc_ai.detect_shapes_with_contour(shapes, imgcamm)
         img_proc_ai.detect_shapes_with_ai(imgcamm)
 

@@ -10,6 +10,16 @@ import common.image_properties as i_prop
 from enum import Enum
 
 cap = cv2.VideoCapture(0)
+
+
+def empty(a):
+    pass
+
+cv2.namedWindow("Parameters")
+cv2.resizeWindow("Parameters",640,240)
+cv2.createTrackbar("Threshold1","Parameters",159,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",53,255,empty)
+cv2.createTrackbar("Area","Parameters",10000,30000,empty)
 # Function to get the color of an object in the image
 def get_color(img:cv2.Mat) -> str:
     """
@@ -170,8 +180,8 @@ def detect_shapes_with_contour(contours, image):
     counter = 0
     for contour in contours:
         area1 = cv2.contourArea(contour)
-
-        if area1 > 100:
+        areaMin = cv2.getTrackbarPos("Area", "Parameters")
+        if area1>areaMin:
             # Get approx contour of shape
             approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
 
