@@ -140,7 +140,7 @@ def compare_all_models(img:cv2.Mat|None, path:str|None, has_colors:bool) -> None
         model_paths.append(os.path.join(os.getcwd(),'dataset','models',file))
 
     for image in images:
-        cv2.imshow(f'No model',image)
+        # cv2.imshow(f'No model',image)
         for model_path in model_paths:
             shape_detector = load_custom_model(model_path)
             annotated, detected_objects = shape_detector.detectObjectsFromImage(input_image=image,
