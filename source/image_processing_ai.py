@@ -93,8 +93,7 @@ def detect_shapes_with_ai(image):
     print("amount of detected objects: ", len(detected_objects))
     annotate_detected_colors(img, detected_objects)
 
-    cv2.imshow("", img)
-    cv2.waitKey()
+    cv2.imshow("ai", img)
 
 
     
