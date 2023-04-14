@@ -119,16 +119,16 @@ def train_custom_model(epochs:int, batch_size:int):
                            )
     trainer.trainModel()
     print(f'Stopped training:\n\t{time.localtime().tm_year}-{time.localtime().tm_mon}-{time.localtime().tm_mday} {time.localtime().tm_hour}:{time.localtime().tm_min}:{time.localtime().tm_sec}')
-def compare_all_models(img:cv2.Mat|None, path:str|None, has_colors:bool) -> None:
+def compare_all_models(img:cv2.Mat|None, image_path:str|None, has_colors:bool) -> None:
     """Opens the image as it looks for each model, (and original), can also give a path to a folder with pictures instead and it will do all the pictures"""
     
     # Make a list with all images
     images = []
     if isinstance(img, cv2.Mat): images.append(img)
-    if os.path.exists(path):
-        for file in os.listdir(path):
-            if file.find('.jpg') == -1: continue
-            images.append(cv2.imread(os.path.join(path,file)))
+    if os.path.exists(image_path):
+        for file in os.listdir(image_path):
+            if file.find('.png') == -1: continue
+            images.append(cv2.imread(os.path.join(image_path,file)))
     if len(images) < 1: raise FileExistsError("Told me to compare models with images, but you gave me no valid images.") 
 
     # Make a list with all models
@@ -147,8 +147,8 @@ def compare_all_models(img:cv2.Mat|None, path:str|None, has_colors:bool) -> None
                                                                                     display_object_name=True)
             if has_colors: annotate_detected_colors(img=annotated, detected_objects=detected_objects)
             cv2.imshow(f'Model: "{os.path.split(model_path)[1]}"',annotated)
-        print('Press `esc` for the next')
-        while(not (cv2.waitKey(20) & 0xFF ==27)):time.sleep(1)# Break the loop when user hits 'esc' key
+        print('Press the any key for the next image')
+        cv2.waitKey()
 
 def detect_shapes(img): ## OLD CODE
     # Custom Object Detection
@@ -224,12 +224,10 @@ def detect_shapes(img): ## OLD CODE
 
 if __name__ == "__main__":
     
-    train_custom_model(epochs=14, batch_size=5)
-    # compare_all_models(img=None,
-    #                    path=os.path.join(os.getcwd(),'files','image_processing'),
-    #                    has_colors=False)
+    # train_custom_model(epochs=14, batch_size=5)
+    compare_all_models(img=None,
+                       image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','images'),
+                       has_colors=False)
 
     # Display to user
-    # print('Press `esc` to close...')
-    # while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
-    # cv2.destroyAllWindows()
+    cv2.destroyAllWindows()
