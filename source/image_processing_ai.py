@@ -94,22 +94,19 @@ def load_custom_model(path) -> CustomObjectDetection:
     shape_detector.setJsonPath(json_path)
     shape_detector.loadModel()
     return shape_detector
-def train_custom_model(hours:float|int, batch_size:int)->int:
+def train_custom_model(epochs:int, batch_size:int):
     """Trains the model with the data provided in the folders
     ---
-    - `hours` a float (or int) of hours that the ai should train for roughly
-    - `batch_size` how many images should be run trough the ai in parallel (minimum is 2)
-    ---
-    outputs `int` `amount_of_data_per_minute` what can be used to correct the time estimation.
+    - `epochs` [> 2] int, how many times the trainer may ajust the model
+    - `batch_size` [> 1] int, how many images should be run trough the ai in parallel
     """
     batch_size = max(2, batch_size)
+    epochs = max(3, epochs)
 
     dataset_path = os.path.join(os.getcwd(), 'dataset')
 
     amount_of_data = len(os.listdir(os.path.join(dataset_path, 'train', 'annotations'))) + len(os.listdir(os.path.join(dataset_path, 'validation', 'annotations')))
-    amount_of_data_per_minute = 3740 # Applies only to Brosha (Koens desktop)
-    minutes_per_epoch = amount_of_data / amount_of_data_per_minute
-    epochs = max(3, int( hours * 60 / minutes_per_epoch ))
+    
 
     print(f'Start training:\n\t{time.localtime().tm_year}-{time.localtime().tm_mon}-{time.localtime().tm_mday} {time.localtime().tm_hour}:{time.localtime().tm_min}:{time.localtime().tm_sec}\n\t{epochs} epochs\t{batch_size} batch_size')
     trainer = DetectionModelTrainer()
@@ -121,6 +118,7 @@ def train_custom_model(hours:float|int, batch_size:int)->int:
                            ,train_from_pretrained_model=os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
                            )
     trainer.trainModel()
+    print(f'Stopped training:\n\t{time.localtime().tm_year}-{time.localtime().tm_mon}-{time.localtime().tm_mday} {time.localtime().tm_hour}:{time.localtime().tm_min}:{time.localtime().tm_sec}')
 def compare_all_models(img:cv2.Mat|None, path:str|None, has_colors:bool) -> None:
     """Opens the image as it looks for each model, (and original), can also give a path to a folder with pictures instead and it will do all the pictures"""
     
@@ -226,12 +224,12 @@ def detect_shapes(img): ## OLD CODE
 
 if __name__ == "__main__":
     
-    train_custom_model(hours=2, batch_size=2)
+    train_custom_model(epochs=14, batch_size=5)
     # compare_all_models(img=None,
     #                    path=os.path.join(os.getcwd(),'files','image_processing'),
     #                    has_colors=False)
 
     # Display to user
-    print('Press `esc` to close...')
-    while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
-    cv2.destroyAllWindows()
+    # print('Press `esc` to close...')
+    # while(not (cv2.waitKey(20) & 0xFF ==27)):pass# Break the loop when user hits 'esc' key
+    # cv2.destroyAllWindows()
