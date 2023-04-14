@@ -225,8 +225,12 @@ def detect_shapes(img): ## OLD CODE
 if __name__ == "__main__":
     
     # train_custom_model(epochs=14, batch_size=5)
+    
+    # compare_all_models(img=None,
+    #                    image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','500'),
+    #                    has_colors=False)
     compare_all_models(img=None,
-                       image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','images'),
+                       image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','1000'),
                        has_colors=False)
 
     # Display to user
