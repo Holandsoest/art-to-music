@@ -109,7 +109,7 @@ def train_custom_model(hours:float|int, batch_size:int)->int:
     amount_of_data = len(os.listdir(os.path.join(dataset_path, 'train', 'annotations'))) + len(os.listdir(os.path.join(dataset_path, 'validation', 'annotations')))
     amount_of_data_per_minute = 3740 # Applies only to Brosha (Koens desktop)
     minutes_per_epoch = amount_of_data / amount_of_data_per_minute
-    epochs = max(2, int( hours * 60 / minutes_per_epoch ))
+    epochs = max(3, int( hours * 60 / minutes_per_epoch ))
 
     print(f'Start training:\n\t{time.localtime().tm_year}-{time.localtime().tm_mon}-{time.localtime().tm_mday} {time.localtime().tm_hour}:{time.localtime().tm_min}:{time.localtime().tm_sec}\n\t{epochs} epochs\t{batch_size} batch_size')
     trainer = DetectionModelTrainer()
@@ -226,10 +226,10 @@ def detect_shapes(img): ## OLD CODE
 
 if __name__ == "__main__":
     
-    # train_custom_model(hours=0, batch_size=10)
-    compare_all_models(img=None,
-                       path=os.path.join(os.getcwd(),'files','image_processing'),
-                       has_colors=False)
+    train_custom_model(hours=2, batch_size=2)
+    # compare_all_models(img=None,
+    #                    path=os.path.join(os.getcwd(),'files','image_processing'),
+    #                    has_colors=False)
 
     # Display to user
     print('Press `esc` to close...')
