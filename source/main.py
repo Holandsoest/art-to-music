@@ -1,6 +1,7 @@
 import cv2
 import image_processing as img_proc
 import common.midi_creation as mc
+import sound
 
 if __name__ == "__main__":
     img = cv2.imread('files\image_processing\ExampleShapes6.png')
@@ -17,6 +18,7 @@ if __name__ == "__main__":
             print('Enjoy the music')
             break
         
-    mc.MakeSong(list_of_shapes)     
+    mc.MakeSong(list_of_shapes)
+    sound.AudiRenderPlugin(list_of_shapes)    
     cv2.destroyAllWindows()
 

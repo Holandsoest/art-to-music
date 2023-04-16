@@ -46,16 +46,17 @@ def MakeSong(list):
             # add tracks
             time_piano = 0 # time to zero
             channel_piano = 0 #channel to zero
-
+            print(2)
             # create ass many tracks as objects on the board    
             midi_piano.addTrackName(object_piano, time_piano, f"TrackPiano{object_piano}") # give track a name
             midi_piano.addTempo(object_piano, time_piano, shape.bpm) # set bpm
-            midi_piano.addProgramChange(object_piano, 0, time_piano, shape.instrument) # add instrument
+            midi_piano.addProgramChange(object_piano, 0, time_piano, 1) # add instrument = shape.instrument = 1
             midi_piano.addNote(object_piano, channel_piano, shape.pitch, time_piano, shape.duration, shape.volume) # make a note
             
             object_piano +=1
         
         if amount_of_instruments -1 == iteration:
+            print(iteration)
             #write all the midi files
             with open("piano_output.mid", "wb") as output_file:
                 midi_piano.writeFile(output_file)
