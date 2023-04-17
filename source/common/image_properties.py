@@ -1,5 +1,7 @@
 class Image:
-    def __init__(shape, name, size, color, x_axis, y_axis):
+    def __init__(shape, counter, name, size, color, x_axis, y_axis):
+        #counter for the shapes.
+        shape.counter = counter
         #name is an integer related to instrument, 
         #see: https://www.midi.org/specifications-old/item/gm-level-1-sound-set
         shape.instrument = name

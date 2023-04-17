@@ -72,6 +72,13 @@ def get_color(img:cv2.Mat) -> str:
         return 'red'
     
 def detect_shapes_with_ai(image):
+    """
+    Function to detect shapes via AI\n
+    Input:
+    - image: the image loaded in via opencv2
+
+    Returns nothing.    
+    """
     contours = ip.get_contours_from_image(image)
     amount_of_contours = len(contours)
     # # Custom Object Detection
@@ -92,10 +99,8 @@ def detect_shapes_with_ai(image):
     print("amount of detected objects: ", len(detected_objects))
     annotate_detected_colors(img, detected_objects)
 
-    cv2.imshow("", img)
+    cv2.imshow("ai", img)
     cv2.waitKey()
-
-
     
 def detect_shapes_with_contour(contours, image):
     """
@@ -121,8 +126,6 @@ def detect_shapes_with_contour(contours, image):
     shape_detector.setModelPath(model_custom_path)
     shape_detector.setJsonPath(jason_path)
     shape_detector.loadModel()
-
-    
 
     def get_image_from_box(contour, img):
         """
@@ -153,7 +156,8 @@ def detect_shapes_with_contour(contours, image):
         
         Returns "empty" if nothing is detected, else it will detect the name of the shape.
         """
-        # cv2.imshow("", box)
+        img_grayscaled = cv2.cvtColor(box, cv2.COLOR_BGR2GRAY)
+        # cv2.imshow("", img_grayscaled)
         # print("press esc to continue...")
         # cv2.waitKey()
         img, obj = shape_detector.detectObjectsFromImage(input_image=box, 
@@ -165,9 +169,11 @@ def detect_shapes_with_contour(contours, image):
         else:
             cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             return obj[0]["name"]
-
+        
     counter = 0
+
     for contour in contours:
+        counter += 1
         area1 = cv2.contourArea(contour)
 
         if area1 > 100:
@@ -182,11 +188,12 @@ def detect_shapes_with_contour(contours, image):
             shape_colorcode_to_bpm = ip.get_bpm_from_color(int(x),int(y),image)
             shape_width_to_duration = ip.get_duration_from_width(width, img_width)
             shape_height_to_pitch = ip.get_volume_from_size(height, img_height)
-            shape = i_prop.Image(0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), int(shape_height_to_pitch))
+            shape = i_prop.Image(counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), int(shape_height_to_pitch))
 
             if len(approx) == 3:
                 # Shape is a triangle
                 shape.instrument = "triangle"
+                # cv2.drawContours(image, contours, -1, (0,255,0), 3)
 
             elif len(approx) == 4 : 
                 x2, y2 , w, h = cv2.boundingRect(approx)
@@ -206,7 +213,6 @@ def detect_shapes_with_contour(contours, image):
                 # Shape is half circle, circle or heart
                 shape_name = detect_shape_with_ai(get_image_from_box(contour, image))
                 if shape_name == "empty":
-                    counter+=1
                     continue
                 else: 
                     shape.instrument = shape_name
@@ -216,11 +222,12 @@ def detect_shapes_with_contour(contours, image):
         else:
             continue
 
-    print("counter: ", counter)
     for shape in list_of_shapes:
-        print("instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
+        print(shape.counter, "instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
 
+    # cv2.imshow("contour", image)
     print("total amount of shapes detected: ", len(list_of_shapes))
+
 
 def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
     obj_last = []

@@ -4,7 +4,7 @@ import common.midi_creation as mc
 import image_processing_ai as img_proc_ai
 
 if __name__ == "__main__":
-    img_path = 'files\image_processing\example_shapes (10).jpg'
+    img_path = 'files\image_processing\example_shapes_1.png'
     img = cv2.imread(img_path)
 
 # img 14.jpg has 86 stars
@@ -15,15 +15,15 @@ if __name__ == "__main__":
 
     img_proc_ai.detect_shapes_with_ai(img)
 
-    print('Press esc to continue...')   
+    # print('Press esc to continue...')   
 
-    while(1):
-        cv2.imshow("image",img)
+    # while(1):
+    #     cv2.imshow("image",img)
 
-        # Break the loop when user hits 'esc' key 
-        if cv2.waitKey(20) & 0xFF ==27:
-            print('Enjoy the music')
-            break
+    #     # Break the loop when user hits 'esc' key 
+    #     if cv2.waitKey(20) & 0xFF ==27:
+    #         print('Enjoy the music')
+    #         break
         
     cv2.destroyAllWindows()
 

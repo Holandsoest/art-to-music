@@ -83,11 +83,12 @@ def get_contours_from_image(image):
 
     The function returns a all the contours detected in the image
     """
-    #Reading the image with opencv
+    # Reading the image with opencv
     img_grayscaled = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    img_blur = cv2.blur(img_grayscaled, (3,3))
+    # add img_blur if you make use of jpg files
+    # img_blur = cv2.blur(img_grayscaled, (3,3))
 
-    ret , thrash = cv2.threshold(img_blur, 240 , 255, cv2.CHAIN_APPROX_NONE)
+    ret , thrash = cv2.threshold(img_grayscaled, 240 , 255, cv2.CHAIN_APPROX_NONE)
     contours , hierarchy = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     
     print("amount of contours: ", len(contours))
