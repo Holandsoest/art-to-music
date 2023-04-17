@@ -48,11 +48,10 @@ def MakeSong(list):
             channel_drum = 0 #channel to zero
 
             # create ass many tracks as objects on the board    
-            midi_drum.addTrackName(object_drum, time_drum, f"TrackDrum{object_drum}") # give track a name
+            midi_drum.addTrackName(object_drum, time_drum, f"Track{object_drum}") # give track a name
             midi_drum.addTempo(object_drum, time_drum, shape.bpm) # set bpm
-            midi_drum.addProgramChange(object_drum, 0, time_drum, 30) # add instrument = shape.instrument = 1
+            midi_drum.addProgramChange(object_drum, 0, time_drum, 1) # add instrument = shape.instrument = 1
             midi_drum.addNote(object_drum, channel_drum, shape.pitch, time_drum, shape.duration, shape.volume) # make a note
-            midi_drum.addNote(object_drum, channel_drum, 50, 2, 2, 255) # make a note
             
             object_drum +=1
         
