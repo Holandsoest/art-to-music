@@ -5,20 +5,19 @@ from pydub import AudioSegment
 def AudiRenderPlugin(list):
     sample_rate = 44100
     buffer_size = 128
-    print(1)
     for shape in list:
         engine = daw.RenderEngine(sample_rate, buffer_size)
         synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
         assert synth.get_name() == "my_synth"
-        synth.load_state(shape.instrument + "_preset"  r"files\daw_files\{}_preset")
-        synth.load_midi(shape.instrument +"_output.mid", clear_previous=False, beats=False, all_events=False) 
+        synth.load_state(f"files\daw_files\{shape.instrument}_preset")
+        synth.load_midi(f"{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
 
         engine.load_graph([
                         (synth,[])
         ])
 
         engine.set_bpm(120)
-        engine.render(16)  
+        engine.render(4)  
         audio = engine.get_audio()  
         wavfile.write(shape.instrument + '.wav', sample_rate, audio.transpose()) # Don't forget to transpose!
 

@@ -113,7 +113,7 @@ def readImage(image):
 
         if len(approx) == 3:
             #Triangle = Guitar sound = number 30
-            shape.instrument = "piano"
+            shape.instrument = "drum"
 
         elif len(approx) == 4 : 
             x2, y2 , w, h = cv2.boundingRect(approx)
