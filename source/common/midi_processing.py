@@ -26,8 +26,8 @@ def AudiRenderPlugin(list):
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
             assert synth.get_name() == "my_synth"
-            synth.load_state(f"files\daw_files\{shape.instrument}_preset")
-            synth.load_midi(f"{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
+            synth.load_state(f"files\audio_genarator\preset_files\{shape.instrument}_preset")
+            synth.load_midi(f"files\audio_genarator\midi_files\{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
             engine.load_graph([
                             (synth,[])
             ])
@@ -41,8 +41,8 @@ def AudiRenderPlugin(list):
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
             assert synth.get_name() == "my_synth"
-            synth.load_state(f"files\daw_files\{shape.instrument}_preset")
-            synth.load_midi(f"{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
+            synth.load_state(f"files\audio_genarator\preset_files\{shape.instrument}_preset")
+            synth.load_midi(f"files\audio_genarator\midi_files\{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
 
             engine.load_graph([
                             (synth,[])
@@ -57,8 +57,8 @@ def AudiRenderPlugin(list):
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
             assert synth.get_name() == "my_synth"
-            synth.load_state(f"files\daw_files\{shape.instrument}_preset")
-            synth.load_midi(f"{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
+            synth.load_state(f"files\audio_genarator\preset_files\{shape.instrument}_preset")
+            synth.load_midi(f"files\audio_genarator\midi_files\{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
 
             engine.load_graph([
                             (synth,[])
@@ -73,8 +73,8 @@ def AudiRenderPlugin(list):
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
             assert synth.get_name() == "my_synth"
-            synth.load_state(f"files\daw_files\{shape.instrument}_preset")
-            synth.load_midi(f"{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
+            synth.load_state(f"files\audio_genarator\preset_files\{shape.instrument}_preset")
+            synth.load_midi(f"files\audio_genarator\midi_files\{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
 
             engine.load_graph([
                             (synth,[])
@@ -89,8 +89,8 @@ def AudiRenderPlugin(list):
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
             assert synth.get_name() == "my_synth"
-            synth.load_state(f"files\daw_files\{shape.instrument}_preset")
-            synth.load_midi(f"{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
+            synth.load_state(f"files\audio_genarator\preset_files\{shape.instrument}_preset")
+            synth.load_midi(f"files\audio_genarator\midi_files\{shape.instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
 
             engine.load_graph([
                             (synth,[])
@@ -103,11 +103,11 @@ def AudiRenderPlugin(list):
    
 
     # Load the first MP3 file
-    sound1 = AudioSegment.from_file("flute.wav", format="wav")
-    sound2 = AudioSegment.from_file("drum.wav", format="wav")
-    sound3 = AudioSegment.from_file("violin.wav", format="wav")
-    sound4 = AudioSegment.from_file("cello.wav", format="wav")
-    sound5 = AudioSegment.from_file("guitar.wav", format="wav")
+    sound1 = AudioSegment.from_file("files\audio_genarator\flute.wav", format="wav")
+    sound2 = AudioSegment.from_file("files\audio_genarator\drum.wav", format="wav")
+    sound3 = AudioSegment.from_file("files\audio_genarator\violin.wav", format="wav")
+    sound4 = AudioSegment.from_file("files\audio_genarator\cello.wav", format="wav")
+    sound5 = AudioSegment.from_file("files\audio_genarator\guitar.wav", format="wav")
 
     # Set the desired overlap time in milliseconds
     overlap_time = 16000
