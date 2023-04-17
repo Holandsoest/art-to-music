@@ -26,4 +26,4 @@ if __name__ == "__main__":
     #     if cv2.waitKey(1) & 0xFF == ord('q'):
     #         break
 
-    # mc.MakeSong(list_of_shapes)
+    mc.MakeSong(list_of_shapes)
