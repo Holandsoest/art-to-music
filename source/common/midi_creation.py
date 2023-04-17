@@ -43,10 +43,10 @@ def MakeSong(list):
 
     for shape in list:
         if amount_of_drum > 0 and shape.instrument == "drum":
-            print("here")
             # add tracks
             time_drum = 0 # time to zero
             channel_drum = 0 #channel to zero
+
             # create ass many tracks as objects on the board    
             midi_drum.addTrackName(object_drum, time_drum, f"TrackDrum{object_drum}") # give track a name
             midi_drum.addTempo(object_drum, time_drum, shape.bpm) # set bpm
