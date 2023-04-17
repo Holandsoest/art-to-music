@@ -82,6 +82,7 @@ def get_color(img:cv2.Mat) -> str:
     else:
         return 'red'
     
+
 def detect_shapes_with_ai(image):
     contours = ip.get_contours_from_image(image)
     amount_of_contours = len(contours)
@@ -101,10 +102,9 @@ def detect_shapes_with_ai(image):
                                                     display_object_name=True)
     
     print("amount of detected objects: ", len(detected_objects))
-    annotate_detected_colors(img, detected_objects)
+    # annotate_detected_colors(img, detected_objects)
 
     cv2.imshow("ai", img)
-
 
     
 def detect_shapes_with_contour(contours, image):
@@ -119,7 +119,7 @@ def detect_shapes_with_contour(contours, image):
     list_of_shapes = []
 
     # # Custom Object Detection
-    # jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
+    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
     model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'koen-best.pt')
 
     #Get the height, width and channel of the image
@@ -127,10 +127,10 @@ def detect_shapes_with_contour(contours, image):
     img_size = img_height*img_width
 
     shape_detector = CustomObjectDetection()
-    # shape_detector.setModelTypeAsTinyYOLOv3()
+    shape_detector.setModelTypeAsTinyYOLOv3()
     shape_detector.setModelPath(model_custom_path)
-    # shape_detector.setJsonPath(jason_path)
-    # shape_detector.loadModel()
+    shape_detector.setJsonPath(jason_path)
+    shape_detector.loadModel()
 
     
 
@@ -183,8 +183,7 @@ def detect_shapes_with_contour(contours, image):
         areaMin = cv2.getTrackbarPos("Area", "Parameters")
         if area1>areaMin:
             # Get approx contour of shape
-            approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
-
+            approx = cv2.approxPolyDP(contour, 0.02* cv2.arcLength(contour, True), True)
             # minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
             # It will create a rectangle around the shapes
             box = cv2.minAreaRect(contour)
@@ -198,21 +197,23 @@ def detect_shapes_with_contour(contours, image):
             if len(approx) == 3:
                 # Shape is a triangle
                 shape.instrument = "triangle"
-
+                cv2.drawContours(image, contour, -1, (255, 0, 0), 3)
             elif len(approx) == 4 : 
                 x2, y2 , w, h = cv2.boundingRect(approx)
                 aspect_ratio = float(w)/h
                 if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
                     shape.instrument = "square"
+                    cv2.drawContours(image, contour, -1, (255, 0, 0), 3)
                     # Shape is a square
                 else:
                     shape.instrument = "rectangle"
+                    cv2.drawContours(image, contour, -1, (255, 0, 0), 3)
                     # Shape is a rectangle
 
             elif len(approx) == 10 :
                 # Shape is a star
                 shape.instrument = "star"
-
+                cv2.drawContours(image, contour, -1, (255, 0, 0), 3)
             else:
                 # Shape is half circle, circle or heart
                 shape_name = detect_shape_with_ai(get_image_from_box(contour, image))
@@ -233,61 +234,59 @@ def detect_shapes_with_contour(contours, image):
 
     print("total amount of shapes detected: ", len(list_of_shapes))
 
-def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
-    obj_last = []
-    for obj in detected_objects:
-        x1, y1, x2, y2 = obj["box_points"]
-        obj_img = img[y1:y2, x1:x2]
 
-        # Call function to extract color data
-        color = get_color(obj_img)
-        obj["color"] = color
-        if obj_last:
-            if obj_last["name"] == obj["name"] and obj_last["color"] == obj["color"] and obj_last["percentage_probability"] == obj["percentage_probability"]:
-                continue
-            else:
-                # Color label text
-                color_label = ("Color: " + color)
-                # adding a text to the object 
-                cv2.putText(img, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-        else: 
-            # Color label text
-            color_label = ("Color: " + color)
-            # adding a text to the object 
-            cv2.putText(img, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+def points(contours, imgContour,x,y,w,h):
+    peri = cv2.arcLength(contours,True)
+    approx = cv2.approxPolyDP(contours,0.02*peri,True)
+    if len(approx) == 3:
+        cv2.putText(imgContour, "Triangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+        cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
+    elif len(approx) == 4 : 
+        aspect_ratio = float(w)/h
+        if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
+            cv2.putText(imgContour, "Square", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+            cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
+        else:  
+            cv2.putText(imgContour, "Rectangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+            cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
+
+    
+    elif len(approx) == 10 :
+        # Shape is a star
+        cv2.putText(imgContour, "Star", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+        cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
+
+    else :
+        cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+
+
+
+# def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
+#     obj_last = []
+#     for obj in detected_objects:
+#         x1, y1, x2, y2 = obj["box_points"]
+#         obj_img = img[y1:y2, x1:x2]
+
+#         # Call function to extract color data
+#         color = get_color(obj_img)
+#         obj["color"] = color
+#         if obj_last:
+#             if obj_last["name"] == obj["name"] and obj_last["color"] == obj["color"] and obj_last["percentage_probability"] == obj["percentage_probability"]:
+#                 continue
+#             else:
+#                 # Color label text
+#                 color_label = ("Color: " + color)
+#                 # adding a text to the object 
+#                 cv2.putText(img, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+#         else: 
+#             # Color label text
+#             color_label = ("Color: " + color)
+#             # adding a text to the object 
+#             cv2.putText(img, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         
-        obj_last = obj
+#         obj_last = obj
 
-class ModelSelection(Enum):
-    """An enum of different choices.  
-    - `ORIGINAL_MODEL`  Is the downloaded `tiny-yolov3` model. It can detect kites.  
-    - `PREVIOUS_STABLE` A model is stable when the trainer person has validated that it is the current best; this is the previous one.  
-    - `STABLE`          A model is stable when the trainer person has validated that it is the current best.  
-    - `LATEST`          The model that was most recently made. Latest models might constantly change.  
-    - `CUSTOM`          Change the paths below here to quickly test another model or json."""
-    # ORIGINAL_MODEL = 0
-    # PREVIOUS_STABLE = 1
-    # STABLE = 2
-    LATEST = 3
-    CUSTOM = 4
-model_paths = {
-    # ModelSelection.ORIGINAL_MODEL:  os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt'),
-    # ModelSelection.STABLE:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.98251_epoch-18.pt'),
-    ModelSelection.LATEST:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_last.pt'),
-    ModelSelection.CUSTOM:          os.path.join(os.getcwd(), 'dataset', 'models', 'tiny-yolov3_dataset_mAP-0.85113_epoch-7.pt'),
-}
 
-def load_custom_model(path) -> CustomObjectDetection:
-    """Loads the model and the Json and returns the `shape_detector`"""
-    json_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_path = path
-
-    shape_detector = CustomObjectDetection()
-    shape_detector.setModelTypeAsTinyYOLOv3()
-    shape_detector.setModelPath(model_path)
-    shape_detector.setJsonPath(json_path)
-    shape_detector.loadModel()
-    return shape_detector
 
 
     

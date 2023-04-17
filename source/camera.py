@@ -4,7 +4,14 @@
 # Yet to be added processing for the color, the object size size..
 
 # Things to add. Color to BPM
-
+from imageai.Detection.Custom import CustomObjectDetection
+from imageai.Detection.Custom import DetectionModelTrainer
+import cv2 
+import numpy as np 
+import os
+import image_processing as ip
+import common.image_properties as i_prop
+from enum import Enum
 
 from imageai.Detection import ObjectDetection # For AI object detection AI
 import cv2 # library for the webcam ( this one probably can also find color)
@@ -17,9 +24,32 @@ def empty(a):
 
 cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters",640,240)
-cv2.createTrackbar("Threshold1","Parameters",159,255,empty)
+cv2.createTrackbar("Threshold1","Parameters",35,255,empty)
 cv2.createTrackbar("Threshold2","Parameters",53,255,empty)
-cv2.createTrackbar("Area","Parameters",10000,30000,empty)
+cv2.createTrackbar("Area","Parameters",2000,30000,empty)
+
+def detect_shapes_with_ai(image):
+    contours = ip.get_contours_from_image(image)
+    amount_of_contours = len(contours)
+    # # Custom Object Detection
+    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'koen-best.pt')
+
+    shape_detector = CustomObjectDetection()
+    shape_detector.setModelTypeAsTinyYOLOv3()
+    shape_detector.setModelPath(model_custom_path)
+    shape_detector.setJsonPath(jason_path)
+    shape_detector.loadModel()
+
+    img, detected_objects = shape_detector.detectObjectsFromImage(input_image=image, 
+                                                    output_type="array",
+                                                    display_percentage_probability=True,
+                                                    display_object_name=True)
+    
+    print("amount of detected objects: ", len(detected_objects))
+    # annotate_detected_colors(img, detected_objects)
+
+    cv2.imshow("aiiii", img)
 
 
 def points(contours, imgContour,x,y,w,h):
@@ -45,7 +75,8 @@ def points(contours, imgContour,x,y,w,h):
 
     else :
         cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-
+        detect_shapes_with_ai(img)
+        cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
 
 def color(imgContour, x,y,w,h,cy,cx):
     _, frame = cap.read()
@@ -73,14 +104,14 @@ def color(imgContour, x,y,w,h,cy,cx):
         color = "VIOLET"
     else:
         color = "RED"
-    cv2.putText(imgContour, "color: " +  color, (x + w +20, y + 40), 0, 0.5, (0,255,0), 2)
+    # cv2.putText(imgContour, "color: " +  color, (x + w +20, y + 40), 0, 0.5, (0,255,0), 2)
 
 
 def posiont(imgContour,x,y,w,h):
     cy = int(y+h/2)
     cx = int(x+w/2)
     pos_label = ("Position: ({}, {})".format(cx, cy))
-    cv2.putText(imgContour, pos_label, (x + w +20, y + 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    # cv2.putText(imgContour, pos_label, (x + w +20, y + 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     color(imgContour, x,y,w,h,cy,cx)
 
 
@@ -110,13 +141,12 @@ def getContours(imgContour):
             
             points(cnt, imgContour,x,y,w,h)
             #possitions
-            posiont(imgContour, x,y,w,h)
             
             posiont(imgContour,x,y,w,h)
             #color
 
 
-            cv2.putText(imgContour, "Area: " + str(int(area)), (x + w +20, y + 80), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+            # cv2.putText(imgContour, "Area: " + str(int(area)), (x + w +20, y + 80), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
             #extra parts
             #pixel_center_bgr = frame[cy, cx]
             #b, g, r = int(pixel_center_bgr[0]), int(pixel_center_bgr[1]), int(pixel_center_bgr[2])
@@ -131,12 +161,12 @@ def getContours(imgContour):
 if __name__ == "__main__":
     #----------- AI OBJECT DETECTION --------------------
 
-    # Initialize object detection model
-    obj_detect = ObjectDetection()
-    #obj_detect.setModelTypeAsYOLOv3()
-    obj_detect.setModelTypeAsTinyYOLOv3()
-    obj_detect.setModelPath(r"D:\BeCreative\Music based on Art\shape\tiny-yolov3.pt")
-    obj_detect.loadModel()
+    # # Initialize object detection model
+    # obj_detect = ObjectDetection()
+    # #obj_detect.setModelTypeAsYOLOv3()
+    # obj_detect.setModelTypeAsTinyYOLOv3()
+    # obj_detect.setModelPath(r"D:\BeCreative\Music based on Art\shape\tiny-yolov3.pt")
+    # obj_detect.loadModel()
     #-------------------------------------------------------
 
     # Set webcam parameters
@@ -147,9 +177,9 @@ if __name__ == "__main__":
 
     while True:
         ret, img = cap.read()
-        imgcamm, preds = obj_detect.detectObjectsFromImage(input_image=img, output_type="array",
-                                                                   display_percentage_probability=False,
-                                                                   display_object_name=True)
+        # imgcamm, preds = obj_detect.detectObjectsFromImage(input_image=img, output_type="array",
+        #                                                            display_percentage_probability=False,
+        #                                                            display_object_name=True)
         
 
         
@@ -192,13 +222,13 @@ if __name__ == "__main__":
         #     cv2.putText(annotated_image, color, (x, y-40), cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 0, 255), 2)
         #     cv2.putText(annotated_image, pos_label, (x , y - 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
     
-
-        getContours(imgcamm)
-
+        # detect_shapes_with_ai(img)
+        getContours(img)
+        
         
         # imgStack = stackImages(0.8,([imgContour]))
         # cv2.imshow("Result", imgStack)
-        cv2.imshow("ai", imgcamm)
+        cv2.imshow("ai", img)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break    
 
