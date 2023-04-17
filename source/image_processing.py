@@ -1,7 +1,6 @@
 import cv2
-import pandas as pd
-import os
-import common.image_properties as ip
+import numpy as np
+# import pandas as pd
 
 def get_bpm_from_color(x_axis, y_axis, image):
     """
@@ -75,6 +74,48 @@ def get_volume_from_size(obj_size, img_size):
     """
     return min((((obj_size)+(img_size*0.2))/img_size)*255, 255)
 
+def get_pitch_from_size(obj_height, img_height, shape_name):
+    """
+    This function scales the size of an object in an image relative to the size of the entire image.img_size
+    It takes two arguments:
+    - obj_size: the size of the object in pixels
+    - img_size: the size of the entire image in pixels
+    
+    It returns a scaled value between 20 - 255 based on the ratio of obj_size to img_size.
+    It starts at 20 otherwise the smaller objects wouldn't even make a sound.
+    """
+    match shape_name:
+        case "triangle":
+            # represents a <instrument>, the pitch of this instrument should be in between # and #
+            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        
+        case "square":
+            # represents a <instrument>, the pitch of this instrument should be in between # and #
+            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        
+        case "rectangle":
+            # represents a <instrument>, the pitch of this instrument should be in between # and #
+            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        
+        case "star":
+            # represents a <instrument>, the pitch of this instrument should be in between # and #
+            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        
+        case "half circle":
+            # represents a <instrument>, the pitch of this instrument should be in between # and #
+            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        
+        case "heart":
+            # represents a <instrument>, the pitch of this instrument should be in between # and #
+            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        
+        case "empty":
+            return 0
+        
+        case _:
+            # represents a <instrument>, the pitch of this instrument should be in between # and #
+            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+
 def get_contours_from_image(image):
     """
     This function reads an image using the OpenCV library and detects contours in the image using the Hough transform algorithm. 
@@ -83,88 +124,43 @@ def get_contours_from_image(image):
 
     The function returns a all the contours detected in the image
     """
+    # aperture_size = 5
+    # L2Gradient = True
+
+    # threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
+    # threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
+
+    # img_blur = cv2.GaussianBlur(image, (3,3), 0)
+    # img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # # Canny makes the whole picture black and white 
+    # img_canny = cv2.Canny(img_gray, threshold1, threshold2, L2gradient = L2Gradient )
+
+    # # A kernel(a matrix of odd size(3,5,7) is convolved with the image.
+    # # A pixel in the original image (either 1 or 0) will be considered 1 only if all the pixels under the kernel are 1, otherwise, it is eroded (made to zero).
+    # # Thus all the pixels near the boundary will be discarded depending upon the size of the kernel.
+    # # So the thickness or size of the foreground object decreases or simply the white region decreases in the image.
+    # kernel = np.ones((5,5))
+    # img_dil = cv2.dilate(img_canny, kernel, iterations = 1)
+    
+    # contours, hierarchy = cv2.findContours(img_dil, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
     # Reading the image with opencv
     img_grayscaled = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
     # add img_blur if you make use of jpg files
     # img_blur = cv2.blur(img_grayscaled, (3,3))
 
     ret , thrash = cv2.threshold(img_grayscaled, 240 , 255, cv2.CHAIN_APPROX_NONE)
-    contours , hierarchy = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    
-    print("amount of contours: ", len(contours))
+    contours , hierarchy = cv2.findContours(thrash, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
     return contours
 
+def setup_contour():
+    def empty(a):
+        pass
 
-# def read_image(image):
-#     """
-#     This function reads an image using the OpenCV library and detects shapes in the image using the Hough transform algorithm. 
-#     It takes one argument:
-#     - image: an image read with OpenCV library.
-
-#     The function returns a list of Image objects, each representing a shape in the image with properties such as volume, pitch, duration, and beats per minute (BPM).
-#     """
-#     #Create shape list_of_shapes
-#     list_of_shapes = []
-
-#     #Reading the image with opencv
-#     img_grayscaled = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-#     #Get the height, width and channel of the image
-#     img_height, img_width, channel = image.shape
-#     img_size = img_height*img_width
-
-#     ret , thrash = cv2.threshold(img_grayscaled, 240 , 255, cv2.CHAIN_APPROX_NONE)
-#     contours , hierarchy = cv2.findContours(thrash, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-
-#     #Go through all the contours/shapes that are detected
-#     for contour in contours:
-#         #Get approx contour of shape
-#         approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
-
-#         #minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
-#         #It will create a rectangle around the shapes
-#         box = cv2.minAreaRect(contour)
-#         (x, y), (width, height), angle = box
-#         shape_size_to_volume = get_volume_from_size(width*height, img_size)
-#         shape_colorcode_to_bpm = get_bpm_from_color(int(x),int(y),image)
-#         shape_width_to_duration = get_duration_from_width(width, img_width)
-#         shape_height_to_pitch = get_volume_from_size(height, img_height)
-#         shape = ip.Image(0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), int(shape_height_to_pitch))
-
-#         if len(approx) == 3:
-#             #Triangle = Guitar sound = number 30
-#             shape.instrument = 30
-
-#         elif len(approx) == 4 : 
-#             x2, y2 , w, h = cv2.boundingRect(approx)
-#             aspect_ratio = float(w)/h
-#             if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
-#                 #Square = Drum = number 119
-#                 shape.instrument = 119
-#             else:
-#                 # #Rectangle (representing a half circle) = flute = number 74
-#                 shape.instrument = 74
-
-#         elif len(approx) == 5 :
-#             #Pentagon (representing a heartshape) = piano = 2
-#             shape.instrument = 2
-
-#         elif len(approx) == 10 :
-#             #Star = Cello = 43
-#             shape.instrument = 43
-
-#         else:
-#             #Circle = lead 1 = 81
-#             shape.instrument = 81
-        
-#         list_of_shapes.append(shape)
-
-#     # Accessing object value using a for loop
-#     for shape in list_of_shapes:
-#         print("instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
-
-#     return list_of_shapes, contours
-
-
-
-
+    cv2.namedWindow("Parameters")
+    cv2.resizeWindow("Parameters", 640, 240)
+    cv2.createTrackbar("Threshold1", "Parameters", 159, 255, empty)
+    cv2.createTrackbar("Threshold2", "Parameters", 53, 255, empty)
+    cv2.createTrackbar("Area", "Parameters", 0, 200, empty)

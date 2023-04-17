@@ -18,9 +18,6 @@ def get_color(img:cv2.Mat) -> str:
     
     Returns what color the object mainly has
     """
-    # Convert image to HSV color space
-    # hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    # Convert image to HSV color space
     hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
     # Define color range for red, green, and blue
@@ -79,8 +76,6 @@ def detect_shapes_with_ai(image):
 
     Returns nothing.    
     """
-    contours = ip.get_contours_from_image(image)
-    amount_of_contours = len(contours)
     # # Custom Object Detection
     jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
     model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'koen-best.pt')
@@ -96,11 +91,8 @@ def detect_shapes_with_ai(image):
                                                     display_percentage_probability=True,
                                                     display_object_name=True)
     
-    print("amount of detected objects: ", len(detected_objects))
     annotate_detected_colors(img, detected_objects)
-
-    cv2.imshow("ai", img)
-    cv2.waitKey()
+    return img
     
 def detect_shapes_with_contour(contours, image):
     """
@@ -142,10 +134,6 @@ def detect_shapes_with_contour(contours, image):
         x_offset=y_offset=500
         l_img[y_offset:y_offset+s_img.shape[0], x_offset:x_offset+s_img.shape[1]] = s_img
 
-        # cv2.imshow("", l_img)
-        # cv2.waitKey()
-        # img_grayscaled = cv2.cvtColor(l_img, cv2.COLOR_BGR2GRAY)
-        # return img_grayscaled
         return l_img
 
 
@@ -156,27 +144,27 @@ def detect_shapes_with_contour(contours, image):
         
         Returns "empty" if nothing is detected, else it will detect the name of the shape.
         """
-        img_grayscaled = cv2.cvtColor(box, cv2.COLOR_BGR2GRAY)
-        # cv2.imshow("", img_grayscaled)
-        # print("press esc to continue...")
-        # cv2.waitKey()
         img, obj = shape_detector.detectObjectsFromImage(input_image=box, 
                                                         output_type="array",
                                                         display_percentage_probability=True,
                                                         display_object_name=True)
+        annotate_detected_colors(img, obj)
+        # cv2.imshow("img", img)
         if not obj:
             return "empty"
         else:
-            cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            # cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
             return obj[0]["name"]
         
     counter = 0
-
+    cv2.drawContours(image, contours, -1, (255,0,0), 3)
     for contour in contours:
         counter += 1
         area1 = cv2.contourArea(contour)
 
-        if area1 > 100:
+        # area_min = cv2.getTrackbarPos("Area", "Parameters")
+        # if area1 > area_min:
+        if area1 > 40:
             # Get approx contour of shape
             approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
 
@@ -187,35 +175,39 @@ def detect_shapes_with_contour(contours, image):
             shape_size_to_volume = ip.get_volume_from_size(width*height, img_size)
             shape_colorcode_to_bpm = ip.get_bpm_from_color(int(x),int(y),image)
             shape_width_to_duration = ip.get_duration_from_width(width, img_width)
-            shape_height_to_pitch = ip.get_volume_from_size(height, img_height)
-            shape = i_prop.Image(counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), int(shape_height_to_pitch))
+            shape = i_prop.Image(counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), 0)
 
             if len(approx) == 3:
                 # Shape is a triangle
                 shape.instrument = "triangle"
-                # cv2.drawContours(image, contours, -1, (0,255,0), 3)
+                shape.pitch = int(ip.get_pitch_from_size(height, img_height, "triangle"))
 
             elif len(approx) == 4 : 
                 x2, y2 , w, h = cv2.boundingRect(approx)
                 aspect_ratio = float(w)/h
                 if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
                     shape.instrument = "square"
+                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "square"))
                     # Shape is a square
                 else:
                     shape.instrument = "rectangle"
+                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "rectangle"))
                     # Shape is a rectangle
 
             elif len(approx) == 10 :
                 # Shape is a star
                 shape.instrument = "star"
+                shape.pitch = int(ip.get_pitch_from_size(height, img_height, "star"))
 
             else:
                 # Shape is half circle, circle or heart
                 shape_name = detect_shape_with_ai(get_image_from_box(contour, image))
                 if shape_name == "empty":
+                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "empty"))
                     continue
                 else: 
                     shape.instrument = shape_name
+                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, shape_name))
                 # Run camera in loop
 
             list_of_shapes.append(shape)
@@ -225,9 +217,7 @@ def detect_shapes_with_contour(contours, image):
     for shape in list_of_shapes:
         print(shape.counter, "instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
 
-    # cv2.imshow("contour", image)
-    print("total amount of shapes detected: ", len(list_of_shapes))
-
+    return image
 
 def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
     obj_last = []
@@ -249,7 +239,7 @@ def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
         else: 
             # Color label text
             color_label = ("Color: " + color)
-            # adding a text to the object 
+            # Adding a text to the object 
             cv2.putText(img, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
         
         obj_last = obj
