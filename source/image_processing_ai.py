@@ -175,29 +175,33 @@ def detect_shapes_with_contour(contours, image):
             shape_size_to_volume = ip.get_volume_from_size(width*height, img_size)
             shape_colorcode_to_bpm = ip.get_bpm_from_color(int(x),int(y),image)
             shape_width_to_duration = ip.get_duration_from_width(width, img_width)
-            shape = i_prop.Image(counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), 0)
+            shape = i_prop.Image("", counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), 0)
 
             if len(approx) == 3:
-                # Shape is a triangle
-                shape.instrument = "triangle"
-                shape.pitch = int(ip.get_pitch_from_size(height, img_height, "triangle"))
+                # Shape is a triangle (Guitar)
+                shape.shape = "triangle"
+                shape.instrument = "guitar"
+                shape.pitch = int(ip.get_pitch_from_size(height, img_height, "guitar"))
 
             elif len(approx) == 4 : 
                 x2, y2 , w, h = cv2.boundingRect(approx)
                 aspect_ratio = float(w)/h
                 if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
-                    shape.instrument = "square"
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "square"))
-                    # Shape is a square
+                    shape.shape = "square   "
+                    shape.instrument = "drum pads"
+                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum pads"))
+                    # Shape is a square (Drum Pads)
                 else:
-                    shape.instrument = "rectangle"
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "rectangle"))
-                    # Shape is a rectangle
+                    shape.shape = "rectangle"
+                    shape.instrument = "drum pads"
+                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum pads"))
+                    # Shape is a rectangle (Drum Pads)
 
             elif len(approx) == 10 :
-                # Shape is a star
-                shape.instrument = "star"
-                shape.pitch = int(ip.get_pitch_from_size(height, img_height, "star"))
+                # Shape is a star (Cello)
+                shape.shape = "star      "
+                shape.instrument = "cello"
+                shape.pitch = int(ip.get_pitch_from_size(height, img_height, "cello"))
 
             else:
                 # Shape is half circle, circle or heart
@@ -206,6 +210,13 @@ def detect_shapes_with_contour(contours, image):
                     shape.pitch = int(ip.get_pitch_from_size(height, img_height, "empty"))
                     continue
                 else: 
+                    shape.shape = shape_name
+                    if shape_name == "half circle":
+                        shape_name = "flute"
+                    elif shape_name == "heart": 
+                        shape_name = "piano"
+                    elif shape_name == "circle":
+                        shape_name = "violin"
                     shape.instrument = shape_name
                     shape.pitch = int(ip.get_pitch_from_size(height, img_height, shape_name))
                 # Run camera in loop
@@ -215,7 +226,14 @@ def detect_shapes_with_contour(contours, image):
             continue
 
     for shape in list_of_shapes:
-        print(shape.counter, "instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
+        print(shape.counter, 
+              "shape:", shape.shape, 
+              "instrument:", shape.instrument, 
+              "volume:", shape.volume, 
+              "bpm:", shape.bpm, 
+              "pitch:", shape.pitch, 
+              "duration:", shape.duration, 
+              sep='\t')
 
     return image
 

@@ -1,31 +1,17 @@
 class Image:
-    def __init__(shape, counter, name, size, color, x_axis, y_axis):
+    def __init__(self, shape, counter, name, size, color, x_axis, y_axis):
+        #shape
+        self.shape = shape
         #counter for the shapes.
-        shape.counter = counter
+        self.counter = counter
         #name is an integer related to instrument, 
         #see: https://www.midi.org/specifications-old/item/gm-level-1-sound-set
-        shape.instrument = name
+        self.instrument = name
         #volume is integer between 20 - 100 (change to 0 - 255)
-        shape.volume = size
+        self.volume = size
         #bpm is an int with table of 30 with a max of 240
-        shape.bpm = color
+        self.bpm = color
         #duration is the x_axis middle point of the shape recalculated to an int between 1 - 4
-        shape.duration = x_axis
+        self.duration = x_axis
         #pitch is the y_axis middle point of the shape recalculated to an int between 0 - 255
-        shape.pitch = y_axis
-
-    
-    def get_instrument(shape):
-        return shape.instrument
-    
-    def get_volume(shape):
-        return shape.volume
-    
-    def get_bpm(shape):
-        return shape.bpm
-    
-    def get_duration(shape):
-        return shape.duration
-    
-    def get_pitch(shape):
-        return shape.pitch
+        self.pitch = y_axis

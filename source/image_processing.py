@@ -85,36 +85,32 @@ def get_pitch_from_size(obj_height, img_height, shape_name):
     It starts at 20 otherwise the smaller objects wouldn't even make a sound.
     """
     match shape_name:
-        case "triangle":
-            # represents a <instrument>, the pitch of this instrument should be in between # and #
-            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        case "guitar":
+            # represents a (triangle) guitar, the pitch of this instrument should be in between 74 and 96
+            return min((((obj_height)+(img_height*0.74))/img_height)*96, 96)
         
-        case "square":
-            # represents a <instrument>, the pitch of this instrument should be in between # and #
-            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        case "drum pads":
+            # represents a (square / rectangle) drumpads, the pitch of this instrument should be in between 69 and 86
+            return min((((obj_height)+(img_height*0.69))/img_height)*86, 86)
         
-        case "rectangle":
-            # represents a <instrument>, the pitch of this instrument should be in between # and #
-            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        case "cello":
+            # represents a (star) cello, the pitch of this instrument should be in between 48 and 77
+            return min((((obj_height)+(img_height*0.48))/img_height)*77, 77)
         
-        case "star":
-            # represents a <instrument>, the pitch of this instrument should be in between # and #
-            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        case "flute":
+            # represents a (half circle) flute, the pitch of this instrument should be in between 72 and 108
+            return min((((obj_height)+(img_height*0.2))/img_height)*108, 108)
         
-        case "half circle":
-            # represents a <instrument>, the pitch of this instrument should be in between # and #
-            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        case "piano":
+            # represents a (heart) piano, the pitch of this instrument should be in between 0 and 100   
+            return min((((obj_height)+(img_height))/img_height)*100, 100)
         
-        case "heart":
-            # represents a <instrument>, the pitch of this instrument should be in between # and #
-            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
+        case "violin":
+            # represents a (circle) violin, the pitch of this instrument should be in between 76 and 103
+            return min((((obj_height)+(img_height*0.76))/img_height)*103, 103)
         
         case "empty":
             return 0
-        
-        case _:
-            # represents a <instrument>, the pitch of this instrument should be in between # and #
-            return min((((obj_height)+(img_height*0.2))/img_height)*255, 255)
 
 def get_contours_from_image(image):
     """
