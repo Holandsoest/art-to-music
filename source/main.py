@@ -1,6 +1,7 @@
 import cv2
 import image_processing as img_proc
-import common.midi_creation as mc
+import common.midi_creation as midi_creation
+import common.midi_processing as midi_processing
 import image_processing_ai as img_proc_ai
 
 cap = cv2.VideoCapture(0)
@@ -25,5 +26,6 @@ if __name__ == "__main__":
     
     #     if cv2.waitKey(1) & 0xFF == ord('q'):
     #         break
-
-    mc.MakeSong(list_of_shapes)
+    
+    midi_creation.MakeSong(list_of_shapes)
+    midi_processing.AudiRenderPlugin(list_of_shapes)
