@@ -123,6 +123,11 @@ venv.bak/
 .spyderproject
 .spyproject
 
+# Created audio files
+files\audio_generator\created_song.mp3
+files\audio_generator\midi_files
+files\audio_generator\wav_files
+
 # Rope project settings
 .ropeproject
 

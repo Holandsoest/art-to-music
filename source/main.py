@@ -7,7 +7,7 @@ import image_processing_ai as img_proc_ai
 cap = cv2.VideoCapture(0)
 
 if __name__ == "__main__":
-    img_path = 'files\image_processing\example_shapes_1.png'
+    img_path = 'files\image_processing\example_shapes.png'
     img = cv2.imread(img_path)
 
     # img_proc.setup_contour()
@@ -23,11 +23,12 @@ if __name__ == "__main__":
         image, list_of_shapes = img_proc_ai.detect_shapes_with_contour(shapes, img)
         cv2.imshow("contour", image)
     
-    print("press any key to continue...")
-    cv2.waitKey()    
+    # print("press any key to continue...")
+    # cv2.waitKey()    
     
     #     if cv2.waitKey(1) & 0xFF == ord('q'):
     #         break
     
     midi_creation.MakeSong(list_of_shapes)
     midi_processing.AudiRenderPlugin(list_of_shapes)
+    cv2.destroyAllWindows()
