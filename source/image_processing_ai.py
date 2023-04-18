@@ -235,7 +235,7 @@ def detect_shapes_with_contour(contours, image):
               "duration:", shape.duration, 
               sep='\t')
 
-    return image
+    return image, list_of_shapes
 
 def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
     obj_last = []

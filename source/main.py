@@ -20,8 +20,10 @@ if __name__ == "__main__":
     if len(shapes) < 1:  
         cv2.imshow("ai", img_proc_ai.detect_shapes_with_ai(img))
     else: 
-        cv2.imshow("contour", img_proc_ai.detect_shapes_with_contour(shapes, img))
+        image, list_of_shapes = img_proc_ai.detect_shapes_with_contour(shapes, img)
+        cv2.imshow("contour", image)
     
+    print("press any key to continue...")
     cv2.waitKey()    
     
     #     if cv2.waitKey(1) & 0xFF == ord('q'):
