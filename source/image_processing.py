@@ -89,7 +89,7 @@ def get_pitch_from_size(obj_height, img_height, shape_name):
             # represents a (triangle) guitar, the pitch of this instrument should be in between 74 and 96
             return min((((obj_height)+(img_height*0.74))/img_height)*96, 96)
         
-        case "drum pads":
+        case "drum":
             # represents a (square / rectangle) drumpads, the pitch of this instrument should be in between 69 and 86
             return min((((obj_height)+(img_height*0.69))/img_height)*86, 86)
         

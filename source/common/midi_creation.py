@@ -105,15 +105,15 @@ def MakeSong(list):
         
         if amount_of_instruments -1 == iteration:
             #write all the midi files
-            with open("drum_output.mid", "wb") as output_file1:
+            with open("files\midi_files\drum_output.mid", "wb") as output_file1:
                 midi_drum.writeFile(output_file1)
-            with open("guitar_output.mid", "wb") as output_file2:
+            with open("files\midi_files\guitar_output.mid", "wb") as output_file2:
                 midi_guitar.writeFile(output_file2)
-            with open("flute_output.mid", "wb") as output_file3:
+            with open("files\midi_files\flute_output.mid", "wb") as output_file3:
                 midi_flute.writeFile(output_file3)
-            with open("violin_output.mid", "wb") as output_file4:
+            with open("files\midi_files\violin_output.mid", "wb") as output_file4:
                 midi_violin.writeFile(output_file4)
-            with open("cello_output.mid", "wb") as output_file5:
+            with open("files\midi_files\cello_output.mid", "wb") as output_file5:
                 midi_cello.writeFile(output_file5)
             
         iteration += 1

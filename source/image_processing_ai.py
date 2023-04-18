@@ -188,13 +188,13 @@ def detect_shapes_with_contour(contours, image):
                 aspect_ratio = float(w)/h
                 if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
                     shape.shape = "square   "
-                    shape.instrument = "drum pads"
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum pads"))
+                    shape.instrument = "drum"
+                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum"))
                     # Shape is a square (Drum Pads)
                 else:
                     shape.shape = "rectangle"
-                    shape.instrument = "drum pads"
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum pads"))
+                    shape.instrument = "drum"
+                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum"))
                     # Shape is a rectangle (Drum Pads)
 
             elif len(approx) == 10 :
