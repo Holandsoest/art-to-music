@@ -38,7 +38,7 @@ def MakeSong(list):
     #make melodies
     melodie1 = [1,0,0,0] #1000
     melodie2 = [0,2,0,0] #0100
-    melodie3 = [1,2,0,0] #1100
+    melodie3 = [1,2,0,0] #1100 
     melodie4 = [0,0,3,0] #0010
     melodie5 = [1,0,3,0] #1010
     melodie6 = [0,2,3,0] #0110
