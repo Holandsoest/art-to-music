@@ -7,7 +7,7 @@ import image_processing_ai as img_proc_ai
 cap = cv2.VideoCapture(0)
 
 if __name__ == "__main__":
-    img_path = 'files\image_processing\example_shapes.png'
+    img_path = 'files\image_processing\example_shapes_1.png'
     img = cv2.imread(img_path)
 
     # img_proc.setup_contour()

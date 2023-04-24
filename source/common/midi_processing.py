@@ -2,6 +2,7 @@ import dawdreamer as daw
 from scipy.io import wavfile
 from pydub import AudioSegment
 import os
+import multiprocessing
 
 def AudiRenderPlugin(list):
     sample_rate = 44100
@@ -9,9 +10,11 @@ def AudiRenderPlugin(list):
     render_time = 6
     amount_of_drum = 0
     amount_of_guitar = 0
-    amount_of_flute = 0
     amount_of_violin = 0
-    amount_of_cello = 0
+    amount_of_flute = 0
+    amount_of_cello = 0    
+    list2 = list
+
 
     AudioSegment.ffmpeg 
 
@@ -20,100 +23,131 @@ def AudiRenderPlugin(list):
     model_wav_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'wav_files')
 
     for shape in list:
-        match shape.instrument:
-            case 'drum':    amount_of_drum = 1
-            case 'guitar':  amount_of_guitar = 1
-            case 'flute':   amount_of_flute = 1
-            case 'violin':  amount_of_violin = 1
-            case 'cello':   amount_of_cello = 1
-            case _: pass
+            match shape.instrument:
+                case 'drum':    amount_of_drum = 1
+                case 'guitar':  amount_of_guitar = 1
+                case 'violin':  amount_of_violin = 1
+                case 'flute':   amount_of_flute = 1
+                case 'cello':   amount_of_cello = 1
+                case _: pass
+                
+    global drum
+    def drum(list_of_objects, drum):
+        for shape in list_of_objects:
+            if drum == 1:
+                engine = daw.RenderEngine(sample_rate, buffer_size)
+                synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+                assert synth.get_name() == "my_synth"
+                synth.load_state(model_preset_path + "\\drum_preset")
+                synth.load_midi(model_midi_path + "\\drum_output.mid", clear_previous=False, beats=False, all_events=False) 
+                engine.load_graph([
+                                (synth,[])
+                ])
+                engine.set_bpm(shape.bpm)
+                engine.render(render_time)  
+                audio = engine.get_audio()  
+                wavfile.write(model_wav_path + "\\drum.wav",  sample_rate, audio.transpose()) 
+                drum +=1
+                print("drum")
 
-    for shape in list:
-        if amount_of_drum == 1 and shape.instrument == "drum":
-            engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
-            assert synth.get_name() == "my_synth"
-            synth.load_state(model_preset_path + "\\drum_preset")
-            synth.load_midi(model_midi_path + "\\drum_output.mid", clear_previous=False, beats=False, all_events=False) 
-            engine.load_graph([
-                            (synth,[])
-            ])
-            engine.set_bpm(shape.bpm)
-            engine.render(render_time)  
-            audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\drum.wav",  sample_rate, audio.transpose()) # Don't forget to transpose!
-            # wavfile.write("drum.wav", sample_rate, audio.transpose())
-            amount_of_drum +=1
-            
+    global guitar
+    def guitar(list_of_objects, guitar):      
+        for shape in list_of_objects:
+            if guitar == 1:
+                engine = daw.RenderEngine(sample_rate, buffer_size)
+                synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+                assert synth.get_name() == "my_synth"
+                synth.load_state(model_preset_path + "\\guitar_preset")
+                synth.load_midi(model_midi_path + "\\guitar_output.mid", clear_previous=False, beats=False, all_events=False) 
+
+                engine.load_graph([
+                                (synth,[])
+                ])
+                engine.set_bpm(shape.bpm)
+                engine.render(render_time)  
+                audio = engine.get_audio()  
+                wavfile.write(model_wav_path + "\\guitar.wav",  sample_rate, audio.transpose()) 
+                guitar +=1
+                print("guitar")
+
+    global violin
+    def violin (list_of_objects, violin):
+        for shape in list_of_objects:
+            if violin == 1:
+                engine = daw.RenderEngine(sample_rate, buffer_size)
+                synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+                assert synth.get_name() == "my_synth"
+                synth.load_state(model_preset_path + "\\violin_preset")
+                synth.load_midi(model_midi_path + "\\violin_output.mid", clear_previous=False, beats=False, all_events=False) 
+
+                engine.load_graph([
+                                (synth,[])
+                ])
+                engine.set_bpm(shape.bpm)
+                engine.render(render_time)  
+                audio = engine.get_audio()  
+                wavfile.write(model_wav_path + "\\violin.wav",  sample_rate, audio.transpose())
+                violin +=1
+                print("violin")
+
+    global flute
+    def flute (list_of_objects, flute):
+        for shape in list_of_objects:
+            if flute == 1:
+                engine = daw.RenderEngine(sample_rate, buffer_size)
+                synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+                assert synth.get_name() == "my_synth"
+                synth.load_state(model_preset_path + "\\flute_preset")
+                synth.load_midi(model_midi_path + "\\flute_output.mid", clear_previous=False, beats=False, all_events=False) 
+
+                engine.load_graph([
+                                (synth,[])
+                ])
+                engine.set_bpm(shape.bpm)
+                engine.render(render_time)  
+                audio = engine.get_audio()  
+                wavfile.write(model_wav_path + "\\flute.wav",  sample_rate, audio.transpose())
+                flute +=1
+                print("flute")
+                
+    global cello
+    def cello (list_of_objects, cello):
+        for shape in list_of_objects:
+            if cello == 1:
+                engine = daw.RenderEngine(sample_rate, buffer_size)
+                synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+                assert synth.get_name() == "my_synth"
+                synth.load_state(model_preset_path + "\\cello_preset")
+                synth.load_midi(model_midi_path + "\\cello_output.mid", clear_previous=False, beats=False, all_events=False) 
+
+                engine.load_graph([
+                                (synth,[])
+                ])
+                engine.set_bpm(shape.bpm)
+                engine.render(render_time)  
+                audio = engine.get_audio()  
+                wavfile.write(model_wav_path + "\\cello.wav", sample_rate, audio.transpose())
+                cello +=1
+                print("cello")
+
+    p1 = multiprocessing.Process(target=drum, args=(list2, amount_of_drum))
+    p2 = multiprocessing.Process(target=violin, args=(list2, amount_of_violin))
+    p3 = multiprocessing.Process(target=guitar, args=(list2, amount_of_guitar))
+    p4 = multiprocessing.Process(target=flute, args=(list2, amount_of_flute))
+    p5 = multiprocessing.Process(target=cello, args=(list2, amount_of_cello))
         
-        if amount_of_guitar == 1 and shape.instrument == "guitar":
-            engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
-            assert synth.get_name() == "my_synth"
-            synth.load_state(model_preset_path + "\\guitar_preset")
-            synth.load_midi(model_midi_path + "\\guitar_output.mid", clear_previous=False, beats=False, all_events=False) 
+    p1.start()
+    p2.start()
+    p3.start()
+    p4.start()
+    p5.start()
 
-            engine.load_graph([
-                            (synth,[])
-            ])
-            engine.set_bpm(shape.bpm)
-            engine.render(render_time)  
-            audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\guitar.wav",  sample_rate, audio.transpose()) # Don't forget to transpose!
-            # wavfile.write("guitar.wav", sample_rate, audio.transpose())
-            amount_of_guitar +=1
+    p1.join()
+    p2.join()
+    p3.join()
+    p4.join()
+    p5.join()
 
-        if amount_of_violin == 1 and shape.instrument == "violin":
-            engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
-            assert synth.get_name() == "my_synth"
-            synth.load_state(model_preset_path + "\\violin_preset")
-            synth.load_midi(model_midi_path + "\\violin_output.mid", clear_previous=False, beats=False, all_events=False) 
-
-            engine.load_graph([
-                            (synth,[])
-            ])
-            engine.set_bpm(shape.bpm)
-            engine.render(render_time)  
-            audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\violin.wav",  sample_rate, audio.transpose()) # Don't forget to transpose!
-            # wavfile.write("violin.wav", sample_rate, audio.transpose())
-            amount_of_violin +=1
-
-        if amount_of_flute == 1 and shape.instrument == "flute":
-            engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
-            assert synth.get_name() == "my_synth"
-            synth.load_state(model_preset_path + "\\flute_preset")
-            synth.load_midi(model_midi_path + "\\flute_output.mid", clear_previous=False, beats=False, all_events=False) 
-
-            engine.load_graph([
-                            (synth,[])
-            ])
-            engine.set_bpm(shape.bpm)
-            engine.render(render_time)  
-            audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\flute.wav",  sample_rate, audio.transpose()) # Don't forget to transpose!
-            # wavfile.write("flute.wav", sample_rate, audio.transpose())
-            amount_of_flute +=1
-
-        if amount_of_cello == 1 and shape.instrument == "cello":
-            engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
-            assert synth.get_name() == "my_synth"
-            synth.load_state(model_preset_path + "\\cello_preset")
-            synth.load_midi(model_midi_path + "\\cello_output.mid", clear_previous=False, beats=False, all_events=False) 
-
-            engine.load_graph([
-                            (synth,[])
-            ])
-            engine.set_bpm(shape.bpm)
-            engine.render(render_time)  
-            audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\cello.wav", sample_rate, audio.transpose()) # Don't forget to transpose!
-            # wavfile.write("cello.wav", sample_rate, audio.transpose())
-            amount_of_cello +=1
-    
     # Load the first MP3 file
     sound1 = AudioSegment.from_file(model_wav_path + "\\drum.wav", format="wav")
     sound2 = AudioSegment.from_file(model_wav_path + "\\flute.wav", format="wav")
@@ -122,7 +156,7 @@ def AudiRenderPlugin(list):
     sound5 = AudioSegment.from_file(model_wav_path + "\\guitar.wav", format="wav")
 
     # Set the desired overlap time in milliseconds
-    overlap_time = 6000
+    overlap_time = render_time * 1000
 
     # Extract the overlapping part from the end of the first MP3 file
     overlap_part = sound1[-overlap_time:]
