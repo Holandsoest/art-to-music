@@ -2,7 +2,7 @@ import dawdreamer as daw
 from scipy.io import wavfile
 from pydub import AudioSegment
 import os
-import multiprocessing
+import multiprocessing as mp
 
 def AudiRenderPlugin(list):
     sample_rate = 44100
@@ -12,10 +12,8 @@ def AudiRenderPlugin(list):
     amount_of_guitar = 0
     amount_of_violin = 0
     amount_of_flute = 0
-    amount_of_cello = 0    
-    list2 = list
-
-
+    amount_of_cello = 0
+    
     AudioSegment.ffmpeg 
 
     model_midi_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_files')
@@ -29,9 +27,8 @@ def AudiRenderPlugin(list):
                 case 'violin':  amount_of_violin = 1
                 case 'flute':   amount_of_flute = 1
                 case 'cello':   amount_of_cello = 1
-                case _: pass
-                
-    global drum
+                case _: pass  
+
     def drum(list_of_objects, drum):
         for shape in list_of_objects:
             if drum == 1:
@@ -50,7 +47,6 @@ def AudiRenderPlugin(list):
                 drum +=1
                 print("drum")
 
-    global guitar
     def guitar(list_of_objects, guitar):      
         for shape in list_of_objects:
             if guitar == 1:
@@ -70,7 +66,6 @@ def AudiRenderPlugin(list):
                 guitar +=1
                 print("guitar")
 
-    global violin
     def violin (list_of_objects, violin):
         for shape in list_of_objects:
             if violin == 1:
@@ -90,7 +85,6 @@ def AudiRenderPlugin(list):
                 violin +=1
                 print("violin")
 
-    global flute
     def flute (list_of_objects, flute):
         for shape in list_of_objects:
             if flute == 1:
@@ -110,7 +104,6 @@ def AudiRenderPlugin(list):
                 flute +=1
                 print("flute")
                 
-    global cello
     def cello (list_of_objects, cello):
         for shape in list_of_objects:
             if cello == 1:
@@ -129,24 +122,26 @@ def AudiRenderPlugin(list):
                 wavfile.write(model_wav_path + "\\cello.wav", sample_rate, audio.transpose())
                 cello +=1
                 print("cello")
+                
+    p1 = mp.Process(target=drum, args=(list, amount_of_drum))
+    p2 = mp.Process(target=violin, args=(list, amount_of_violin))
+    p3 = mp.Process(target=guitar, args=(list, amount_of_guitar))
+    p4 = mp.Process(target=flute, args=(list, amount_of_flute))
+    p5 = mp.Process(target=cello, args=(list, amount_of_cello))
 
-    p1 = multiprocessing.Process(target=drum, args=(list2, amount_of_drum))
-    p2 = multiprocessing.Process(target=violin, args=(list2, amount_of_violin))
-    p3 = multiprocessing.Process(target=guitar, args=(list2, amount_of_guitar))
-    p4 = multiprocessing.Process(target=flute, args=(list2, amount_of_flute))
-    p5 = multiprocessing.Process(target=cello, args=(list2, amount_of_cello))
-        
-    p1.start()
-    p2.start()
-    p3.start()
-    p4.start()
-    p5.start()
+    if __name__ == "__main__":
+        print(1)   
+        p1.start()
+        p2.start()
+        p3.start()
+        p4.start()
+        p5.start()
 
-    p1.join()
-    p2.join()
-    p3.join()
-    p4.join()
-    p5.join()
+        p1.join()
+        p2.join()
+        p3.join()
+        p4.join()
+        p5.join()         
 
     # Load the first MP3 file
     sound1 = AudioSegment.from_file(model_wav_path + "\\drum.wav", format="wav")
