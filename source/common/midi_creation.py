@@ -10,6 +10,8 @@ def MakeSong(list):
                 return pitch + 1 #value closer to low limit so + value
             else:
                 return pitch - 1 #value closer to low limit so - value
+        else: 
+            return pitch
 
     #pitch, bpm, duration, volume, instrument, amount
     amount_of_instruments = len(list) # number of object on the screen 
@@ -95,6 +97,7 @@ def MakeSong(list):
             
             #check for forbidden notes between 69 and 86
             drum_pitch = note(shape.pitch, 69, 86)
+            print(drum_pitch)
 
             #choose melodie
             if shape.duration == 1: #Q1
@@ -117,8 +120,6 @@ def MakeSong(list):
             #add melodie nodes to track
             i = 0
             for i in range(0,4):
-                print(i)
-                print(melodie[i])
                 if melodie[i] >= 1:
                     midi_drum.addNote(object_drum, channel_drum, drum_pitch, time_drum + melodie[i], shape.duration, shape.volume) # make a note
                 i += 1
@@ -152,10 +153,8 @@ def MakeSong(list):
             #add melodie nodes to track
             i = 0
             for i in range(0,4):
-                print(i)
-                print(melodie[i])
                 if melodie[i] >= 1:
-                    midi_drum.addNote(object_guitar, channel_guitar, guitar_pitch, time_guitar + melodie[i], shape.duration, shape.volume) # make a note
+                    midi_guitar.addNote(object_guitar, channel_guitar, guitar_pitch, time_guitar + melodie[i], shape.duration, shape.volume) # make a note
                 i += 1
 
             object_guitar +=1
@@ -187,10 +186,8 @@ def MakeSong(list):
             #add melodie nodes to track
             i = 0
             for i in range(0,4):
-                print(i)
-                print(melodie[i])
                 if melodie[i] >= 1:
-                    midi_drum.addNote(object_flute, channel_flute, flute_pitch, time_flute + melodie[i], shape.duration, shape.volume) # make a note
+                    midi_flute.addNote(object_flute, channel_flute, flute_pitch, time_flute + melodie[i], shape.duration, shape.volume) # make a note
                 i += 1
 
             object_flute +=1
@@ -222,10 +219,8 @@ def MakeSong(list):
             #add melodie nodes to track
             i = 0
             for i in range(0,4):
-                print(i)
-                print(melodie[i])
                 if melodie[i] >= 1:
-                    midi_drum.addNote(object_violin, channel_violin, violin_pitch, time_violin + melodie[i], shape.duration, shape.volume) # make a note
+                    midi_violin.addNote(object_violin, channel_violin, violin_pitch, time_violin + melodie[i], shape.duration, shape.volume) # make a note
                 i += 1
                 
             object_violin +=1
@@ -257,10 +252,8 @@ def MakeSong(list):
             #add melodie nodes to track
             i = 0
             for i in range(0,4):
-                print(i)
-                print(melodie[i])
                 if melodie[i] >= 1:
-                    midi_drum.addNote(object_cello, channel_cello, cello_pitch, time_cello + melodie[i], shape.duration, shape.volume) # make a note
+                    midi_cello.addNote(object_cello, channel_cello, cello_pitch, time_cello + melodie[i], shape.duration, shape.volume) # make a note
                 i += 1
 
             object_cello +=1

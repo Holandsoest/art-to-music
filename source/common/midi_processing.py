@@ -6,7 +6,7 @@ import os
 def AudiRenderPlugin(list):
     sample_rate = 44100
     buffer_size = 128
-    render_time = 6
+    render_time = 8
     amount_of_drum = 0
     amount_of_guitar = 0
     amount_of_flute = 0
@@ -44,8 +44,6 @@ def AudiRenderPlugin(list):
             wavfile.write(model_wav_path + "\\drum.wav",  sample_rate, audio.transpose()) # Don't forget to transpose!
             # wavfile.write("drum.wav", sample_rate, audio.transpose())
             amount_of_drum +=1
-            print("drum")
-            
         
         if amount_of_guitar == 1 and shape.instrument == "guitar":
             engine = daw.RenderEngine(sample_rate, buffer_size)
@@ -123,7 +121,7 @@ def AudiRenderPlugin(list):
     sound5 = AudioSegment.from_file(model_wav_path + "\\guitar.wav", format="wav")
 
     # Set the desired overlap time in milliseconds
-    overlap_time = 6000
+    overlap_time = render_time * 1000
 
     # Extract the overlapping part from the end of the first MP3 file
     overlap_part = sound1[-overlap_time:]
