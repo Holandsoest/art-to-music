@@ -1,5 +1,5 @@
 """Defines how to draw shapes and their bounding boxes."""
-import location as loc
+import common.location as loc
 import tkinter
 import math
 
