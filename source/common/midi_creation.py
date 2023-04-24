@@ -11,7 +11,7 @@ def MakeSong(list):
             else:
                 return pitch - 1 #value closer to low limit so - value
         else: 
-            return pitch
+            return pitch #return value as it was
 
     #pitch, bpm, duration, volume, instrument, amount
     amount_of_instruments = len(list) # number of object on the screen 
@@ -54,22 +54,22 @@ def MakeSong(list):
 
     ''' determen melodies        
     (triangle) guitar
-    Q1 = melodie 5      Q2 = melodie 6      Q3 = melodie 7       Q4 = melodie 8
+    Q1 = melodie 1      Q2 = melodie 2      Q3 = melodie 3       Q4 = melodie 4
 
     (square / rectangle) drum
-    Q1 = melodie       Q2 = melodie       Q3 = melodie        Q4 = melodie 
+    Q1 = melodie 5      Q2 = melodie 6      Q3 = melodie 7       Q4 = melodie 8
     
     (star) cello
-    Q1 = melodie       Q2 = melodie       Q3 = melodie        Q4 = melodie 
+    Q1 = melodie 9      Q2 = melodie 10      Q3 = melodie 11       Q4 = melodie 12
     
     (half circle) flute
-    Q1 = melodie       Q2 = melodie       Q3 = melodie        Q4 = melodie 
+    Q1 = melodie 13     Q2 = melodie 14      Q3 = melodie 15       Q4 = melodie 1
     
     (heart) piano
-    Q1 = melodie       Q2 = melodie       Q3 = melodie        Q4 = melodie 
+    Q1 = melodie 7      Q2 = melodie 8      Q3 = melodie 12       Q4 = melodie 3
     
     (circle) violin
-    Q1 = melodie       Q2 = melodie       Q3 = melodie        Q4 = melodie    
+    Q1 = melodie 6      Q2 = melodie 9       Q3 = melodie 8       Q4 = melodie 2   
     '''
     
     # determine the amount of shapes with the same instrument in the list
@@ -97,7 +97,6 @@ def MakeSong(list):
             
             #check for forbidden notes between 69 and 86
             drum_pitch = note(shape.pitch, 69, 86)
-            print(drum_pitch)
 
             #choose melodie
             if shape.duration == 1: #Q1
@@ -134,13 +133,13 @@ def MakeSong(list):
 
             #choose melodie
             if shape.duration == 1: #Q1
-                melodie = melodie5
+                melodie = melodie1
             elif shape.duration == 2: #Q2
-                melodie = melodie6
+                melodie = melodie2
             elif shape.duration == 3: #Q3
-                melodie = melodie7
+                melodie = melodie3
             elif shape.duration == 4: #Q4
-                melodie = melodie8
+                melodie = melodie4
             
             # add tracks
             time_guitar = 0 # time to zero
@@ -167,13 +166,13 @@ def MakeSong(list):
 
             #choose melodie
             if shape.duration == 1: #Q1
-                melodie = melodie5
+                melodie = melodie13
             elif shape.duration == 2: #Q2
-                melodie = melodie6
+                melodie = melodie14
             elif shape.duration == 3: #Q3
-                melodie = melodie7
+                melodie = melodie15
             elif shape.duration == 4: #Q4
-                melodie = melodie8
+                melodie = melodie1
             
             # add tracks
             time_flute = 0 # time to zero
@@ -200,13 +199,13 @@ def MakeSong(list):
 
             #choose melodie
             if shape.duration == 1: #Q1
-                melodie = melodie5
-            elif shape.duration == 2: #Q2
                 melodie = melodie6
+            elif shape.duration == 2: #Q2
+                melodie = melodie9
             elif shape.duration == 3: #Q3
-                melodie = melodie7
-            elif shape.duration == 4: #Q4
                 melodie = melodie8
+            elif shape.duration == 4: #Q4
+                melodie = melodie2
                         
             # add tracks
             time_violin = 0 # time to zero
@@ -233,13 +232,13 @@ def MakeSong(list):
 
             #choose melodie
             if shape.duration == 1: #Q1
-                melodie = melodie5
+                melodie = melodie9
             elif shape.duration == 2: #Q2
-                melodie = melodie6
+                melodie = melodie10
             elif shape.duration == 3: #Q3
-                melodie = melodie7
+                melodie = melodie11
             elif shape.duration == 4: #Q4
-                melodie = melodie8
+                melodie = melodie12
                         
             # add tracks
             time_cello = 8 # time to zero
