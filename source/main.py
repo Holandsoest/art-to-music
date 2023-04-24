@@ -7,7 +7,7 @@ import image_processing_ai as img_proc_ai
 cap = cv2.VideoCapture(0)
 
 if __name__ == "__main__":
-    img_path = r'C:\Users\gielw\Documents\School\CSS\Git\art-to-music\files\image_processing\example_shapes_1.png'
+    img_path = r'C:\Users\gielw\Documents\School\CSS\Git\art-to-music\files\image_processing\cirkel1.png'
     img = cv2.imread(img_path)
     assert img is not None, "file couldnt be read"
 

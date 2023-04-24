@@ -72,7 +72,7 @@ def get_volume_from_size(obj_size, img_size):
     It returns a scaled value between 20 - 255 based on the ratio of obj_size to img_size.
     It starts at 20 otherwise the smaller objects wouldn't even make a sound.
     """
-    return min((((obj_size)+(img_size*0.2))/img_size)*255, 255)
+    return min((((obj_size)+(img_size*0.7))/img_size)*255, 255)
 
 def get_pitch_from_size(obj_height, img_height, shape_name):
     """

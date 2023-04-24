@@ -196,6 +196,7 @@ def MakeSong(list):
             
             #check for forbidden notes between 76 and 103
             violin_pitch = note(shape.pitch, 76, 103)
+            print(violin_pitch)
 
             #choose melodie
             if shape.duration == 1: #Q1
