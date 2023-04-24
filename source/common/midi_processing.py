@@ -44,6 +44,7 @@ def AudiRenderPlugin(list):
             wavfile.write(model_wav_path + "\\drum.wav",  sample_rate, audio.transpose()) # Don't forget to transpose!
             # wavfile.write("drum.wav", sample_rate, audio.transpose())
             amount_of_drum +=1
+            print("drum")
             
         
         if amount_of_guitar == 1 and shape.instrument == "guitar":

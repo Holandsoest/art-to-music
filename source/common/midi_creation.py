@@ -23,7 +23,7 @@ def MakeSong(list):
     iteration = 0
 
     #make list for forbidden notes
-    forbidden_notes = [22,25,277,30,32,34,42,44,46,49,51,54,56,58,61,63,66,68,70,73,75,78,80,82,85,87,90,92,94,97,99,102,104,106]
+    forbidden_notes = [22,25,27,30,32,34,42,44,46,49,51,54,56,58,61,63,66,68,70,73,75,78,80,82,85,87,90,92,94,97,99,102,104,106]
 
     #make melodies
     melodie1 = [1,0,0,0] #1000
@@ -87,22 +87,23 @@ def MakeSong(list):
             
             #check for forbidden notes between 74 and 96
             drum_pitch = shape.pitch
+            print (drum_pitch)
             drum_low = 74
             drum_high = 96
-            for shape.pitch in forbidden_notes:
+            if drum_pitch in forbidden_notes:
                 if abs(drum_low - drum_pitch) < abs(drum_pitch - drum_high):
                     drum_pitch = drum_pitch + 1 #value closer to low limit so + value
                 else:
                     drum_pitch = drum_pitch - 1 #value closer to low limit so - value
-
+            print (drum_pitch)
             #choose melodie
-            if shape.duration <= 25: #Q1
+            if shape.duration == 1: #Q1
                 melodie = melodie5
-            elif shape.duration <= 50: #Q2
+            elif shape.duration == 2: #Q2
                 melodie = melodie6
-            elif shape.duration <= 75: #Q3
+            elif shape.duration == 3: #Q3
                 melodie = melodie7
-            elif shape.duration <= 100: #Q4
+            elif shape.duration == 4: #Q4
                 melodie = melodie8
 
             # add tracks
@@ -115,7 +116,9 @@ def MakeSong(list):
             midi_drum.addProgramChange(object_drum, 0, time_drum, 1) # add instrument = shape.instrument = 1
             #add melodie nodes to track
             i = 0
-            for i in melodie:
+            for i in range(0,4):
+                print(i)
+                print(melodie[i])
                 if melodie[i] >= 1:
                     midi_drum.addNote(object_drum, channel_drum, drum_pitch, time_drum + melodie[i], shape.duration, shape.volume) # make a note
                 i += 1
