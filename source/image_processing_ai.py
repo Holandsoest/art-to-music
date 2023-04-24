@@ -6,7 +6,7 @@ import cv2
 import numpy as np 
 import os
 import image_processing as ip
-import common.image_properties as i_prop
+import common.image_properties as img_prop
 from enum import Enum
 
 # Function to get the color of an object in the image
@@ -133,7 +133,6 @@ def detect_shapes_with_contour(contours, image):
         l_img = cv2.imread(img_path)
         x_offset=y_offset=500
         l_img[y_offset:y_offset+s_img.shape[0], x_offset:x_offset+s_img.shape[1]] = s_img
-
         return l_img
 
 
@@ -157,14 +156,14 @@ def detect_shapes_with_contour(contours, image):
             return obj[0]["name"]
         
     counter = 0
-    cv2.drawContours(image, contours, -1, (255,0,0), 3)
+    # cv2.drawContours(image, contours, -1, (255,0,0), 3)
     for contour in contours:
         counter += 1
         area1 = cv2.contourArea(contour)
 
         # area_min = cv2.getTrackbarPos("Area", "Parameters")
         # if area1 > area_min:
-        if area1 > 40:
+        if area1 > 50:
             # Get approx contour of shape
             approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
 
@@ -175,51 +174,64 @@ def detect_shapes_with_contour(contours, image):
             shape_size_to_volume = ip.get_volume_from_size(width*height, img_size)
             shape_colorcode_to_bpm = ip.get_bpm_from_color(int(x),int(y),image)
             shape_width_to_duration = ip.get_duration_from_width(width, img_width)
-            shape = i_prop.Image("", counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), 0)
+            shape = img_prop.Image("", counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), 0)
 
             if len(approx) == 3:
                 # Shape is a triangle (Guitar)
                 shape.shape = "triangle"
                 shape.instrument = "guitar"
                 shape.pitch = int(ip.get_pitch_from_size(height, img_height, "guitar"))
-
+                # cv2.drawContours(image, contour, -1, (255,0,0), 3)
             elif len(approx) == 4 : 
                 x2, y2 , w, h = cv2.boundingRect(approx)
                 aspect_ratio = float(w)/h
                 if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
-                    shape.shape = "square   "
+                    shape.shape = "square"
                     shape.instrument = "drum"
                     shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum"))
                     # Shape is a square (Drum Pads)
+                    # cv2.drawContours(image, contour, -1, (255,0,0), 3)
                 else:
                     shape.shape = "rectangle"
                     shape.instrument = "drum"
                     shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum"))
+                    # cv2.drawContours(image, contour, -1, (255,0,0), 3)
                     # Shape is a rectangle (Drum Pads)
 
             elif len(approx) == 10 :
                 # Shape is a star (Cello)
-                shape.shape = "star      "
+                shape.shape = "star"
                 shape.instrument = "cello"
                 shape.pitch = int(ip.get_pitch_from_size(height, img_height, "cello"))
-
+                cv2.drawContours(image, contour, -1, (255,0,0), 3)
             else:
                 # Shape is half circle, circle or heart
                 shape_name = detect_shape_with_ai(get_image_from_box(contour, image))
                 if shape_name == "empty":
                     shape.pitch = int(ip.get_pitch_from_size(height, img_height, "empty"))
+                    cv2.drawContours(image, contour, -1, (0,255,0), 3)
+                    
                     continue
                 else: 
                     shape.shape = shape_name
                     if shape_name == "half circle":
                         shape_name = "flute"
+                        cv2.drawContours(image, contour, -1, (255,255,0), 3)
                     elif shape_name == "heart": 
                         shape_name = "piano"
+                        cv2.drawContours(image, contour, -1, (255,0,255), 3)
                     elif shape_name == "circle":
                         shape_name = "violin"
+                        cv2.drawContours(image, contour, -1, (0,255,255), 3)
+                    elif shape_name == "square":
+                        shape_name = "drum"
+                    elif shape_name == "traingle":
+                        shape_name = "guitar"
+                    elif shape_name == "star":
+                        shape_name = "cello"
+                        cv2.drawContours(image, contour, -1, (0,0,255), 3)
                     shape.instrument = shape_name
                     shape.pitch = int(ip.get_pitch_from_size(height, img_height, shape_name))
-                # Run camera in loop
 
             list_of_shapes.append(shape)
         else:

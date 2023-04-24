@@ -111,8 +111,11 @@ def get_pitch_from_size(obj_height, img_height, shape_name):
         
         case "empty":
             return 0
+        
+        case _:
+            return 0
 
-def get_contours_from_image(image):
+def get_contours_from_image(image, threshold_lower, threshold_upper):
     """
     This function reads an image using the OpenCV library and detects contours in the image using the Hough transform algorithm. 
     It takes one argument:
@@ -120,43 +123,80 @@ def get_contours_from_image(image):
 
     The function returns a all the contours detected in the image
     """
-    # aperture_size = 5
-    # L2Gradient = True
+    ##### this code for .jpg files
+    aperture_size = 5
+    L2Gradient = True
 
-    # threshold1 = cv2.getTrackbarPos("Threshold1", "Parameters")
-    # threshold2 = cv2.getTrackbarPos("Threshold2", "Parameters")
 
-    # img_blur = cv2.GaussianBlur(image, (3,3), 0)
-    # img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # # Canny makes the whole picture black and white 
-    # img_canny = cv2.Canny(img_gray, threshold1, threshold2, L2gradient = L2Gradient )
+    img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    img_blur = cv2.GaussianBlur(img_gray, (5,5), 0)
 
-    # # A kernel(a matrix of odd size(3,5,7) is convolved with the image.
-    # # A pixel in the original image (either 1 or 0) will be considered 1 only if all the pixels under the kernel are 1, otherwise, it is eroded (made to zero).
-    # # Thus all the pixels near the boundary will be discarded depending upon the size of the kernel.
-    # # So the thickness or size of the foreground object decreases or simply the white region decreases in the image.
-    # kernel = np.ones((5,5))
-    # img_dil = cv2.dilate(img_canny, kernel, iterations = 1)
+    # Canny makes the whole picture black and white 
+    # Hysteresis: The final step. Canny does use two thresholds (upper and lower):
+
+    # If a pixel gradient is higher than the upper threshold, the pixel is accepted as an edge
+
+    # If a pixel gradient value is below the lower threshold, then it is rejected.
+
+    # If the pixel gradient is between the two thresholds, 
+    # then it will be accepted only if it is connected to a pixel that is above the upper threshold.
+    # Canny recommended a upper:lower ratio between 2:1 and 3:1.
+    img_canny = cv2.Canny(img_blur, threshold_lower, threshold_upper, aperture_size,  L2gradient = L2Gradient )
+    # cv2.imshow("canny", img_canny)
+    # cv2.waitKey()
     
-    # contours, hierarchy = cv2.findContours(img_dil, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
-    # Reading the image with opencv
-    img_grayscaled = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    contours, hierarchy = cv2.findContours(img_canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-    # add img_blur if you make use of jpg files
-    # img_blur = cv2.blur(img_grayscaled, (3,3))
-
-    ret , thrash = cv2.threshold(img_grayscaled, 240 , 255, cv2.CHAIN_APPROX_NONE)
-    contours , hierarchy = cv2.findContours(thrash, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     return contours
 
-def setup_contour():
-    def empty(a):
-        pass
+def setup_contour(image, amount_of_shapes_in_picture):    
+    threshold_lower = 30
+    threshold_upper = 0
 
-    cv2.namedWindow("Parameters")
-    cv2.resizeWindow("Parameters", 640, 240)
-    cv2.createTrackbar("Threshold1", "Parameters", 159, 255, empty)
-    cv2.createTrackbar("Threshold2", "Parameters", 53, 255, empty)
-    cv2.createTrackbar("Area", "Parameters", 0, 200, empty)
+    def contour_from_contours(contours):
+        counter = 0
+        for contour in contours:
+            area1 = cv2.contourArea(contour)
+
+            # area_min = cv2.getTrackbarPos("Area", "Parameters")
+            # if area1 > area_min:
+            if area1 > 50:
+                counter += 1
+                # Get approx contour of shape
+                # approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
+
+                # # minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
+                # # It will create a rectangle around the shapes
+                # box = cv2.minAreaRect(contour)
+                
+                # (x, y), (width, height), angle = box
+        return counter
+
+    while(1):
+
+        # if len( get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
+        if contour_from_contours(get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
+            threshold_lower +=1
+            threshold_upper = threshold_lower
+
+            while(1):
+                # if len( get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
+                if contour_from_contours(get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
+                    threshold_upper +=1
+                    if threshold_upper > 300:
+                        threshold_upper = threshold_lower
+                        break
+                else:
+                    return threshold_lower, threshold_upper
+
+            if threshold_lower > 300:
+                print("Couldn't find propper threshold values. Return threshold lower is 60 and upper is 180.")
+                threshold_lower = 60
+                threshold_upper = 180
+                return threshold_lower, threshold_upper
+            
+        else:
+            return threshold_lower, threshold_upper
+

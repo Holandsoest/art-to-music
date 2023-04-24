@@ -41,8 +41,7 @@ def AudiRenderPlugin(list):
             engine.set_bpm(shape.bpm)
             engine.render(render_time)  
             audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\drum.wav",  sample_rate, audio.transpose()) # Don't forget to transpose!
-            # wavfile.write("drum.wav", sample_rate, audio.transpose())
+            wavfile.write(model_wav_path + "\\drum.wav",  sample_rate, audio.transpose()) 
             amount_of_drum +=1
             
         
@@ -59,8 +58,7 @@ def AudiRenderPlugin(list):
             engine.set_bpm(shape.bpm)
             engine.render(render_time)  
             audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\guitar.wav",  sample_rate, audio.transpose()) # Don't forget to transpose!
-            # wavfile.write("guitar.wav", sample_rate, audio.transpose())
+            wavfile.write(model_wav_path + "\\guitar.wav",  sample_rate, audio.transpose()) 
             amount_of_guitar +=1
 
         if amount_of_violin == 1 and shape.instrument == "violin":
@@ -76,8 +74,7 @@ def AudiRenderPlugin(list):
             engine.set_bpm(shape.bpm)
             engine.render(render_time)  
             audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\violin.wav",  sample_rate, audio.transpose()) # Don't forget to transpose!
-            # wavfile.write("violin.wav", sample_rate, audio.transpose())
+            wavfile.write(model_wav_path + "\\violin.wav",  sample_rate, audio.transpose()) 
             amount_of_violin +=1
 
         if amount_of_flute == 1 and shape.instrument == "flute":
@@ -93,8 +90,7 @@ def AudiRenderPlugin(list):
             engine.set_bpm(shape.bpm)
             engine.render(render_time)  
             audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\flute.wav",  sample_rate, audio.transpose()) # Don't forget to transpose!
-            # wavfile.write("flute.wav", sample_rate, audio.transpose())
+            wavfile.write(model_wav_path + "\\flute.wav",  sample_rate, audio.transpose())
             amount_of_flute +=1
 
         if amount_of_cello == 1 and shape.instrument == "cello":
@@ -110,8 +106,7 @@ def AudiRenderPlugin(list):
             engine.set_bpm(shape.bpm)
             engine.render(render_time)  
             audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\cello.wav", sample_rate, audio.transpose()) # Don't forget to transpose!
-            # wavfile.write("cello.wav", sample_rate, audio.transpose())
+            wavfile.write(model_wav_path + "\\cello.wav", sample_rate, audio.transpose())
             amount_of_cello +=1
     
     # Load the first MP3 file
