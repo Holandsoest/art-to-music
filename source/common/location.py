@@ -1,6 +1,5 @@
-"""TODO
-- add method overloading
-- add Size class == Pos"""
+#!/usr/bin/env python3
+"""Common functions and classes about sizes and positions"""
 
 class Pos:
     """A simple class that can be used to store an x & y variables as a position or as a size."""

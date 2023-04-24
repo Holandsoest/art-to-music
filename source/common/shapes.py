@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Defines how to draw shapes and their bounding boxes."""
 import common.location as loc
 import tkinter
