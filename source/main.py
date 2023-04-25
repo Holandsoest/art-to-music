@@ -3,6 +3,7 @@ import image_processing as img_proc
 import common.midi_creation as midi_creation
 import common.midi_processing as midi_processing
 import image_processing_ai as img_proc_ai
+import multiprocessing as mp
 
 cap = cv2.VideoCapture(0)
 
@@ -28,7 +29,36 @@ if __name__ == "__main__":
     
     #     if cv2.waitKey(1) & 0xFF == ord('q'):
     #         break
-    
-    midi_creation.MakeSong(list_of_shapes)
-    midi_processing.AudiRenderPlugin(list_of_shapes)
+
+    midi_creation.MakeSong(list_of_shapes) 
+
+    for shape in list_of_shapes:
+        match shape.instrument:
+            case 'drum':    amount_of_drum = 1
+            case 'guitar':  amount_of_guitar = 1
+            case 'cello':   amount_of_cello = 1
+            case 'flute':   amount_of_flute = 1
+            case 'violin':  amount_of_violin = 1
+            case _: pass 
+
+    process1 = mp.Process(target=midi_processing.drum, args=(list_of_shapes, amount_of_drum))
+    process2 = mp.Process(target=midi_processing.violin, args=(list_of_shapes, amount_of_violin))
+    process3 = mp.Process(target=midi_processing.guitar, args=(list_of_shapes, amount_of_guitar))
+    process4 = mp.Process(target=midi_processing.flute, args=(list_of_shapes, amount_of_flute))
+    process5 = mp.Process(target=midi_processing.cello, args=(list_of_shapes, amount_of_cello))
+
+    if __name__ == "__main__":
+        process1.start()
+        process2.start()
+        process3.start()
+        process4.start()
+        process5.start()
+
+        process1.join()
+        process2.join()
+        process3.join()
+        process4.join()
+        process5.join() 
+
+    midi_processing.audio_rendering()
     cv2.destroyAllWindows()
