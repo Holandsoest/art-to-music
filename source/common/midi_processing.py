@@ -5,7 +5,7 @@ import os
 
 sample_rate = 44100
 buffer_size = 128
-render_time = 6
+render_time = 24
 amount_of_drum = 0
 amount_of_guitar = 0
 amount_of_violin = 0
