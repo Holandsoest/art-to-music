@@ -32,20 +32,11 @@ if __name__ == "__main__":
 
     midi_creation.MakeSong(list_of_shapes) 
 
-    for shape in list_of_shapes:
-        match shape.instrument:
-            case 'drum':    amount_of_drum = 1
-            case 'guitar':  amount_of_guitar = 1
-            case 'cello':   amount_of_cello = 1
-            case 'flute':   amount_of_flute = 1
-            case 'violin':  amount_of_violin = 1
-            case _: pass 
-
-    process1 = mp.Process(target=midi_processing.drum, args=(list_of_shapes, amount_of_drum))
-    process2 = mp.Process(target=midi_processing.violin, args=(list_of_shapes, amount_of_violin))
-    process3 = mp.Process(target=midi_processing.guitar, args=(list_of_shapes, amount_of_guitar))
-    process4 = mp.Process(target=midi_processing.flute, args=(list_of_shapes, amount_of_flute))
-    process5 = mp.Process(target=midi_processing.cello, args=(list_of_shapes, amount_of_cello))
+    process1 = mp.Process(target=midi_processing.drum, args=(list_of_shapes))
+    process2 = mp.Process(target=midi_processing.violin, args=(list_of_shapes))
+    process3 = mp.Process(target=midi_processing.guitar, args=(list_of_shapes))
+    process4 = mp.Process(target=midi_processing.flute, args=(list_of_shapes))
+    process5 = mp.Process(target=midi_processing.cello, args=(list_of_shapes))
 
     if __name__ == "__main__":
         process1.start()
