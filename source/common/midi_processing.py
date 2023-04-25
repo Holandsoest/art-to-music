@@ -15,8 +15,7 @@ model_midi_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_fi
 model_preset_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'preset_files')
 model_wav_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'wav_files')    
 
-def drum(list_of_objects):
-    amount_of_drum = 0
+def drum(list_of_objects, amount_of_drum):
     for shape in list_of_objects:
         if amount_of_drum == 1:
             engine = daw.RenderEngine(sample_rate, buffer_size)
@@ -33,8 +32,7 @@ def drum(list_of_objects):
             wavfile.write(model_wav_path + "\\drum.wav",  sample_rate, audio.transpose()) 
             amount_of_drum +=1
 
-def guitar(list_of_objects):  
-    amount_of_guitar = 0     
+def guitar(list_of_objects, amount_of_guitar):      
     for shape in list_of_objects:  
         if amount_of_guitar == 1:
             engine = daw.RenderEngine(sample_rate, buffer_size)
@@ -52,8 +50,7 @@ def guitar(list_of_objects):
             wavfile.write(model_wav_path + "\\guitar.wav",  sample_rate, audio.transpose()) 
             amount_of_guitar +=1
 
-def violin (list_of_objects):
-    amount_of_violin = 0
+def violin (list_of_objects, amount_of_violin):
     for shape in list_of_objects:
         if amount_of_violin == 1:
             engine = daw.RenderEngine(sample_rate, buffer_size)
@@ -71,8 +68,7 @@ def violin (list_of_objects):
             wavfile.write(model_wav_path + "\\violin.wav",  sample_rate, audio.transpose())
             amount_of_violin +=1
 
-def flute (list_of_objects):
-    amount_of_flute = 0
+def flute (list_of_objects, amount_of_flute):
     for shape in list_of_objects:
         if amount_of_flute == 1:
             engine = daw.RenderEngine(sample_rate, buffer_size)
@@ -90,14 +86,14 @@ def flute (list_of_objects):
             wavfile.write(model_wav_path + "\\flute.wav",  sample_rate, audio.transpose())
             amount_of_flute +=1
             
-def cello (list_of_objects):
-    amount_of_cello = 0
+def cello (list_of_objects, amount_of_cello):
     for shape in list_of_objects:
         if amount_of_cello == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+            synth = engine.make_plugin_processor("my_synth", r"D:\Muziek\muziek\Fl studio plugins\Sylenth1\Sylenth1 v2.2.1.1 Main Files\64-Bit\Sylenth1.dll")
             assert synth.get_name() == "my_synth"
-            synth.load_state(model_preset_path + "\\cello_preset")
+            synth.open_editor()
+            #synth.load_state(model_preset_path + "\\cello_preset")
             synth.load_midi(model_midi_path + "\\cello_output.mid", clear_previous=False, beats=False, all_events=False) 
 
             engine.load_graph([

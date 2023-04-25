@@ -32,11 +32,11 @@ if __name__ == "__main__":
 
     midi_creation.MakeSong(list_of_shapes) 
 
-    process1 = mp.Process(target=midi_processing.drum, args=(list_of_shapes))
-    process2 = mp.Process(target=midi_processing.violin, args=(list_of_shapes))
-    process3 = mp.Process(target=midi_processing.guitar, args=(list_of_shapes))
-    process4 = mp.Process(target=midi_processing.flute, args=(list_of_shapes))
-    process5 = mp.Process(target=midi_processing.cello, args=(list_of_shapes))
+    process1 = mp.Process(target=midi_processing.drum, args=(list_of_shapes, 0))
+    process2 = mp.Process(target=midi_processing.violin, args=(list_of_shapes, 0))
+    process3 = mp.Process(target=midi_processing.guitar, args=(list_of_shapes, 0))
+    process4 = mp.Process(target=midi_processing.flute, args=(list_of_shapes, 0))
+    process5 = mp.Process(target=midi_processing.cello, args=(list_of_shapes, 0))
 
     if __name__ == "__main__":
         process1.start()
