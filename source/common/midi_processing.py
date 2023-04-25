@@ -20,16 +20,7 @@ def AudiRenderPlugin(list):
     model_wav_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'wav_files')
 
     for shape in list:
-        match shape.instrument:
-            case 'drum':    amount_of_drum = 1
-            case 'guitar':  amount_of_guitar = 1
-            case 'flute':   amount_of_flute = 1
-            case 'violin':  amount_of_violin = 1
-            case 'cello':   amount_of_cello = 1
-            case _: pass
-
-    for shape in list:
-        if amount_of_drum == 1 and shape.instrument == "drum":
+        if amount_of_drum == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
             assert synth.get_name() == "my_synth"
@@ -45,7 +36,7 @@ def AudiRenderPlugin(list):
             # wavfile.write("drum.wav", sample_rate, audio.transpose())
             amount_of_drum +=1
         
-        if amount_of_guitar == 1 and shape.instrument == "guitar":
+        if amount_of_guitar == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
             assert synth.get_name() == "my_synth"
@@ -62,7 +53,7 @@ def AudiRenderPlugin(list):
             # wavfile.write("guitar.wav", sample_rate, audio.transpose())
             amount_of_guitar +=1
 
-        if amount_of_violin == 1 and shape.instrument == "violin":
+        if amount_of_violin == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
             assert synth.get_name() == "my_synth"
@@ -79,7 +70,7 @@ def AudiRenderPlugin(list):
             # wavfile.write("violin.wav", sample_rate, audio.transpose())
             amount_of_violin +=1
 
-        if amount_of_flute == 1 and shape.instrument == "flute":
+        if amount_of_flute == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
             assert synth.get_name() == "my_synth"
@@ -96,7 +87,7 @@ def AudiRenderPlugin(list):
             # wavfile.write("flute.wav", sample_rate, audio.transpose())
             amount_of_flute +=1
 
-        if amount_of_cello == 1 and shape.instrument == "cello":
+        if amount_of_cello == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
             assert synth.get_name() == "my_synth"
