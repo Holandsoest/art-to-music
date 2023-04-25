@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import os
 # import pandas as pd
 
 def get_bpm_from_color(x_axis, y_axis, image):
@@ -124,79 +125,95 @@ def get_contours_from_image(image, threshold_lower, threshold_upper):
     The function returns a all the contours detected in the image
     """
     ##### this code for .jpg files
-    aperture_size = 5
+    aperture_size = 2
     L2Gradient = True
-
 
     img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     img_blur = cv2.GaussianBlur(img_gray, (5,5), 0)
 
-    # Canny makes the whole picture black and white 
+    # Canny explained 
     # Hysteresis: The final step. Canny does use two thresholds (upper and lower):
-
     # If a pixel gradient is higher than the upper threshold, the pixel is accepted as an edge
-
     # If a pixel gradient value is below the lower threshold, then it is rejected.
-
     # If the pixel gradient is between the two thresholds, 
     # then it will be accepted only if it is connected to a pixel that is above the upper threshold.
     # Canny recommended a upper:lower ratio between 2:1 and 3:1.
     img_canny = cv2.Canny(img_blur, threshold_lower, threshold_upper, aperture_size,  L2gradient = L2Gradient )
+    # cv2.imshow("image", img_canny)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
+
+    
     # cv2.imshow("canny", img_canny)
     # cv2.waitKey()
-    
 
     contours, hierarchy = cv2.findContours(img_canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    print("contours1: ", len(contours))
+    
+    n = 0
+    for cnt in contours:
+   
+        # It is also called arc length. 
+        # It can be found out using cv.arcLength() function. 
+        # Second argument specify whether shape is a closed contour (if passed True), or just a curve.
+        perimeter = cv2.arcLength(cnt,True)
+        if perimeter == False:
+            contours = contours[:n] + contours[n+1:]
+        n += 1
 
-
+    # cv2.drawContours(image, contours, -1, (255,0,0), 1)
+    # cv2.imshow("image contour", image)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
+    # print("contours2: ", len(contours))
     return contours
 
-def setup_contour(image, amount_of_shapes_in_picture):    
+def setup_contour(image, amount_of_shapes_in_picture):
+    model_custom_path = os.path.join(os.getcwd(), 'files', 'image_processing')
+    threshold_values = open(model_custom_path +"\\threshold_values.txt", "w")    
     threshold_lower = 30
     threshold_upper = 0
 
-    def contour_from_contours(contours):
+    def check_area_of_contours(contours):
         counter = 0
         for contour in contours:
             area1 = cv2.contourArea(contour)
 
-            # area_min = cv2.getTrackbarPos("Area", "Parameters")
-            # if area1 > area_min:
-            if area1 > 50:
+            if area1 > 35:
                 counter += 1
-                # Get approx contour of shape
-                # approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
-
-                # # minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
-                # # It will create a rectangle around the shapes
-                # box = cv2.minAreaRect(contour)
-                
-                # (x, y), (width, height), angle = box
+                if counter == amount_of_shapes_in_picture:
+                    print("counter: ", counter)
         return counter
 
     while(1):
 
-        # if len( get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
-        if contour_from_contours(get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
-            threshold_lower +=1
+        if len( get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
+        # if check_area_of_contours(get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
+            threshold_lower +=2
             threshold_upper = threshold_lower
 
             while(1):
-                # if len( get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
-                if contour_from_contours(get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
-                    threshold_upper +=1
+                if len( get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
+                # if check_area_of_contours(get_contours_from_image(image, threshold_lower, threshold_upper)) != amount_of_shapes_in_picture:
+                    threshold_upper +=5
                     if threshold_upper > 300:
                         threshold_upper = threshold_lower
                         break
                 else:
+                    threshold_values.write(str(threshold_lower) + "\n" + str(threshold_upper)) 
+                    threshold_values.close()
                     return threshold_lower, threshold_upper
 
             if threshold_lower > 300:
                 print("Couldn't find propper threshold values. Return threshold lower is 60 and upper is 180.")
                 threshold_lower = 60
                 threshold_upper = 180
+                threshold_values.write(str(threshold_lower) + "\n" + str(threshold_upper))
+                threshold_values.close()
                 return threshold_lower, threshold_upper
             
         else:
+            threshold_values.write(str(threshold_lower) + "\n" + str(threshold_upper))
+            threshold_values.close()
             return threshold_lower, threshold_upper
 
