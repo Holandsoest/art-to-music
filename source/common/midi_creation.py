@@ -73,6 +73,7 @@ def MakeSong(list):
 
     #make melodies
     #first 4 index are for the notes 
+    melodie0 = [0,0,0,0, 0,0,0,0]
     melodie1 = [1,0,0,0, 0,0,0,0] #1000 
     melodie2 = [0,2,0,0, 0,0,0,0] #0100
     melodie3 = [1,2,0,0, 0,-2,0,0] #1100 
@@ -117,8 +118,8 @@ def MakeSong(list):
             case 'flute':   amount_of_flute += 1
             case 'violin':  amount_of_violin += 1
             case 'cello':   amount_of_cello += 1
-            case _: pass
-            
+            case _: pass        
+      
     # make midi file for every instrument
     midi_drum = MIDIFile(amount_of_drum, removeDuplicates=False)    
     midi_guitar = MIDIFile(amount_of_guitar, removeDuplicates=False)
@@ -126,6 +127,55 @@ def MakeSong(list):
     midi_violin = MIDIFile(amount_of_violin, removeDuplicates=False)
     midi_cello = MIDIFile(amount_of_cello, removeDuplicates=False)
 
+    # -----------drum-----------
+    # add tracks
+    time_drum = 0 # time to zero
+    channel_drum = 0 #channel to zero
+
+    # create ass many tracks as objects on the board    
+    midi_drum.addTrackName(object_drum, time_drum, f"Track{object_drum}") # give track a name
+    midi_drum.addTempo(object_drum, time_drum, shape.bpm) # set bpm
+    midi_drum.addProgramChange(object_drum, 0, time_drum, 1) # add instrument = shape.instrument = 1
+
+    # -----------guitar-----------
+    # add tracks
+    time_guitar = 0 # time to zero
+    channel_guitar = 0 #channel to zero
+
+    # create ass many tracks as objects on the board    
+    midi_guitar.addTrackName(object_guitar, time_guitar, f"Track{object_guitar}") # give track a name
+    midi_guitar.addTempo(object_guitar, time_guitar, shape.bpm) # set bpm
+    midi_guitar.addProgramChange(object_guitar, 0, time_guitar, 1) # add instrument = shape.instrument = 1
+
+    # -----------flute-----------
+    # add tracks
+    time_flute = 0 # time to zero
+    channel_flute = 0 #channel to zero
+
+    # create ass many tracks as objects on the board    
+    midi_flute.addTrackName(object_flute, time_flute, f"Track{object_flute}") # give track a name
+    midi_flute.addTempo(object_flute, time_flute, shape.bpm) # set bpm
+    midi_flute.addProgramChange(object_flute, 0, time_flute, 1) # add instrument = shape.instrument = 1
+
+    # -----------violin-----------
+    # add tracks
+    time_violin = 0 # time to zero
+    channel_violin = 0 #channel to zero
+
+    # create ass many tracks as objects on the board    
+    midi_violin.addTrackName(object_violin, time_violin, f"Track{object_violin}") # give track a name
+    midi_violin.addTempo(object_violin, time_violin, shape.bpm) # set bpm
+    midi_violin.addProgramChange(object_violin, 0, time_violin, 1) # add instrument = shape.instrument = 1
+
+    # -----------cello-----------
+    # add tracks
+    time_cello = 0 # time to zero
+    channel_cello = 0 #channel to zero
+    # create ass many tracks as objects on the board    
+    midi_cello.addTrackName(object_cello, time_cello, f"Track{object_cello}") # give track a name
+    midi_cello.addTempo(object_cello, time_cello, shape.bpm) # set bpm
+    midi_cello.addProgramChange(object_cello, 0, time_cello, 1) # add instrument = shape.instrument = 1
+    
     #fill midi files with notes and melodies
     for shape in list:
         
@@ -145,15 +195,6 @@ def MakeSong(list):
             elif shape.duration == 4: #Q4
                 melodie = melodie8
 
-            # add tracks
-            time_drum = 0 # time to zero
-            channel_drum = 0 #channel to zero
-
-            # create ass many tracks as objects on the board    
-            midi_drum.addTrackName(object_drum, time_drum, f"Track{object_drum}") # give track a name
-            midi_drum.addTempo(object_drum, time_drum, shape.bpm) # set bpm
-            midi_drum.addProgramChange(object_drum, 0, time_drum, 1) # add instrument = shape.instrument = 1
-
             addnote(object_drum, channel_drum, drum_pitch, time_drum, shape.duration, shape.volume, "drum", melodie) #add melodie nodes to track#add melodie nodes to track
             object_drum +=1
 
@@ -172,16 +213,7 @@ def MakeSong(list):
                 melodie = melodie3
             elif shape.duration == 4: #Q4
                 melodie = melodie4
-            
-            # add tracks
-            time_guitar = 0 # time to zero
-            channel_guitar = 0 #channel to zero
 
-            # create ass many tracks as objects on the board    
-            midi_guitar.addTrackName(object_guitar, time_guitar, f"Track{object_guitar}") # give track a name
-            midi_guitar.addTempo(object_guitar, time_guitar, shape.bpm) # set bpm
-            midi_guitar.addProgramChange(object_guitar, 0, time_guitar, 1) # add instrument = shape.instrument = 1
-         
             addnote(object_guitar, channel_guitar, guitar_pitch, time_guitar, shape.duration, shape.volume, "guitar", melodie) #add melodie nodes to track
             object_guitar +=1
 
@@ -200,15 +232,6 @@ def MakeSong(list):
                 melodie = melodie15
             elif shape.duration == 4: #Q4
                 melodie = melodie1
-            
-            # add tracks
-            time_flute = 0 # time to zero
-            channel_flute = 0 #channel to zero
-
-            # create ass many tracks as objects on the board    
-            midi_flute.addTrackName(object_flute, time_flute, f"Track{object_flute}") # give track a name
-            midi_flute.addTempo(object_flute, time_flute, shape.bpm) # set bpm
-            midi_flute.addProgramChange(object_flute, 0, time_flute, 1) # add instrument = shape.instrument = 1
 
             addnote(object_flute, channel_flute, flute_pitch, time_flute, shape.duration, shape.volume, "flute", melodie) #add melodie nodes to track
             object_flute +=1
@@ -228,15 +251,6 @@ def MakeSong(list):
                 melodie = melodie8
             elif shape.duration == 4: #Q4
                 melodie = melodie2
-                        
-            # add tracks
-            time_violin = 0 # time to zero
-            channel_violin = 0 #channel to zero
-
-            # create ass many tracks as objects on the board    
-            midi_violin.addTrackName(object_violin, time_violin, f"Track{object_violin}") # give track a name
-            midi_violin.addTempo(object_violin, time_violin, shape.bpm) # set bpm
-            midi_violin.addProgramChange(object_violin, 0, time_violin, 1) # add instrument = shape.instrument = 1
 
             addnote(object_violin, channel_violin, violin_pitch, time_violin, shape.duration, shape.volume, "violin", melodie) #add melodie nodes to track
             object_violin +=1
@@ -249,7 +263,7 @@ def MakeSong(list):
 
             #choose melodie
             if shape.duration == 1: #Q1
-                melodie = melodie5
+                melodie = melodie9
             elif shape.duration == 2: #Q2
                 melodie = melodie10
             elif shape.duration == 3: #Q3
@@ -257,20 +271,22 @@ def MakeSong(list):
             elif shape.duration == 4: #Q4
                 melodie = melodie12
                         
-            # add tracks
-            time_cello = 0 # time to zero
-            channel_cello = 0 #channel to zero
-
-            # create ass many tracks as objects on the board    
-            midi_cello.addTrackName(object_cello, time_cello, f"Track{object_cello}") # give track a name
-            midi_cello.addTempo(object_cello, time_cello, shape.bpm) # set bpm
-            midi_cello.addProgramChange(object_cello, 0, time_cello, 1) # add instrument = shape.instrument = 1
-            
             addnote(object_cello, channel_cello, cello_pitch, time_cello, shape.duration, shape.volume, "cello", melodie)#add melodie nodes to track
-            object_cello +=1
+            object_cello +=1    
         
         #Mmake wav files of all the midi's when al nodes are added
         if amount_of_instruments -1 == iteration:
+            if amount_of_drum == 0:
+                addnote(object_drum, channel_drum, 0, time_drum, 0, 0, "drum", melodie0) #clear track
+            if amount_of_guitar == 0:
+                addnote(object_guitar, channel_guitar, 0, time_guitar, 0, 0, "guitar", melodie0) #clear track
+            if amount_of_flute == 0:
+                addnote(object_flute, channel_flute, 0, time_flute, 0, 0, "flute", melodie0) #clear track
+            if amount_of_violin == 0:
+                addnote(object_violin, channel_violin, 0, time_violin, 0, 0, "violin", melodie0) #clear track
+            if amount_of_cello == 0:
+                addnote(object_cello, channel_cello, 0, time_cello, 0, 0, "cello", melodie0) #clear track
+
             #write all the midi files
             with open(model_custom_path + "\\drum_output.mid", "wb") as output_file1: 
                 midi_drum.writeFile(output_file1)
