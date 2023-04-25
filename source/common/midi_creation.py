@@ -249,7 +249,7 @@ def MakeSong(list):
 
             #choose melodie
             if shape.duration == 1: #Q1
-                melodie = melodie9
+                melodie = melodie5
             elif shape.duration == 2: #Q2
                 melodie = melodie10
             elif shape.duration == 3: #Q3
@@ -258,7 +258,7 @@ def MakeSong(list):
                 melodie = melodie12
                         
             # add tracks
-            time_cello = 8 # time to zero
+            time_cello = 0 # time to zero
             channel_cello = 0 #channel to zero
 
             # create ass many tracks as objects on the board    
