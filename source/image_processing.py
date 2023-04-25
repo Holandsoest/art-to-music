@@ -2,6 +2,21 @@ import cv2
 import pandas as pd
 import os
 import common.image_properties as ip
+import numpy as np
+cap = cv2.VideoCapture(0)
+
+suiii = 5
+L2Gradient =  True
+img_counter = 0
+
+def empty(a):
+    pass
+
+cv2.namedWindow("Parameters")
+cv2.resizeWindow("Parameters",640,240)
+cv2.createTrackbar("Threshold1","Parameters",200,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",200,255,empty)
+cv2.createTrackbar("Area","Parameters",1111,30000,empty)
 
 def get_bpm_from_color(x_axis, y_axis, image):
     """
@@ -75,6 +90,8 @@ def get_volume_from_size(obj_size, img_size):
     """
     return min((((obj_size)+(img_size*0.2))/img_size)*255, 255)
 
+
+
 def get_contours_from_image(image):
     """
     This function reads an image using the OpenCV library and detects contours in the image using the Hough transform algorithm. 
@@ -84,15 +101,26 @@ def get_contours_from_image(image):
     The function returns a all the contours detected in the image
     """
     #Reading the image with opencv
-    img_grayscaled = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # img_blur = cv2.blur(img_grayscaled, (3,3))
+    threshold1 = cv2.getTrackbarPos("Threshold1","Parameters")
+    threshold2 = cv2.getTrackbarPos("Threshold2","Parameters")
 
-    ret , thrash = cv2.threshold(img_grayscaled, 140 , 255, cv2.CHAIN_APPROX_NONE)
-    contours , hierarchy = cv2.findContours(thrash, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    imgContour = image.copy()
+    imgBlur = cv2.GaussianBlur(image,(3,3),0)
+    imgGray = cv2.cvtColor(imgBlur,cv2.COLOR_BGR2GRAY)
+    imgCanny = cv2.Canny(imgGray,threshold1,threshold2, L2gradient = L2Gradient)
+
+    kernel = np.ones((5,5))
+    imgDil = cv2.dilate(imgCanny,kernel,iterations=1)
+
+    contours , hierarchy = cv2.findContours(imgDil, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     
     print("amount of contours: ", len(contours))
+
     return contours
 
+
+
+    
 
 # def read_image(image):
 #     """

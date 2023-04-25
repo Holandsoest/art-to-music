@@ -12,14 +12,7 @@ from enum import Enum
 cap = cv2.VideoCapture(0)
 
 
-def empty(a):
-    pass
 
-cv2.namedWindow("Parameters")
-cv2.resizeWindow("Parameters",640,240)
-cv2.createTrackbar("Threshold1","Parameters",159,255,empty)
-cv2.createTrackbar("Threshold2","Parameters",53,255,empty)
-cv2.createTrackbar("Area","Parameters",10000,30000,empty)
 # Function to get the color of an object in the image
 def get_color(img:cv2.Mat) -> str:
     """
@@ -103,8 +96,11 @@ def detect_shapes_with_ai(image):
     
     print("amount of detected objects: ", len(detected_objects))
     # annotate_detected_colors(img, detected_objects)
-
     cv2.imshow("ai", img)
+
+
+
+
 
     
 def detect_shapes_with_contour(contours, image):
@@ -217,11 +213,15 @@ def detect_shapes_with_contour(contours, image):
             else:
                 # Shape is half circle, circle or heart
                 shape_name = detect_shape_with_ai(get_image_from_box(contour, image))
+                
                 if shape_name == "empty":
                     counter+=1
+                    
                     continue
                 else: 
                     shape.instrument = shape_name
+                    cv2.drawContours(image, contour, -1, (0, 0, 255), 3)
+                    
                 # Run camera in loop
 
             list_of_shapes.append(shape)
@@ -233,31 +233,7 @@ def detect_shapes_with_contour(contours, image):
         print("instrument:", shape.instrument, "volume:", shape.volume, "bpm:", shape.bpm, "pitch:", shape.pitch, "duration:", shape.duration, sep='\t')
 
     print("total amount of shapes detected: ", len(list_of_shapes))
-
-
-def points(contours, imgContour,x,y,w,h):
-    peri = cv2.arcLength(contours,True)
-    approx = cv2.approxPolyDP(contours,0.02*peri,True)
-    if len(approx) == 3:
-        cv2.putText(imgContour, "Triangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-        cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
-    elif len(approx) == 4 : 
-        aspect_ratio = float(w)/h
-        if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
-            cv2.putText(imgContour, "Square", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-            cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
-        else:  
-            cv2.putText(imgContour, "Rectangle", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-            cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
-
-    
-    elif len(approx) == 10 :
-        # Shape is a star
-        cv2.putText(imgContour, "Star", (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-        cv2.drawContours(imgContour, contours, -1, (255, 0, 0), 3)
-
-    else :
-        cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+    return image, list_of_shapes
 
 
 
