@@ -225,11 +225,12 @@ def detect_shapes(img): ## OLD CODE
 if __name__ == "__main__":
     # Training settings
     epochs = 4
-    batch_size = 50
+    batch_size = 2
     training_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','train','annotations')))
     validation_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','validation','annotations')))
-    hours = round( 4*training_count*epochs/30000/14, 1)
-    print(f'Training the AI with {epochs}epochs and a batch_size of {batch_size}\nWith {training_count} training images and {validation_count} validation images\nIs estimated to take Brosha ~{hours} hours...\nScared?\n')
+    estimation_duration = round( 4*training_count*epochs/30000/14   +   training_count/250000.0*2.25, 1)
+    estimated_completion = round( estimation_duration + time.localtime().tm_hour + time.localtime().tm_min/60.0 ,1)
+    print(f'Training the AI with {epochs}epochs and a batch_size of {batch_size}\nWith {training_count} training images and {validation_count} validation images\nIs estimated to take Brosha ~{estimation_duration} hours...\nEstimation reads to be done at ~{estimated_completion}\nScared?\n')
     train_custom_model(epochs, batch_size)
     
 
