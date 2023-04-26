@@ -91,6 +91,8 @@ def angle_mirror_(rad_angle:float, mirror_vertical=False)->float:
 
 # Shapes
 class Shape:
+    def __init__(self):
+        self.canvas_ids = []
     def get_polygon_coordinates_(self, location_offset:loc.Pos) -> list:
         """Returns a list of coordinates that can be used by `tkinter` to draw a `polygon` on a `canvas`"""
 
@@ -99,16 +101,16 @@ class Shape:
             polygon_coordinates.append(  int(round(  node.x + location_offset.x,  0  ))  )
             polygon_coordinates.append(  int(round(  node.y + location_offset.y,  0  ))  )
         return polygon_coordinates
-    
     def draw_shape(self, tkinter_canvas:tkinter.Canvas, outline_color:str, fill_color:str, width_outline:int, location_offset:loc.Pos) -> int:
         """Returns an `object_ID` of the shape drawn on the `tkinter_canvas`"""
         if (width_outline < 0): raise RuntimeWarning('A `width_outline` cannot be negative.')
 
-        return tkinter_canvas.create_polygon(self.get_polygon_coordinates_(location_offset),
+        id = tkinter_canvas.create_polygon(self.get_polygon_coordinates_(location_offset),
                                              outline=outline_color, width=width_outline,
                                              smooth=1 if isinstance(self, Heart) or isinstance(self, HalfCircle) else 0,
                                              fill=fill_color)
-    
+        self.canvas_ids.append(id) # store the id so we can remove the shape from the canvas later
+        return id
     def draw_shadow(self, tkinter_canvas:tkinter.Canvas, depth_shadow_px:int, sun_rotation_rad:float, shadows_float=False) -> list[int]|None:
         """Returns a list of `object_ID`'s of the shapes drawn on the `tkinter_canvas`, unless the `depth_shadow_px` is zero then it returns a `None`"""
         if (depth_shadow_px < 0): raise RuntimeWarning('A `depth_shadow_px` cannot be negative.')
@@ -135,10 +137,16 @@ class Shape:
                                               location_offset=calculate_arm_point_(start_pos=self.center_pos,
                                                                                    length_trace=i,
                                                                                    rotation_rad=sun_rotation_rad) - self.center_pos))
+        for id in output_ids:
+            self.canvas_ids.append(id) # store the ids so we can remove the shape from the canvas later
         return output_ids
-    
+    def remove_shape(self, tkinter_canvas:tkinter.Canvas) -> None:
+        """Accesses the `Tkinter.Canvas` and deletes the drawing along with the shadow (if present)"""
+        for id in self.canvas_ids:
+            tkinter_canvas.delete(id)
 class Star(Shape):
     def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0, depth_percentage=50):
+        super().__init__()
         rotation_rad %= math.pi * 2 / 5 # Shape repeats every 72 degrees
 
         self.center_pos = center_pos
@@ -167,6 +175,7 @@ class Star(Shape):
         self.annotation=Annotation(4, image_size=img_size, coordinates=self.outline_coordinates)
 class Square(Shape):
     def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0):
+        super().__init__()
         rotation_rad %= math.pi * 2 / 4 # Shape repeats every 90 degrees
 
         self.center_pos = center_pos
@@ -179,6 +188,7 @@ class Square(Shape):
         self.annotation=Annotation(2, image_size=img_size, coordinates=self.outline_coordinates)
 class SymmetricTriangle(Shape):
     def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0):
+        super().__init__()
         rotation_rad %= math.pi * 2 / 3 # Shape repeats every 60 degrees
 
         self.center_pos = center_pos
@@ -191,6 +201,7 @@ class SymmetricTriangle(Shape):
         self.annotation=Annotation(5, image_size=img_size, coordinates=self.outline_coordinates)
 class Heart(Shape):
     def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0, depth_percentage=50):
+        super().__init__()
         rotation_rad %= math.pi * 2 # Shape repeats every 360 degrees
         depth_percentage=min(95,max(40,depth_percentage)) # Limit depth percentage to 20-80
 
@@ -255,6 +266,7 @@ class Heart(Shape):
         self.annotation=Annotation(3, image_size=img_size, coordinates=self.outline_coordinates)
 class HalfCircle(Shape):
     def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0):
+        super().__init__()
         rotation_rad %= math.pi * 2 # Shape repeats every 360 degrees
 
         self.center_pos = center_pos
@@ -297,6 +309,7 @@ class HalfCircle(Shape):
         self.annotation=Annotation(1, image_size=img_size, coordinates=self.outline_coordinates)
 class Circle(Shape):
     def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10):
+        super().__init__()
 
         self.center_pos = center_pos
         self.size_in_pixels = size_in_pixels
