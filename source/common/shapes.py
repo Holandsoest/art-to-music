@@ -144,6 +144,7 @@ class Shape:
         """Accesses the `Tkinter.Canvas` and deletes the drawing along with the shadow (if present)"""
         for id in self.canvas_ids:
             tkinter_canvas.delete(id)
+        self.canvas_ids.clear()
 class Star(Shape):
     def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0, depth_percentage=50):
         super().__init__()
