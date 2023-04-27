@@ -4,6 +4,8 @@
 import common.shapes as shapes
 import common.location as loc
 
+from enum import Enum # Keep enums UPPER_CASE according to https://docs.python.org/3/howto/enum.html  
+
 import tkinter
 from tkinter import ttk
 
@@ -19,26 +21,58 @@ class Gui(tkinter.Tk):
         self.minsize(width=528,height=360)
 
         # Declare objects
-        self.pallet = GuiPallet(master=self, background_color='white')
-        self.main_canvas = tkinter.Canvas(master=self, background='white', borderwidth=2, relief='raised')
-        self.main_canvas.pack(side='left', expand=True, fill='both')
+        self.canvas = MainCanvas(master=self, background_color='white')
         self.actions = GuiActions(master=self, background_color='white')
+class MainCanvas(tkinter.Canvas):
+    def __init__(self, master, background_color:str):
+        super().__init__(master, background=background_color, borderwidth=2, relief='raised')
 
-        # Bind behavior https://www.pythontutorial.net/tkinter/tkinter-event-binding/ 
+        # Declare
         self.list_of_canvas_shapes = []
         self.in_hand = []
         self.verbose_events = True
-        def pick_up(event, parent:str):
-            if (self.verbose_events): print(f'<pick_up> at {event.x},{event.y} in {parent}')
-            self.unbind_all('<Button-1>')
-            self.unbind_all('<ButtonRelease-1>')
-            bind()
 
-            if parent != 'main_canvas':
-                self.in_hand.append(parent)
+        # Defining the Pallet
+        class PalletItem(Enum):
+            NONE = -1
+            YELLOW = 0
+            ORANGE = 1
+            RED = 2
+            GREEN = 3
+            PURPLE = 4
+            BLUE = 5
+            CIRCLE = 6
+            SQUARE = 7
+            TRIANGLE = 8
+            STAR = 9
+            HEART = 10
+            HALF_CIRCLE = 11
+            TRASH_CAN = 12
+        self.last_color = PalletItem.YELLOW
+        def pallet_width() -> int:
+            """Returns the width of the pallet as a integer"""
+            return 64
+        def get_pallet_item(canvas_pos:loc.Pos) -> PalletItem:
+            """Checks what was selected by the pointer and returns that object, as long as it is part of the pallet
+            See `PalletItem` for options"""
+            if canvas_pos.x > pallet_width(): return PalletItem.NONE
+            pallet_item_number = canvas_pos.y * 13 / self.winfo_height() # Gives the PalletItemNumber
+            return PalletItem[pallet_item_number]
+        # TODO: Add the shapes and colors here
+
+        # Bind behavior https://www.pythontutorial.net/tkinter/tkinter-event-binding/
+        def pick_up(event):
+            if (self.verbose_events): print(f'<pick_up> at {event.x},{event.y}')
+            pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
+
+            if pallet_item != PalletItem.NONE:
+                if PalletItem.YELLOW <= pallet_item <= PalletItem.BLUE: # It is an color
+                    self.last_color = pallet_item
+                self.in_hand.append(pallet_item)
+                if (self.verbose_events): print (f'Picked up {pallet_item.name}')
                 return
-            
-            # Get tuple of closest shapes
+            # Pick_up event did not happen in the pallet
+            event.x -= pallet_width()
             for shape in self.list_of_canvas_shapes:
                 box = shape.annotation.box
                 if event.x < box.pos.x: continue                # Left of box  (out of range)
@@ -47,14 +81,15 @@ class Gui(tkinter.Tk):
                 if event.y > box.pos.y + box.size.y: continue   # Bottom of box(out of range)
 
                 self.in_hand.append(shape)
-                shape.remove_shape(self.main_canvas)
+                shape.remove_shape(self)
                 self.list_of_canvas_shapes.remove(shape)
-                print ('Item picked up')
+                if (self.verbose_events): print (f'Shape picked up from: {box}')
                 return
-        # FOUND BUG: event and parent are incorrect when `let_go`
-        def let_go(event, parent:str):
-            if (self.verbose_events): print(f'<let_go> at {event.x},{event.y} in {parent}')
+            if (self.verbose_events): print ('No shape in the region')
+        def let_go(event):
+            if (self.verbose_events): print(f'<let_go> at {event.x},{event.y}')
 
+            
             for item in self.in_hand:
                 if parent == 'trash_can':               # Delete the hand
                     self.in_hand.remove(item)
@@ -106,85 +141,15 @@ class Gui(tkinter.Tk):
                                          location_offset=loc.Pos())
                     continue
                 pass # TODO: UNDER CONSTRUCTION DRAGGING DATA TO EXISTING SHAPE
-        def bind():
-            self.pallet.yellow.bind     ('<Button-1>', lambda event: pick_up(event, 'yellow'))
-            self.pallet.orange.bind     ('<Button-1>', lambda event: pick_up(event, 'orange'))
-            self.pallet.red.bind        ('<Button-1>', lambda event: pick_up(event, 'red'))
-            self.pallet.green.bind      ('<Button-1>', lambda event: pick_up(event, 'green'))
-            self.pallet.purple.bind     ('<Button-1>', lambda event: pick_up(event, 'purple'))
-            self.pallet.blue.bind       ('<Button-1>', lambda event: pick_up(event, 'blue'))
-            self.pallet.circle.bind     ('<Button-1>', lambda event: pick_up(event, 'circle'))
-            self.pallet.square.bind     ('<Button-1>', lambda event: pick_up(event, 'square'))
-            self.pallet.triangle.bind   ('<Button-1>', lambda event: pick_up(event, 'triangle'))
-            self.pallet.star.bind       ('<Button-1>', lambda event: pick_up(event, 'star'))
-            self.pallet.heart.bind      ('<Button-1>', lambda event: pick_up(event, 'heart'))
-            self.pallet.half_circle.bind('<Button-1>', lambda event: pick_up(event, 'half_circle'))
-            self.pallet.trash_can.bind  ('<Button-1>', lambda event: pick_up(event, 'trash_can'))
-            self.actions.play.bind      ('<Button-1>', lambda event: pick_up(event, 'play'))
-            self.actions.ai.bind        ('<Button-1>', lambda event: pick_up(event, 'ai'))
-            self.main_canvas.bind       ('<Button-1>', lambda event: pick_up(event, 'main_canvas'))
-
-            self.pallet.yellow.bind     ('<ButtonRelease-1>', lambda event: let_go(event, parent='yellow'))
-            self.pallet.orange.bind     ('<ButtonRelease-1>', lambda event: let_go(event, parent='orange'))
-            self.pallet.red.bind        ('<ButtonRelease-1>', lambda event: let_go(event, parent='red'))
-            self.pallet.green.bind      ('<ButtonRelease-1>', lambda event: let_go(event, parent='green'))
-            self.pallet.purple.bind     ('<ButtonRelease-1>', lambda event: let_go(event, parent='purple'))
-            self.pallet.blue.bind       ('<ButtonRelease-1>', lambda event: let_go(event, parent='blue'))
-            self.pallet.circle.bind     ('<ButtonRelease-1>', lambda event: let_go(event, parent='circle'))
-            self.pallet.square.bind     ('<ButtonRelease-1>', lambda event: let_go(event, parent='square'))
-            self.pallet.triangle.bind   ('<ButtonRelease-1>', lambda event: let_go(event, parent='triangle'))
-            self.pallet.star.bind       ('<ButtonRelease-1>', lambda event: let_go(event, parent='star'))
-            self.pallet.heart.bind      ('<ButtonRelease-1>', lambda event: let_go(event, parent='heart'))
-            self.pallet.half_circle.bind('<ButtonRelease-1>', lambda event: let_go(event, parent='half_circle'))
-            self.pallet.trash_can.bind  ('<ButtonRelease-1>', lambda event: let_go(event, parent='trash_can'))
-            # self.actions.play.bind      ('<ButtonRelease-1>', lambda event: let_go(event, parent='play'))
-            # self.actions.ai.bind        ('<ButtonRelease-1>', lambda event: let_go(event, parent='ai'))
-            self.main_canvas.bind       ('<ButtonRelease-1>', lambda event: let_go(event, parent='main_canvas'))
-            self.main_canvas.bind       ('<Motion>', lambda event: let_go(event, parent='main_canvas'))
-        bind()
+        self.bind ('<Button-1>',        lambda event: pick_up(event))
+        self.bind ('<ButtonRelease-1>', lambda event: let_go (event))
+        # self.bind ('<Motion>',          lambda event: temp   (event))
 
         self.list_of_canvas_shapes.append(shapes.Star(loc.Size(500,500), loc.Pos(60,100), size_in_pixels=64, rotation_rad=2.0))
         for shape in self.list_of_canvas_shapes:
             shape.draw_shape(self.main_canvas, 'blue','red', width_outline=1, location_offset=loc.Pos())
-
-class GuiPallet(ttk.Frame):
-    def __init__(self, master, background_color:str):
-        super().__init__(master, borderwidth=2, relief='groove')
-
-        # Declare
-        self.colors_frame = ttk.Frame(master=self, borderwidth=2, relief='groove')
-        self.yellow  =ttk.Label(master=self.colors_frame, text = 'Yellow' ,background = background_color)
-        self.orange  =ttk.Label(master=self.colors_frame, text = 'Orange' ,background = background_color)
-        self.red     =ttk.Label(master=self.colors_frame, text = 'Red'    ,background = background_color)
-        self.green   =ttk.Label(master=self.colors_frame, text = 'Green'  ,background = background_color)
-        self.purple  =ttk.Label(master=self.colors_frame, text = 'Purple' ,background = background_color)
-        self.blue    =ttk.Label(master=self.colors_frame, text = 'Blue'   ,background = background_color)
-        self.yellow.pack (expand=True, fill='both', pady=3)
-        self.orange.pack (expand=True, fill='both', pady=3)
-        self.red.pack    (expand=True, fill='both', pady=3)
-        self.green.pack  (expand=True, fill='both', pady=3)
-        self.purple.pack (expand=True, fill='both', pady=3)
-        self.blue.pack   (expand=True, fill='both', pady=3)
-        self.shapes_frame=ttk.Frame(master=self, borderwidth=2, relief='groove')
-        self.circle      =ttk.Label(master=self.shapes_frame, text = 'Circle' ,background = background_color)
-        self.square      =ttk.Label(master=self.shapes_frame, text = 'Square' ,background = background_color)
-        self.triangle    =ttk.Label(master=self.shapes_frame, text = 'Triangle'    ,background = background_color)
-        self.star        =ttk.Label(master=self.shapes_frame, text = 'Star'  ,background = background_color)
-        self.heart       =ttk.Label(master=self.shapes_frame, text = 'Heart' ,background = background_color)
-        self.half_circle =ttk.Label(master=self.shapes_frame, text = 'Half_circle'   ,background = background_color)
-        self.circle.pack     (expand=True, fill='both', pady=3)
-        self.square.pack     (expand=True, fill='both', pady=3)
-        self.triangle.pack   (expand=True, fill='both', pady=3)
-        self.star.pack       (expand=True, fill='both', pady=3)
-        self.heart.pack      (expand=True, fill='both', pady=3)
-        self.half_circle.pack(expand=True, fill='both', pady=3)
-        self.trash_can      =ttk.Label(master=self, text = 'Trash_can' ,background = background_color)
-
-        # Pack
-        self.colors_frame.pack(expand=True, fill='both')
-        self.shapes_frame.pack(expand=True, fill='both')
-        self.trash_can.pack   (expand=True, fill='both', pady=3)
-        self.pack(side = 'left', fill = 'y', padx = 3, pady = 3)
+        
+        self.pack(side = 'left', fill = 'both', expand=True)
 class GuiActions(ttk.Frame):
     def __init__(self, master, background_color:str):
         super().__init__(master, borderwidth=2, relief='groove')
