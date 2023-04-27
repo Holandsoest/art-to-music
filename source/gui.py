@@ -56,8 +56,8 @@ class MainCanvas(tkinter.Canvas):
             """Checks what was selected by the pointer and returns that object, as long as it is part of the pallet
             See `PalletItem` for options"""
             if canvas_pos.x > pallet_width(): return PalletItem.NONE
-            pallet_item_number = canvas_pos.y * 13 / self.winfo_height() # Gives the PalletItemNumber
-            return PalletItem[pallet_item_number]
+            pallet_item_number = int(canvas_pos.y * 13 / self.winfo_height()) # Gives the PalletItemNumber
+            return PalletItem(pallet_item_number)
         # TODO: Add the shapes and colors here
 
         # Bind behavior https://www.pythontutorial.net/tkinter/tkinter-event-binding/
@@ -66,7 +66,7 @@ class MainCanvas(tkinter.Canvas):
             pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
 
             if pallet_item != PalletItem.NONE:
-                if PalletItem.YELLOW <= pallet_item <= PalletItem.BLUE: # It is an color
+                if PalletItem.YELLOW.value <= pallet_item.value <= PalletItem.BLUE.value: # It is an color
                     self.last_color = pallet_item
                 self.in_hand.append(pallet_item)
                 if (self.verbose_events): print (f'Picked up {pallet_item.name}')
@@ -90,64 +90,64 @@ class MainCanvas(tkinter.Canvas):
             if (self.verbose_events): print(f'<let_go> at {event.x},{event.y}')
 
             
-            for item in self.in_hand:
-                if parent == 'trash_can':               # Delete the hand
-                    self.in_hand.remove(item)
-                    continue
-                elif parent != 'main_canvas':           # Drag shape to pallet??? Wut?
-                    if isinstance(item, str): continue   #Cannot overwrite pallet !
-                    self.list_of_canvas_shapes.append(item)
-                    item.draw_shape(tkinter_canvas=self.main_canvas, outline_color='gray', fill_color='gray', width_outline=1, location_offset=loc.Pos()) # TODO: I loose the info of the `outline_color`, `fill_color`, `width_outline` !
-                    self.in_hand.remove(item)
-                    continue
+            # for item in self.in_hand:
+            #     if parent == 'trash_can':               # Delete the hand
+            #         self.in_hand.remove(item)
+            #         continue
+            #     elif parent != 'main_canvas':           # Drag shape to pallet??? Wut?
+            #         if isinstance(item, str): continue   #Cannot overwrite pallet !
+            #         self.list_of_canvas_shapes.append(item)
+            #         item.draw_shape(tkinter_canvas=self.main_canvas, outline_color='gray', fill_color='gray', width_outline=1, location_offset=loc.Pos()) # TODO: I loose the info of the `outline_color`, `fill_color`, `width_outline` !
+            #         self.in_hand.remove(item)
+            #         continue
                 
-                if not isinstance(item, str):           # Dropping shape from hand
-                    match (shapes.object_names_array[int(item.annotation.class_id)]):
-                        case 'circle':
-                            new_shape = shapes.Circle(loc.Size(),
-                                                      center_pos=loc.Pos(event.x, event.y),
-                                                      size_in_pixels=item.size_in_pixels)
-                        case 'half circle':
-                            new_shape = shapes.HalfCircle(loc.Size(),
-                                                      center_pos=loc.Pos(event.x, event.y),
-                                                      size_in_pixels=item.size_in_pixels,
-                                                      rotation_rad=item.rotation_rad)
-                        case 'square':
-                            new_shape = shapes.Square(loc.Size(),
-                                                      center_pos=loc.Pos(event.x, event.y),
-                                                      size_in_pixels=item.size_in_pixels,
-                                                      rotation_rad=item.rotation_rad)
-                        case 'heart':
-                            new_shape = shapes.Heart(loc.Size(),
-                                                      center_pos=loc.Pos(event.x, event.y),
-                                                      size_in_pixels=item.size_in_pixels,
-                                                      rotation_rad=item.rotation_rad,
-                                                      depth_percentage=item.depth_percentage)
-                        case 'star':
-                            new_shape = shapes.Star(loc.Size(),
-                                                      center_pos=loc.Pos(event.x, event.y),
-                                                      size_in_pixels=item.size_in_pixels,
-                                                      rotation_rad=item.rotation_rad,
-                                                      depth_percentage=item.depth_percentage)
-                        case _: # 'triangle'
-                            new_shape = shapes.SymmetricTriangle(loc.Size(),
-                                                      center_pos=loc.Pos(event.x, event.y),
-                                                      size_in_pixels=item.size_in_pixels,
-                                                      rotation_rad=item.rotation_rad)
-                    self.in_hand.remove(item)
-                    self.list_of_canvas_shapes.append(new_shape)
-                    new_shape.draw_shape(tkinter_canvas=self.main_canvas,
-                                         outline_color='gray', fill_color='gray', width_outline=1, # TODO: I loose the info of the `outline_color`, `fill_color`, `width_outline` !
-                                         location_offset=loc.Pos())
-                    continue
-                pass # TODO: UNDER CONSTRUCTION DRAGGING DATA TO EXISTING SHAPE
+            #     if not isinstance(item, str):           # Dropping shape from hand
+            #         match (shapes.object_names_array[int(item.annotation.class_id)]):
+            #             case 'circle':
+            #                 new_shape = shapes.Circle(loc.Size(),
+            #                                           center_pos=loc.Pos(event.x, event.y),
+            #                                           size_in_pixels=item.size_in_pixels)
+            #             case 'half circle':
+            #                 new_shape = shapes.HalfCircle(loc.Size(),
+            #                                           center_pos=loc.Pos(event.x, event.y),
+            #                                           size_in_pixels=item.size_in_pixels,
+            #                                           rotation_rad=item.rotation_rad)
+            #             case 'square':
+            #                 new_shape = shapes.Square(loc.Size(),
+            #                                           center_pos=loc.Pos(event.x, event.y),
+            #                                           size_in_pixels=item.size_in_pixels,
+            #                                           rotation_rad=item.rotation_rad)
+            #             case 'heart':
+            #                 new_shape = shapes.Heart(loc.Size(),
+            #                                           center_pos=loc.Pos(event.x, event.y),
+            #                                           size_in_pixels=item.size_in_pixels,
+            #                                           rotation_rad=item.rotation_rad,
+            #                                           depth_percentage=item.depth_percentage)
+            #             case 'star':
+            #                 new_shape = shapes.Star(loc.Size(),
+            #                                           center_pos=loc.Pos(event.x, event.y),
+            #                                           size_in_pixels=item.size_in_pixels,
+            #                                           rotation_rad=item.rotation_rad,
+            #                                           depth_percentage=item.depth_percentage)
+            #             case _: # 'triangle'
+            #                 new_shape = shapes.SymmetricTriangle(loc.Size(),
+            #                                           center_pos=loc.Pos(event.x, event.y),
+            #                                           size_in_pixels=item.size_in_pixels,
+            #                                           rotation_rad=item.rotation_rad)
+            #         self.in_hand.remove(item)
+            #         self.list_of_canvas_shapes.append(new_shape)
+            #         new_shape.draw_shape(tkinter_canvas=self.main_canvas,
+            #                              outline_color='gray', fill_color='gray', width_outline=1, # TODO: I loose the info of the `outline_color`, `fill_color`, `width_outline` !
+            #                              location_offset=loc.Pos())
+            #         continue
+            #     pass # TODO: UNDER CONSTRUCTION DRAGGING DATA TO EXISTING SHAPE
         self.bind ('<Button-1>',        lambda event: pick_up(event))
         self.bind ('<ButtonRelease-1>', lambda event: let_go (event))
         # self.bind ('<Motion>',          lambda event: temp   (event))
 
         self.list_of_canvas_shapes.append(shapes.Star(loc.Size(500,500), loc.Pos(60,100), size_in_pixels=64, rotation_rad=2.0))
         for shape in self.list_of_canvas_shapes:
-            shape.draw_shape(self.main_canvas, 'blue','red', width_outline=1, location_offset=loc.Pos())
+            shape.draw_shape(self, 'blue','red', width_outline=1, location_offset=loc.Pos(x=pallet_width(),y=0))
         
         self.pack(side = 'left', fill = 'both', expand=True)
 class GuiActions(ttk.Frame):
