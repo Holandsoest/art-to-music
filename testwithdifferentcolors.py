@@ -15,9 +15,9 @@ def empty(a):
 
 cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters",640,240)
-cv2.createTrackbar("Threshold1","Parameters",159,255,empty)
-cv2.createTrackbar("Threshold2","Parameters",53,255,empty)
-cv2.createTrackbar("Area","Parameters",1111,30000,empty)
+cv2.createTrackbar("Threshold1","Parameters",123,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",30,255,empty)
+cv2.createTrackbar("Area","Parameters",100,30000,empty)
 
 img_counter = 0
 
@@ -28,7 +28,7 @@ def stackImages(scale,imgArray):
     rows = len(imgArray)
     cols = len(imgArray[0])
     rowsAvailable = isinstance(imgArray[0], list)
-    width = imgArray[0][0].shape[1]
+    width = imgArray[0][0].shape[0]
     height = imgArray[0][0].shape[0]
     if rowsAvailable:
         for x in range ( 0, rows):
@@ -165,7 +165,8 @@ while True:
     
     getContours(imgDil,imgContour)
 
-    imgStack = stackImages(0.8,([imgBlur, imgGray, imgCanny],[imgContour, imgContour, imgContour]))
+    imgStack = stackImages(0.8,([imgCanny,imgContour]))
+    # imgStack = stackImages(0.8,([imgBlur, imgGray, imgCanny],[imgContour, imgContour, imgContour]))
     #imgStack = stackImages(0.8,([imgContour]))
     cv2.imshow("Result", imgStack)
 

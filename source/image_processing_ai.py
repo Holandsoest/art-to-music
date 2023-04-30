@@ -199,28 +199,28 @@ def detect_shapes_with_contour(contours, image):
                 aspect_ratio = float(w)/h
                 if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
                     shape.instrument = "square"
-                    cv2.drawContours(image, contour, -1, (255, 0, 0), 3)
+                    cv2.drawContours(image, contour, -1, (0, 0, 255), 3)
                     # Shape is a square
                 else:
                     shape.instrument = "rectangle"
-                    cv2.drawContours(image, contour, -1, (255, 0, 0), 3)
+                    cv2.drawContours(image, contour, -1, (255, 0, 255), 3)
                     # Shape is a rectangle
 
             elif len(approx) == 10 :
                 # Shape is a star
                 shape.instrument = "star"
-                cv2.drawContours(image, contour, -1, (255, 0, 0), 3)
+                cv2.drawContours(image, contour, -1, (0, 255, 255), 3)
             else:
                 # Shape is half circle, circle or heart
                 shape_name = detect_shape_with_ai(get_image_from_box(contour, image))
-                
+                cv2.drawContours(image, contour, -1, (0, 255, 0), 3)
                 if shape_name == "empty":
                     counter+=1
                     
                     continue
                 else: 
                     shape.instrument = shape_name
-                    cv2.drawContours(image, contour, -1, (0, 0, 255), 3)
+                    
                     
                 # Run camera in loop
 

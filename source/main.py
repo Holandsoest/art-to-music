@@ -28,14 +28,9 @@
 #         if cv2.waitKey(1) & 0xFF == ord('q'):
 #             break    
 
-#         # Break the loop when user hits 'esc' key 
-#         # if cv2.waitKey(20) & 0xFF ==27:
-#         #     print('Enjoy the music')
-#         #     break
-        
-#     # cv2.destroyAllWindows()
 
-#     # mc.MakeSong(list_of_shapes)
+        
+
 
 
 
@@ -70,11 +65,26 @@ if __name__ == "__main__":
 
             shapes = img_proc.get_contours_from_image(img)      
             print("shapes: ", len(shapes))
+
+            
+            # shapes = img_proc.get_contours_from_image(img)         
+            # img_proc_ai.detect_shapes_with_contour(shapes, img)
+            # img_proc_ai.detect_shapes_with_ai(img)
+
+
             if len(shapes) < 1:  
                 cv2.imshow("ai", img_proc_ai.detect_shapes_with_ai(img))
             else: 
                 image, list_of_shapes = img_proc_ai.detect_shapes_with_contour(shapes, img)
+                # img_proc_ai.detect_shapes_with_ai(image)
                 cv2.imshow("contour", image)
+                
+
+
+                # shapes = img_proc.get_contours_from_image(img)
+                # img_proc_ai.detect_shapes_with_contour(shapes, img)   
+                # img_proc_ai.detect_shapes_with_ai(img)
+                # cv2.imshow("contour", img)
 
         elif    cv2.waitKey(1) & 0xFF == ord('q'):
             break  

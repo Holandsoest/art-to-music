@@ -14,9 +14,9 @@ def empty(a):
 
 cv2.namedWindow("Parameters")
 cv2.resizeWindow("Parameters",640,240)
-cv2.createTrackbar("Threshold1","Parameters",200,255,empty)
-cv2.createTrackbar("Threshold2","Parameters",200,255,empty)
-cv2.createTrackbar("Area","Parameters",1111,30000,empty)
+cv2.createTrackbar("Threshold1","Parameters",130,255,empty)
+cv2.createTrackbar("Threshold2","Parameters",30,255,empty)
+cv2.createTrackbar("Area","Parameters",150,30000,empty)
 
 def get_bpm_from_color(x_axis, y_axis, image):
     """
@@ -107,12 +107,12 @@ def get_contours_from_image(image):
     imgContour = image.copy()
     imgBlur = cv2.GaussianBlur(image,(3,3),0)
     imgGray = cv2.cvtColor(imgBlur,cv2.COLOR_BGR2GRAY)
-    imgCanny = cv2.Canny(imgGray,threshold1,threshold2, L2gradient = L2Gradient)
+    imgCanny = cv2.Canny(imgGray,threshold1,threshold2, apertureSize=3, L2gradient = L2Gradient)
 
-    kernel = np.ones((5,5))
-    imgDil = cv2.dilate(imgCanny,kernel,iterations=1)
+    # kernel = np.ones((5,5))
+    # imgDil = cv2.dilate(imgCanny,kernel,iterations=1)
 
-    contours , hierarchy = cv2.findContours(imgDil, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    contours , hierarchy = cv2.findContours(imgCanny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     
     print("amount of contours: ", len(contours))
 
