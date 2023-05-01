@@ -225,7 +225,7 @@ def detect_shapes(img): ## OLD CODE
 if __name__ == "__main__":
     # Training settings
     epochs = 4
-    batch_size = 20
+    batch_size = 10
     training_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','train','annotations')))
     validation_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','validation','annotations')))
     estimation_duration = round( 4*training_count*epochs/30000/14   +   training_count/250000.0*2.25, 1)
