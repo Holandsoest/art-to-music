@@ -6,9 +6,9 @@ def empty(img):
 
 video = cv2.VideoCapture(0)
 cv2.namedWindow("TrackBar")
-cv2.createTrackbar("Area","TrackBar",3000,30000,empty)
-cv2.createTrackbar("hue_min","TrackBar",21,179,empty) 
-cv2.createTrackbar("hue_max","TrackBar",31,179,empty) 
+cv2.createTrackbar("Area","TrackBar",1000,30000,empty)
+cv2.createTrackbar("hue_min","TrackBar",25,179,empty) 
+cv2.createTrackbar("hue_max","TrackBar",50,179,empty) 
 cv2.createTrackbar("sat_min","TrackBar",105,179,empty) 
 cv2.createTrackbar("sat_max","TrackBar",255,255,empty) 
 cv2.createTrackbar("val_min","TrackBar",60,255,empty)                
@@ -48,27 +48,53 @@ while True:
     cnts,hei=cv2.findContours(mask,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE )
     for c in cnts:
         area = cv2.contourArea(c)
+        # str(int(area))
         areaMin = cv2.getTrackbarPos("Area", "TrackBar")        
         if area>areaMin:
             peri = cv2.arcLength(c,True)
             approx=cv2.approxPolyDP(c, 0.02*peri,True)
             x,y,w,h=cv2.boundingRect(c)
+            print(str(int(area)))
 
+
+
+            contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+            contours = contours[0] if len(contours) == 2 else contours[1]
+            big_contour = max(contours, key=cv2.contourArea)
+            little_contour = min(contours, key=cv2.contourArea)
+            area1 = cv2.contourArea(big_contour)
+            area1 = cv2.contourArea(big_contour)
+            x1,y1,w1,h1 = cv2.boundingRect(big_contour)
+            cv2.rectangle(img, (x1, y1), (x1+w1, y1+h1), (0, 0, 255), 2)
+            # print("red - largest rectangle x,y,w,h,area:",x1,y1,w1,h1,area1)
+
+            area2 = cv2.contourArea(little_contour)
+            x2,y2,w2,h2 = cv2.boundingRect(little_contour)
+            # cv2.rectangle(img, (x2, y2), (x2+w2, y2+h2), (0, 255, 0), 2)
+            # print("green - smallest rectangle x,y,w,h,area:",x2,y2,w2,h2,area2)
+
+            # save resulting image
+            print('2rectangles_result.jpg',img)
+
+
+            # contours,hierarchy = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
+            # print("coins in the image : ", int(len(area)))
             
-            maxi = area
-            big = max[area]
-            for b in big:
-                if b > maxi:
-                    maxi = b
+            # maxi = area
+            # big = max(area)
+            # print(big)
+            # for b in big:
+            #     if b > maxi:
+            #         maxi = b
                     
-            print("Greatest number: ", maxi)
-            cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0),2)
+            # print("Greatest number: ", maxi)
+            # cv2.rectangle(img, (x,y), (x+w, y+h), (0,255,0),2)
             feedback(img, x,y,w,h)
             print(area)
 
     cv2.imshow("Frame",img)
     # cv2.imshow("hsv",hsv)
-    # cv2.imshow("Mask",mask)
+    cv2.imshow("Mask",mask)
     k=cv2.waitKey(1)
     if k==ord('q'):
 
