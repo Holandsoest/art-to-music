@@ -25,6 +25,7 @@ img_counter = 0
 
 
 def stackImages(scale,imgArray):
+
     rows = len(imgArray)
     cols = len(imgArray[0])
     rowsAvailable = isinstance(imgArray[0], list)

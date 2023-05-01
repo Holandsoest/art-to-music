@@ -145,7 +145,6 @@ def detect_shapes_with_contour(contours, image):
         l_img = cv2.imread(img_path)
         x_offset=y_offset=500
         l_img[y_offset:y_offset+s_img.shape[0], x_offset:x_offset+s_img.shape[1]] = s_img
-
         # cv2.imshow("", l_img)
         # cv2.waitKey()
         # img_grayscaled = cv2.cvtColor(l_img, cv2.COLOR_BGR2GRAY)
@@ -189,6 +188,7 @@ def detect_shapes_with_contour(contours, image):
             shape_width_to_duration = ip.get_duration_from_width(width, img_width)
             shape_height_to_pitch = ip.get_volume_from_size(height, img_height)
             shape = i_prop.Image(0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), int(shape_height_to_pitch))
+            shape = i_prop.Image(3, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), int(shape_height_to_pitch))
 
             if len(approx) == 3:
                 # Shape is a triangle
@@ -199,7 +199,7 @@ def detect_shapes_with_contour(contours, image):
                 aspect_ratio = float(w)/h
                 if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
                     shape.instrument = "square"
-                    cv2.drawContours(image, contour, -1, (0, 0, 255), 3)
+                    
                     # Shape is a square
                 else:
                     shape.instrument = "rectangle"
