@@ -54,7 +54,7 @@ while True:
             peri = cv2.arcLength(c,True)
             approx=cv2.approxPolyDP(c, 0.02*peri,True)
             x,y,w,h=cv2.boundingRect(c)
-            print(str(int(area)))
+            # print(str(int(area)))
 
 
 
@@ -74,7 +74,7 @@ while True:
             # print("green - smallest rectangle x,y,w,h,area:",x2,y2,w2,h2,area2)
 
             # save resulting image
-            print('2rectangles_result.jpg',img)
+            # print('2rectangles_result.jpg',img)
 
 
             # contours,hierarchy = cv2.findContours(mask,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
