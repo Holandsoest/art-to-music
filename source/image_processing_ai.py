@@ -225,7 +225,7 @@ def detect_shapes(img): ## OLD CODE
 if __name__ == "__main__":
     # Training settings
     epochs = 4
-    batch_size = 10
+    batch_size = 25
     training_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','train','annotations')))
     validation_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','validation','annotations')))
     estimation_duration = round( 4*training_count*epochs/30000/14   +   training_count/250000.0*2.25, 1)
@@ -237,9 +237,9 @@ if __name__ == "__main__":
     # compare_all_models(img=None,
     #                    image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','500'),
     #                    has_colors=False)
-    compare_all_models(img=None,
-                       image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','1000'),
-                       has_colors=False)
+    # compare_all_models(img=None,
+    #                    image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','1000'),
+    #                    has_colors=False)
 
     # Display to user
     cv2.destroyAllWindows()
