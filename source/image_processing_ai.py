@@ -2,6 +2,7 @@
 #This is for processing while using webcam https://wellsr.com/python/object-detection-from-webcams-with-yolo/
 from imageai.Detection.Custom import CustomObjectDetection
 from imageai.Detection.Custom import DetectionModelTrainer
+import os_bedtime
 import cv2 
 import numpy as np 
 import os
@@ -224,6 +225,7 @@ def detect_shapes(img): ## OLD CODE
 
 if __name__ == "__main__":
     # Training settings
+    os_bedtime.computer_sleep(hibernate=True, wake_up_events_disabled=True)
     epochs = 4
     batch_size = 25
     training_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','train','annotations')))
@@ -232,14 +234,14 @@ if __name__ == "__main__":
     estimated_completion = round( estimation_duration + time.localtime().tm_hour + time.localtime().tm_min/60.0 ,1)
     print(f'Training the AI with {epochs}epochs and a batch_size of {batch_size}\nWith {training_count} training images and {validation_count} validation images\nIs estimated to take Brosha ~{estimation_duration} hours...\nEstimation reads to be done at ~{estimated_completion}\nScared?\n')
     train_custom_model(epochs, batch_size)
-    
+    os_bedtime.computer_sleep(hibernate=True, wake_up_events_disabled=True)
 
     # compare_all_models(img=None,
     #                    image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','500'),
     #                    has_colors=False)
-    # compare_all_models(img=None,
-    #                    image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','1000'),
-    #                    has_colors=False)
+    compare_all_models(img=None,
+                       image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','1000'),
+                       has_colors=False)
 
     # Display to user
     cv2.destroyAllWindows()
