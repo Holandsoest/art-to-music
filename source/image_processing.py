@@ -115,6 +115,37 @@ def get_pitch_from_size(obj_height, img_height, shape_name):
         
         case _:
             return 0
+        
+def stack_images(scale, imgArray):
+    rows = len(imgArray)
+    cols = len(imgArray[0])
+    rowsAvailable = isinstance(imgArray[0], list)
+    width = imgArray[0][0].shape[1]
+    height = imgArray[0][0].shape[0]
+    if rowsAvailable:
+        for x in range ( 0, rows):
+            for y in range(0, cols):
+                if imgArray[x][y].shape[:2] == imgArray[0][0].shape [:2]:
+                    imgArray[x][y] = cv2.resize(imgArray[x][y], (0, 0), None, scale, scale)
+                else:
+                    imgArray[x][y] = cv2.resize(imgArray[x][y], (imgArray[0][0].shape[1], imgArray[0][0].shape[0]), None, scale, scale)
+                if len(imgArray[x][y].shape) == 2: imgArray[x][y]= cv2.cvtColor( imgArray[x][y], cv2.COLOR_GRAY2BGR)
+        imageBlank = np.zeros((height, width, 3), np.uint8)
+        hor = [imageBlank]*rows
+        hor_con = [imageBlank]*rows
+        for x in range(0, rows):
+            hor[x] = np.hstack(imgArray[x])
+        ver = np.vstack(hor)
+    else:
+        for x in range(0, rows):
+            if imgArray[x].shape[:2] == imgArray[0].shape[:2]:
+                imgArray[x] = cv2.resize(imgArray[x], (0, 0), None, scale, scale)
+            else:
+                imgArray[x] = cv2.resize(imgArray[x], (imgArray[0].shape[1], imgArray[0].shape[0]), None,scale, scale)
+            if len(imgArray[x].shape) == 2: imgArray[x] = cv2.cvtColor(imgArray[x], cv2.COLOR_GRAY2BGR)
+        hor= np.hstack(imgArray)
+        ver = hor
+    return ver
 
 def get_contours_from_image(image, threshold_lower, threshold_upper):
     """
@@ -125,12 +156,12 @@ def get_contours_from_image(image, threshold_lower, threshold_upper):
     The function returns a all the contours detected in the image
     """
     ##### this code for .jpg files
-    aperture_size = 2
+    aperture_size = 3
     L2Gradient = True
 
-    img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    img_blur = cv2.GaussianBlur(img_gray, (5,5), 0)
-
+    
+    img_blur = cv2.GaussianBlur(image, (5,5), 0)
+    img_gray = cv2.cvtColor(img_blur, cv2.COLOR_BGR2GRAY)
     # Canny explained 
     # Hysteresis: The final step. Canny does use two thresholds (upper and lower):
     # If a pixel gradient is higher than the upper threshold, the pixel is accepted as an edge
@@ -143,7 +174,6 @@ def get_contours_from_image(image, threshold_lower, threshold_upper):
     # cv2.waitKey()
     # cv2.destroyAllWindows()
 
-    
     # cv2.imshow("canny", img_canny)
     # cv2.waitKey()
 
@@ -161,6 +191,10 @@ def get_contours_from_image(image, threshold_lower, threshold_upper):
             contours = contours[:n] + contours[n+1:]
         n += 1
 
+    img_stack = stack_images(0.8,([img_gray],[img_blur],[img_canny]))
+    # cv2.imshow("result", img_stack)
+    # cv2.waitKey()
+    # cv2.destroyAllWindows()
     # cv2.drawContours(image, contours, -1, (255,0,0), 1)
     # cv2.imshow("image contour", image)
     # cv2.waitKey()

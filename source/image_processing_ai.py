@@ -107,7 +107,7 @@ def detect_shapes_with_contour(contours, image):
 
     # # Custom Object Detection
     jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'koen-best.pt')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'second-best.pt')
 
     #Get the height, width and channel of the image
     img_height, img_width, channel = image.shape
@@ -148,14 +148,17 @@ def detect_shapes_with_contour(contours, image):
                                                         display_percentage_probability=True,
                                                         display_object_name=True)
         annotate_detected_colors(img, obj)
-        # cv2.imshow("img", img)
+        cv2.imshow("img", img)
+        cv2.waitKey()
+        cv2.destroyAllWindows()
         if not obj:
             cv2.imshow("empty shape", box)
             cv2.waitKey()
             cv2.destroyAllWindows()
             return "empty"
         else:
-            # cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            # TODO: return most common shape
             return obj[0]["name"]
         
     counter = 0
@@ -164,15 +167,13 @@ def detect_shapes_with_contour(contours, image):
         counter += 1
         area1 = cv2.contourArea(contour)
 
-        # area_min = cv2.getTrackbarPos("Area", "Parameters")
-        # if area1 > area_min:
         if area1 > 50:
             # Get approx contour of shape
             # Now you can use this function to approximate the shape. 
             # In this, second argument is called epsilon, which is maximum distance from contour to approximated contour. 
             # It is an accuracy parameter. 
             # A wise selection of epsilon is needed to get the correct output.
-            epsilon = 0.05*cv2.arcLength(contour,True)
+            epsilon = 0.01*cv2.arcLength(contour,True)
             approx = cv2.approxPolyDP(contour,epsilon,True)
             # approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
 
@@ -180,16 +181,12 @@ def detect_shapes_with_contour(contours, image):
             # It will create a rectangle around the shapes
             rect = cv2.minAreaRect(contour)
 
-            (x,y),radius = cv2.minEnclosingCircle(contour)
-            center = (int(x),int(y))
-            radius = int(radius)
-            cv2.circle(image,center,radius,(0,255,0),1)
+            
 
-            box = cv2.boxPoints(rect)
-            box = np.int0(box)
-            cv2.drawContours(image,[box],0,(0,0,255),1)
+            # box = cv2.boxPoints(rect)
+            # box = np.int0(box)
+            # cv2.drawContours(image,[box],0,(0,0,255),1)
             (x, y), (width, height), angle = rect
-
 
             shape_size_to_volume = ip.get_volume_from_size(width*height, img_size)
             shape_colorcode_to_bpm = ip.get_bpm_from_color(int(x),int(y),image)
@@ -201,7 +198,6 @@ def detect_shapes_with_contour(contours, image):
                 shape.shape = "triangle"
                 shape.instrument = "guitar"
                 shape.pitch = int(ip.get_pitch_from_size(height, img_height, "guitar"))
-                # cv2.drawContours(image, contour, -1, (255,0,0), 1)
             elif len(approx) == 4 : 
                 x2, y2 , w, h = cv2.boundingRect(approx)
                 aspect_ratio = float(w)/h
@@ -210,12 +206,10 @@ def detect_shapes_with_contour(contours, image):
                     shape.instrument = "drum"
                     shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum"))
                     # Shape is a square (Drum Pads)
-                    # cv2.drawContours(image, contour, -1, (255,0,0), 1)
                 else:
                     shape.shape = "rectangle"
                     shape.instrument = "drum"
                     shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum"))
-                    # cv2.drawContours(image, contour, -1, (255,0,0), 1)
                     # Shape is a rectangle (Drum Pads)
 
             elif len(approx) == 10 :
@@ -223,37 +217,39 @@ def detect_shapes_with_contour(contours, image):
                 shape.shape = "star"
                 shape.instrument = "cello"
                 shape.pitch = int(ip.get_pitch_from_size(height, img_height, "cello"))
-                # cv2.drawContours(image, contour, -1, (255,0,0), 1)
             else:
                 # Shape is half circle, circle or heart
                 shape_name = detect_shape_with_ai(get_image_from_box(contour, image))
                 if shape_name == "empty":
                     shape.pitch = int(ip.get_pitch_from_size(height, img_height, "empty"))
-                    # cv2.drawContours(image, contour, -1, (0,255,0), 1)
                     
                     continue
                 else: 
                     shape.shape = shape_name
                     if shape_name == "half circle":
                         shape_name = "flute"
-                        # cv2.drawContours(image, contour, -1, (255,255,0), 1)
                     elif shape_name == "heart": 
                         shape_name = "piano"
-                        # cv2.drawContours(image, contour, -1, (255,0,255), 1)
                     elif shape_name == "circle":
+                        (x3,y3),radius = cv2.minEnclosingCircle(contour)
+                        center = (int(x3),int(y3))
+                        radius = int(radius)
+                        cv2.circle(image,center,radius,(0,255,0),1)
+
+                        print("x: ",x ,"x3: ", x3, "y: ", y, " y3: ", y3)
                         shape_name = "violin"
-                        # cv2.drawContours(image, contour, -1, (0,255,255), 1)
                     elif shape_name == "square":
                         shape_name = "drum"
-                    elif shape_name == "traingle":
+                    elif shape_name == "triangle":
                         shape_name = "guitar"
                     elif shape_name == "star":
                         shape_name = "cello"
-                        # cv2.drawContours(image, contour, -1, (0,0,255), 1)
                     shape.instrument = shape_name
                     shape.pitch = int(ip.get_pitch_from_size(height, img_height, shape_name))
 
             list_of_shapes.append(shape)
+            # cv2.putText(image, shape.shape, (x[0],y[0]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            cv2.drawContours(image, contour, -1, (255,0,0), 1)
         else:
             continue
 
