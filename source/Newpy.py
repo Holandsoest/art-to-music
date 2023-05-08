@@ -7,11 +7,11 @@ def empty(img):
 video = cv2.VideoCapture(0)
 cv2.namedWindow("TrackBar")
 cv2.createTrackbar("Area","TrackBar",1000,30000,empty)
-cv2.createTrackbar("hue_min","TrackBar",25,179,empty) 
-cv2.createTrackbar("hue_max","TrackBar",50,179,empty) 
-cv2.createTrackbar("sat_min","TrackBar",105,179,empty) 
+cv2.createTrackbar("hue_min","TrackBar",9,179,empty) 
+cv2.createTrackbar("hue_max","TrackBar",78,179,empty) 
+cv2.createTrackbar("sat_min","TrackBar",107,179,empty) 
 cv2.createTrackbar("sat_max","TrackBar",255,255,empty) 
-cv2.createTrackbar("val_min","TrackBar",60,255,empty)                
+cv2.createTrackbar("val_min","TrackBar",85,255,empty)                
 cv2.createTrackbar("val_max","TrackBar",255,255,empty)
 
 def tracking(img):
