@@ -13,15 +13,16 @@ amount_of_flute = 0
 amount_of_cello = 0
 model_midi_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_files')
 model_preset_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'preset_files')
-model_wav_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'wav_files')    
+model_wav_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'wav_files')
+model_plugin_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'StupidSimpleSampler')      
 
 def drum(list_of_objects, amount_of_drum):
     for shape in list_of_objects:
         if amount_of_drum == 1:
             engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+            synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
-            synth.load_state(model_preset_path + "\\drum_preset")
+            synth.load_state(model_preset_path + "\\kick.fxb")
             synth.load_midi(model_midi_path + "\\drum_output.mid", clear_previous=False, beats=False, all_events=False) 
             engine.load_graph([
                             (synth,[])
@@ -36,7 +37,7 @@ def guitar(list_of_objects, amount_of_guitar):
     for shape in list_of_objects:  
         if amount_of_guitar == 1:
             engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+            synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
             synth.load_state(model_preset_path + "\\guitar_preset")
             synth.load_midi(model_midi_path + "\\guitar_output.mid", clear_previous=False, beats=False, all_events=False) 
@@ -54,7 +55,7 @@ def violin (list_of_objects, amount_of_violin):
     for shape in list_of_objects:
         if amount_of_violin == 1:
             engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+            synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
             synth.load_state(model_preset_path + "\\violin_preset")
             synth.load_midi(model_midi_path + "\\violin_output.mid", clear_previous=False, beats=False, all_events=False) 
@@ -72,7 +73,7 @@ def flute (list_of_objects, amount_of_flute):
     for shape in list_of_objects:
         if amount_of_flute == 1:
             engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+            synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
             synth.load_state(model_preset_path + "\\flute_preset")
             synth.load_midi(model_midi_path + "\\flute_output.mid", clear_previous=False, beats=False, all_events=False) 
@@ -90,10 +91,11 @@ def cello (list_of_objects, amount_of_cello):
     for shape in list_of_objects:
         if amount_of_cello == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
-            synth = engine.make_plugin_processor("my_synth", r"D:\Muziek\muziek\Fl studio plugins\Sylenth1\Sylenth1 v2.2.1.1 Main Files\64-Bit\Sylenth1.dll")
+            synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
+            synth.load_state(model_preset_path + "\\clap.fxb")
             synth.open_editor()
-            #synth.load_state(model_preset_path + "\\cello_preset")
+            #synth.save_state(model_preset_path + "\\cello_preset_StupidSimpleSampler")
             synth.load_midi(model_midi_path + "\\cello_output.mid", clear_previous=False, beats=False, all_events=False) 
 
             engine.load_graph([
