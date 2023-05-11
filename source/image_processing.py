@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 import os
 import image_processing_ai as img_proc_ai
 import common.image_properties as img_prop
@@ -36,8 +35,6 @@ def get_bpm_from_color(x_axis, y_axis, image):
     #     return cname
     
     # colorName = get_shape_color(r,g,b)
-
-
 
     def round_up_to_30(number):
         return min(((number + 29) // 30) * 30, 240)
@@ -119,37 +116,6 @@ def get_pitch_from_size(obj_height, img_height, shape_name):
         
         case _:
             return 0
-        
-# def stack_images(scale, imgArray):
-#     rows = len(imgArray)
-#     cols = len(imgArray[0])
-#     rowsAvailable = isinstance(imgArray[0], list)
-#     width = imgArray[0][0].shape[1]
-#     height = imgArray[0][0].shape[0]
-#     if rowsAvailable:
-#         for x in range ( 0, rows):
-#             for y in range(0, cols):
-#                 if imgArray[x][y].shape[:2] == imgArray[0][0].shape [:2]:
-#                     imgArray[x][y] = cv2.resize(imgArray[x][y], (0, 0), None, scale, scale)
-#                 else:
-#                     imgArray[x][y] = cv2.resize(imgArray[x][y], (imgArray[0][0].shape[1], imgArray[0][0].shape[0]), None, scale, scale)
-#                 if len(imgArray[x][y].shape) == 2: imgArray[x][y]= cv2.cvtColor( imgArray[x][y], cv2.COLOR_GRAY2BGR)
-#         imageBlank = np.zeros((height, width, 3), np.uint8)
-#         hor = [imageBlank]*rows
-#         hor_con = [imageBlank]*rows
-#         for x in range(0, rows):
-#             hor[x] = np.hstack(imgArray[x])
-#         ver = np.vstack(hor)
-#     else:
-#         for x in range(0, rows):
-#             if imgArray[x].shape[:2] == imgArray[0].shape[:2]:
-#                 imgArray[x] = cv2.resize(imgArray[x], (0, 0), None, scale, scale)
-#             else:
-#                 imgArray[x] = cv2.resize(imgArray[x], (imgArray[0].shape[1], imgArray[0].shape[0]), None,scale, scale)
-#             if len(imgArray[x].shape) == 2: imgArray[x] = cv2.cvtColor(imgArray[x], cv2.COLOR_GRAY2BGR)
-#         hor= np.hstack(imgArray)
-#         ver = hor
-#     return ver
 
 def get_contours_from_image(image, threshold_lower, threshold_upper):
     """
@@ -178,7 +144,6 @@ def get_contours_from_image(image, threshold_lower, threshold_upper):
     
     n = 0
     for cnt in contours:
-   
         # It is also called arc length. 
         # It can be found out using cv.arcLength() function. 
         # Second argument specify whether shape is a closed contour (if passed True), or just a curve.
@@ -195,15 +160,6 @@ def setup_contour(image, amount_of_shapes_in_picture):
     threshold_values = open(model_custom_path +"\\threshold_values.txt", "w")    
     threshold_lower = 30
     threshold_upper = 0
-
-    def check_area_of_contours(contours):
-        counter = 0
-        for contour in contours:
-            area1 = cv2.contourArea(contour)
-
-            if area1 > 35:
-                counter += 1
-        return counter
 
     while(1):
 
@@ -282,7 +238,6 @@ def detect_shapes_via_contour(contours, image):
             # A wise selection of epsilon is needed to get the correct output.
             epsilon = 0.02*cv2.arcLength(contour,True)
             approx = cv2.approxPolyDP(contour,epsilon,True)
-            # approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
 
             # minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
             # It will create a rectangle around the shapes

@@ -17,7 +17,7 @@ if __name__ == "__main__":
     img_copy = img.copy()
     assert img is not None, "file could not be read, check with os.path.exists()"
 
-    do_setup = True
+    do_setup = False
     if do_setup == False:
         threshold_handle = open('files\\image_processing\\threshold_values.txt', 'r')
         list_threshold = threshold_handle.readlines()
@@ -54,6 +54,7 @@ if __name__ == "__main__":
             image_ai, list_of_shapes_ai = img_proc_ai.detect_shapes_with_ai(img)
             image_contour, list_of_shapes_contour = img_proc.detect_shapes_via_contour(contours, img_copy)
             cv2.imshow("ai", image_ai)
+            
             cv2.imshow("contour", image_contour)
 
         elif cv2.waitKey(1) & 0xFF == ord('q'):
