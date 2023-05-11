@@ -165,14 +165,12 @@ class MainCanvas(tkinter.Canvas):
                 # Apply properties to shape
                 found = False
                 for shape in self.list_of_canvas_shapes:
-                    box = shape.annotation.box
-                    if event.x < box.pos.x: continue                # Left of box  (out of range)
-                    if event.x > box.pos.x + box.size.x: continue   # Right of box (out of range)
-                    if event.y < box.pos.y: continue                # Top of box   (out of range)
-                    if event.y > box.pos.y + box.size.y: continue   # Bottom of box(out of range)
+                    if event.x < shape.box.pos.x: continue                # Left of box  (out of range)
+                    if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of box (out of range)
+                    if event.y < shape.box.pos.y: continue                # Top of box   (out of range)
+                    if event.y > shape.box.pos.y + shape.box.size.y: continue   # Bottom of box(out of range)
 
-                    new_shape_shape = shapes.object_names_array[int(shape.annotation.class_id)].replace(' ', '_')
-                    new_shape_pos   = shape.center_pos
+                    new_shape_shape = shapes.object_names_array[int(shape.class_id)].replace(' ', '_')
                     if PalletItem.YELLOW.value <= pallet_item.value <= PalletItem.BLUE.value:           new_shape_color = pallet_item.name.lower()
                     if PalletItem.CIRCLE.value <= pallet_item.value <= PalletItem.HALF_CIRCLE.value:    new_shape_shape = pallet_item.name.lower()
 
@@ -184,40 +182,34 @@ class MainCanvas(tkinter.Canvas):
                     self.in_hand.remove(item) # TODO: Implement background
                     continue
                 
+                new_box = loc.Box(x= event.x - 25,
+                                  y= event.y - 25,
+                                  width= 50,
+                                  height= 50)
                 match (new_shape_shape):
                     case 'circle':
-                        new_shape = shapes.Circle(canvas_size(),
-                                                center_pos=new_shape_pos,
-                                                size_in_pixels=new_shape_radius)
-                    case 'half_circle':
-                        new_shape = shapes.HalfCircle(canvas_size(),
-                                                center_pos=new_shape_pos,
-                                                size_in_pixels=new_shape_radius,
-                                                rotation_rad=new_shape_rot_rad)
+                        new_shape = shapes.Circle(box=new_box, fill_color=self.last_color.name.lower(), outline_color=self.last_color.name.lower())
+                    case 'half circle':
+                        new_shape = shapes.HalfCircle(box=new_box, fill_color=self.last_color.name.lower(), outline_color=self.last_color.name.lower(),
+                                                rotation_rad=0)
                     case 'square':
-                        new_shape = shapes.Square(canvas_size(),
-                                                center_pos=loc.new_shape_pos,
-                                                size_in_pixels=new_shape_radius,
-                                                rotation_rad=new_shape_rot_rad)
+                        new_shape = shapes.Square(box=new_box, fill_color=self.last_color.name.lower(), outline_color=self.last_color.name.lower(),
+                                                rotation_rad=0)
                     case 'heart':
-                        new_shape = shapes.Heart(canvas_size(),
-                                                center_pos=new_shape_pos,
-                                                size_in_pixels=new_shape_radius,
-                                                rotation_rad=new_shape_rot_rad,
-                                                depth_percentage=new_shape_depth)
+                        new_shape = shapes.Heart(box=new_box,
+                                                    fill_color=self.last_color.name.lower(), outline_color=self.last_color.name.lower(),
+                                                rotation_rad=0,
+                                                depth_percentage=50)
                     case 'star':
-                        new_shape = shapes.Star(canvas_size(),
-                                                center_pos=new_shape_pos,
-                                                size_in_pixels=new_shape_radius,
-                                                rotation_rad=new_shape_rot_rad,
-                                                depth_percentage=new_shape_depth)
+                        new_shape = shapes.Star(box=new_box,
+                                                fill_color=self.last_color.name.lower(), outline_color=self.last_color.name.lower(),
+                                                rotation_rad=0,
+                                                depth_percentage=50)
                     case _: # 'triangle'
-                        new_shape = shapes.SymmetricTriangle(canvas_size(),
-                                                center_pos=new_shape_pos,
-                                                size_in_pixels=new_shape_radius,
-                                                rotation_rad=new_shape_rot_rad)
+                        new_shape = shapes.SymmetricTriangle(box=new_box,
+                                                    fill_color=self.last_color.name.lower(), outline_color=self.last_color.name.lower(),
+                                                rotation_rad=0)
                 new_shape.draw_shape(tkinter_canvas=self,
-                                     outline_color=new_shape_color, fill_color=new_shape_color, width_outline=1,
                                      location_offset=loc.Pos(x=pallet_width(),y=0))
                 self.list_of_canvas_shapes.append(new_shape)
                 self.in_hand.remove(item)
