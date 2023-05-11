@@ -14,7 +14,7 @@ shape_detector = CustomObjectDetection()
 def setup_ai():
     # # Custom Object Detection
     jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'best_T250k_e4-b20_mAP-0.63917_epoch-1.pt')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'dataset_version_mAP-0.63917.pt')
 
     shape_detector.setModelTypeAsTinyYOLOv3()
     shape_detector.setModelPath(model_custom_path)
@@ -217,9 +217,6 @@ def detect_shapes_with_ai(image):
         shape_colorcode_to_bpm = img_proc.get_bpm_from_color(int(middle_point_x),int(middle_point_y),image)
         shape_width_to_duration = img_proc.get_duration_from_width(width, img_width)
         shape_ai = img_prop.Image("", counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), 0, obj["box_points"] )
-        # Call function to extract color data
-        # color = get_color(obj_img)
-        # obj["color"] = color
         shape_ai.shape = obj["name"]
 
         if obj["name"] == "half circle":
@@ -237,19 +234,8 @@ def detect_shapes_with_ai(image):
         else:
             shape_ai.instrument = "empty"
         shape_ai.pitch = int(img_proc.get_pitch_from_size(height, img_height, shape_ai.instrument))
-        # obj["color"]
-        # obj["percentage_probability"]
         list_of_shapes.append(shape_ai)
-
-        print(shape_ai.counter, 
-              "shape:", shape_ai.shape, 
-              "instrument:", shape_ai.instrument, 
-              "volume:", shape_ai.volume, 
-              "bpm:", shape_ai.bpm, 
-              "pitch:", shape_ai.pitch, 
-              "duration:", shape_ai.duration, 
-              sep='\t')
-    print("------------------------------------------------------------------------------------------------------")
+        
     return img, list_of_shapes
 
 def detect_shape_with_ai(box):
