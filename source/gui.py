@@ -181,6 +181,8 @@ class MainCanvas(tkinter.Canvas):
                 if not found and PalletItem.YELLOW.value <= pallet_item.value <= PalletItem.BLUE.value:
                     self.in_hand.remove(item) # TODO: Implement background
                     continue
+                new_shape_shape = item.name.lower().replace(' ', '_')
+                print(f'`new_shape_shape` = `{new_shape_shape}`')
                 
                 new_box = loc.Box(x= event.x - 25,
                                   y= event.y - 25,
