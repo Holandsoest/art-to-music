@@ -93,7 +93,7 @@ def getContours(img, imgContour):
             cv2.drawContours(imgContour, cnt, -1, (255, 0, 0), 3)
             peri = cv2.arcLength(cnt,True)
             approx = cv2.approxPolyDP(cnt,0.02*peri,True)
-            print(approx)
+            # print(approx)
 
 
             #possitions
@@ -139,11 +139,11 @@ def getContours(img, imgContour):
             #cv2.putText(frame, color, (cx - 200, 100), 0, 3, (b, g, r), 5)
             # cv2.circle(imgContour, (x, y),5, (x+w,y+h), (25, 25, 25), 2)
 
-            cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
-            cv2.putText(imgContour, pos_label, (x + w +20, y + 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            cv2.putText(imgContour, "color: " +  color, (x + w +20, y + 40), 0, 0.5, (0,255,0), 2)
-            cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
-            cv2.putText(imgContour, "Area: " + str(int(area)), (x + w +20, y + 80), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+            # cv2.rectangle(imgContour,(x,y),(x+w,y+h),(0,255,0),2)
+            # cv2.putText(imgContour, pos_label, (x + w +20, y + 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            # cv2.putText(imgContour, "color: " +  color, (x + w +20, y + 40), 0, 0.5, (0,255,0), 2)
+            # cv2.putText(imgContour, "Points: " + str(len(approx)), (x + w +20, y + 20), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
+            # cv2.putText(imgContour, "Area: " + str(int(area)), (x + w +20, y + 80), cv2.FONT_HERSHEY_COMPLEX,0.5, (0,255,0),2)
 
 
 
@@ -166,7 +166,7 @@ while True:
     
     getContours(imgDil,imgContour)
 
-    imgStack = stackImages(0.8,([imgCanny,imgContour]))
+    imgStack = stackImages(0.8,([imgCanny]))
     # imgStack = stackImages(0.8,([imgBlur, imgGray, imgCanny],[imgContour, imgContour, imgContour]))
     #imgStack = stackImages(0.8,([imgContour]))
     cv2.imshow("Result", imgStack)
@@ -174,7 +174,7 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
         img_name = "opencv_fram_{}.png".format(img_counter)
         cv2.imwrite(img_name, imgStack)
-        print("screenshot taken")
+        # print("screenshot taken")
         img = Image.open("opencv_fram_{}.png".format(img_counter))
         img.show()  
         img_counter+=1 
