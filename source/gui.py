@@ -215,7 +215,7 @@ class MainCanvas(tkinter.Canvas):
         self.bind ('<ButtonRelease-1>', lambda event: let_go (event))
         # self.bind ('<Motion>',          lambda event: temp   (event))
 
-        self.list_of_canvas_shapes.append(shapes.Star(loc.Size(500,500), loc.Pos(60,100), size_in_pixels=64, rotation_rad=2.0))
+        self.list_of_canvas_shapes.append(shapes.Star(loc.Box(x=50, y=20, width=50, height=50), rotation_rad=2.0))
         for shape in self.list_of_canvas_shapes:
             shape.draw_shape(self, 'blue','red', width_outline=1, location_offset=loc.Pos(x=pallet_width(),y=0))
         

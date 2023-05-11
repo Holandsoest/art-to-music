@@ -60,6 +60,7 @@ class Annotation:
         if self_lower_pos.x > other_upper_pos.x: return False # Right of other
         if self_lower_pos.y > other_upper_pos.y: return False # Under other
         return True
+# TODO: function/class that builds an Annotation from shape/child_of_shape
 
 # Functions to help draw shapes
 def calculate_arm_point_(start_pos:loc.Pos, length_trace=1, rotation_rad=0.0) -> loc.Pos:
@@ -91,11 +92,13 @@ def angle_mirror_(rad_angle:float, mirror_vertical=False)->float:
 
 # Shapes
 class Shape:
-    def __init__(self):
+    def __init__(self, box):
         self.canvas_ids = []
+        self.box = box
+        self.center_pos = loc.Pos(x= box.pos.x + box.size.x/2,
+                                  y= box.pos.y + box.size.y/2)
     def get_polygon_coordinates_(self, location_offset:loc.Pos) -> list:
         """Returns a list of coordinates that can be used by `tkinter` to draw a `polygon` on a `canvas`"""
-
         polygon_coordinates = []
         for node in self.outline_coordinates:
             polygon_coordinates.append(  int(round(  node.x + location_offset.x,  0  ))  )
@@ -146,20 +149,17 @@ class Shape:
             tkinter_canvas.delete(id)
         self.canvas_ids.clear()
 class Star(Shape):
-    def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0, depth_percentage=50):
-        super().__init__()
-        rotation_rad %= math.pi * 2 / 5 # Shape repeats every 72 degrees
-
-        self.center_pos = center_pos
-        self.size_in_pixels = size_in_pixels
-        self.rotation_rad=rotation_rad
+    def __init__(self, box:loc.Box, rotation_rad=0.0, depth_percentage=50):
+        super().__init__(box)
+        self.rotation_rad = rotation_rad % (math.pi * 2 / 5) # Shape repeats every 72 degrees
+        self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
         self.depth_percentage=depth_percentage
 
         # store the outline in a list
         self.outline_coordinates = []
 
-        outer_points = calculate_shape_arms_(center_pos=center_pos, traces=5, length_traces=size_in_pixels / 2, rotation=rotation_rad)
-        inner_points = calculate_shape_arms_(center_pos=center_pos, traces=5, length_traces=size_in_pixels / 200 * depth_percentage,
+        outer_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius / 2, rotation=rotation_rad)
+        inner_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius / 200 * depth_percentage,
                                          rotation=rotation_rad + (math.pi / float(5)))
 
         self.outline_coordinates.append(outer_points[0])
@@ -172,174 +172,141 @@ class Star(Shape):
         self.outline_coordinates.append(inner_points[3])
         self.outline_coordinates.append(outer_points[4])
         self.outline_coordinates.append(inner_points[4])
-
-        self.annotation=Annotation(4, image_size=img_size, coordinates=self.outline_coordinates)
 class Square(Shape):
-    def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0):
-        super().__init__()
-        rotation_rad %= math.pi * 2 / 4 # Shape repeats every 90 degrees
-
-        self.center_pos = center_pos
-        self.size_in_pixels = size_in_pixels
-        self.rotation_rad=rotation_rad
+    def __init__(self, box:loc.Box, rotation_rad=0.0):
+        super().__init__(box)
+        self.rotation_rad = rotation_rad % (math.pi * 2 / 4) # Shape repeats every 90 degrees
+        self.radius = math.sqrt((self.box.size.x/2)**2 + (self.box.size.y/2)**2) # Pythagoras to the corner (rotation will be taken in account later)
 
         # store the outline in a list
-        self.outline_coordinates = calculate_shape_arms_(center_pos=center_pos, traces=4, length_traces=size_in_pixels / 2, rotation=rotation_rad)
-
-        self.annotation=Annotation(2, image_size=img_size, coordinates=self.outline_coordinates)
+        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=4, length_traces=self.radius / 2, rotation=rotation_rad)
 class SymmetricTriangle(Shape):
-    def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0):
-        super().__init__()
-        rotation_rad %= math.pi * 2 / 3 # Shape repeats every 60 degrees
-
-        self.center_pos = center_pos
-        self.size_in_pixels = size_in_pixels
-        self.rotation_rad=rotation_rad
+    def __init__(self, box:loc.Box, rotation_rad=0.0):
+        super().__init__(box)
+        self.rotation_rad = rotation_rad % (math.pi * 2 / 3) # Shape repeats every 60 degrees
+        self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
 
         # store the outline in a list
-        self.outline_coordinates = calculate_shape_arms_(center_pos=center_pos, traces=3, length_traces=size_in_pixels / 2, rotation=rotation_rad)
-
-        self.annotation=Annotation(5, image_size=img_size, coordinates=self.outline_coordinates)
+        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=3, length_traces=self.radius / 2, rotation=rotation_rad) #BUG: Now self.box is not an annotation box !
 class Heart(Shape):
-    def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0, depth_percentage=50):
-        super().__init__()
-        rotation_rad %= math.pi * 2 # Shape repeats every 360 degrees
-        depth_percentage=min(95,max(40,depth_percentage)) # Limit depth percentage to 20-80
-
-        self.center_pos = center_pos
-        self.size_in_pixels = size_in_pixels
-        self.rotation_rad=rotation_rad
-        self.depth_percentage=depth_percentage
-
-        radius = size_in_pixels / 2
+    def __init__(self, box:loc.Box, rotation_rad=0.0, depth_percentage=50):
+        super().__init__(box)
+        self.rotation_rad = rotation_rad % (math.pi * 2) # Shape repeats every 360 degrees
+        self.depth_percentage=min(95,max(40,depth_percentage)) # Limit depth percentage to 20-80
+        self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
         pi = math.pi
 
         # store the outline in a list
         shape_dict = {
-            "point_1":      (3/2*pi,     radius),
-            "under_arch_2": (65/36*pi,   radius*0.87),
-            "right_3":      (1/9*pi,     radius*1.08),
-            "top_right_4":  (1/4*pi,     radius*1.25),#1.41
-            "top_5":        (31/90*pi,   radius*1.15),
-            "top_center_6": (4/9*pi,     radius*0.95),
-            "hole_7":       (1/2*pi,     size_in_pixels*depth_percentage/100) # use the point_pos as start_pos for this line
+            "point_1":      (3/2*pi,     self.radius),
+            "under_arch_2": (65/36*pi,   self.radius*0.87),
+            "right_3":      (1/9*pi,     self.radius*1.08),
+            "top_right_4":  (1/4*pi,     self.radius*1.25),#1.41
+            "top_5":        (31/90*pi,   self.radius*1.15),
+            "top_center_6": (4/9*pi,     self.radius*0.95),
+            "hole_7":       (1/2*pi,     self.box.size.add()/2*depth_percentage/100) # use the point_pos as start_pos for this line
         }
         self.outline_coordinates = []
 
         # get location of the right side of the heart
         arm_rotation, arm_length = shape_dict["point_1"]
-        point_pos = calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad)
+        point_pos = calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad)
         self.outline_coordinates.append(point_pos)
         self.outline_coordinates.append(point_pos)
 
         arm_rotation, arm_length = shape_dict["under_arch_2"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["right_3"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["top_right_4"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["top_5"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["top_center_6"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
 
         arm_rotation, arm_length = shape_dict["hole_7"]
-        hole_pos = calculate_arm_point_(point_pos, arm_length, arm_rotation + rotation_rad)
+        hole_pos = calculate_arm_point_(point_pos, arm_length, arm_rotation + self.rotation_rad)
         self.outline_coordinates.append(hole_pos)
 
         # get location of the left side of the heart
         self.outline_coordinates.append(hole_pos)
         
         arm_rotation, arm_length = shape_dict["top_center_6"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, angle_mirror_(arm_rotation, mirror_vertical=True) + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, angle_mirror_(arm_rotation, mirror_vertical=True) + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["top_5"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, angle_mirror_(arm_rotation, mirror_vertical=True) + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, angle_mirror_(arm_rotation, mirror_vertical=True) + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["top_right_4"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, angle_mirror_(arm_rotation, mirror_vertical=True) + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, angle_mirror_(arm_rotation, mirror_vertical=True) + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["right_3"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, angle_mirror_(arm_rotation, mirror_vertical=True) + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, angle_mirror_(arm_rotation, mirror_vertical=True) + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["under_arch_2"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, angle_mirror_(arm_rotation, mirror_vertical=True) + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, angle_mirror_(arm_rotation, mirror_vertical=True) + self.rotation_rad))
 
         self.outline_coordinates.append(point_pos)
         self.outline_coordinates.append(point_pos)
-
-        self.annotation=Annotation(3, image_size=img_size, coordinates=self.outline_coordinates)
 class HalfCircle(Shape):
-    def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10, rotation_rad=0.0):
-        super().__init__()
-        rotation_rad %= math.pi * 2 # Shape repeats every 360 degrees
-
-        self.center_pos = center_pos
-        self.size_in_pixels = size_in_pixels
-        self.rotation_rad=rotation_rad
-
-        radius = size_in_pixels / 2
+    def __init__(self, box:loc.Box, rotation_rad=0.0):
+        super().__init__(box)
+        self.rotation_rad = rotation_rad % (math.pi * 2) # Shape repeats every 360 degrees
+        self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
         pi = math.pi
 
         # store the outline in a list
         shape_dict = {
-            "right_top":    (1/6*pi,    radius),
-            "left_top":     (5/6*pi,    radius),
-            "right_center": (0,         radius*0.75),
-            "left_center":  (pi,        radius*0.75),
-            "left_bottom":  (5/4*pi,    radius*0.5),
-            "right_bottom": (7/4*pi,    radius*0.5)
+            "right_top":    (1/6*pi,    self.radius),
+            "left_top":     (5/6*pi,    self.radius),
+            "right_center": (0,         self.radius*0.75),
+            "left_center":  (pi,        self.radius*0.75),
+            "left_bottom":  (5/4*pi,    self.radius*0.5),
+            "right_bottom": (7/4*pi,    self.radius*0.5)
         }
         self.outline_coordinates = []
         
         arm_rotation, arm_length = shape_dict["right_top"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["left_top"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["left_center"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
-        # self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
+        # self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["left_bottom"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["right_bottom"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["right_center"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
-        # self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
+        # self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         arm_rotation, arm_length = shape_dict["right_top"]
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
-        self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation + rotation_rad))
-
-        self.annotation=Annotation(1, image_size=img_size, coordinates=self.outline_coordinates)
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
+        self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
 class Circle(Shape):
-    def __init__(self, img_size:loc.Size, center_pos:loc.Pos, size_in_pixels=10):
-        super().__init__()
-
-        self.center_pos = center_pos
-        self.size_in_pixels = size_in_pixels
-
-        radius = size_in_pixels / 2
+    def __init__(self, box:loc.Box):
+        super().__init__(box)
+        self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
         pi = math.pi
 
         # store the outline in a list
         shape_dict = {
-            "right_top":    (1/4*pi,    math.sqrt( (radius**2) * 2)),
-            "left_top":     (3/4*pi,    math.sqrt( (radius**2) * 2)),
-            "left_bottom":  (5/4*pi,    math.sqrt( (radius**2) * 2)),
-            "right_bottom": (7/4*pi,    math.sqrt( (radius**2) * 2))
+            "right_top":    (1/4*pi,    math.sqrt( (self.radius**2) * 2)),
+            "left_top":     (3/4*pi,    math.sqrt( (self.radius**2) * 2)),
+            "left_bottom":  (5/4*pi,    math.sqrt( (self.radius**2) * 2)),
+            "right_bottom": (7/4*pi,    math.sqrt( (self.radius**2) * 2))
         }
         self.outline_coordinates = []
         for dot in shape_dict:
             arm_rotation, arm_length = shape_dict[dot]
-            self.outline_coordinates.append(calculate_arm_point_(center_pos, arm_length, arm_rotation))
-
-        self.annotation=Annotation(0, image_size=img_size, coordinates=self.outline_coordinates)
+            self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation))
 
     def draw_shape(self, tkinter_canvas:tkinter.Canvas, outline_color:str, fill_color:str, width_outline:int, location_offset:loc.Pos) -> int:
         """Returns an `object_ID` of the shape drawn on the `tkinter_canvas`"""
         if (width_outline < 0): raise RuntimeWarning('A `width_outline` cannot be negative.')
 
-        return tkinter_canvas.create_oval(self.annotation.box.pos.x + location_offset.x,
-                                          self.annotation.box.pos.y + location_offset.y,
-                                          self.annotation.box.pos.x + self.annotation.box.size.x + location_offset.x,
-                                          self.annotation.box.pos.y + self.annotation.box.size.y + location_offset.y,
+        return tkinter_canvas.create_oval(self.box.pos.x + location_offset.x,
+                                          self.box.pos.y + location_offset.y,
+                                          self.box.pos.x + self.box.size.x + location_offset.x,
+                                          self.box.pos.y + self.box.size.y + location_offset.y,
                                           outline=outline_color,
                                           width=1,
                                           fill=fill_color)
