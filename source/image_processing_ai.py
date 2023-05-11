@@ -5,9 +5,21 @@ from imageai.Detection.Custom import DetectionModelTrainer
 import cv2 
 import numpy as np 
 import os
-import image_processing as ip
-import common.image_properties as img_prop
 from enum import Enum
+import common.image_properties as img_prop
+import image_processing as img_proc
+
+shape_detector = CustomObjectDetection()
+
+def setup_ai():
+    # # Custom Object Detection
+    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'best_T250k_e4-b20_mAP-0.63917_epoch-1.pt')
+
+    shape_detector.setModelTypeAsTinyYOLOv3()
+    shape_detector.setModelPath(model_custom_path)
+    shape_detector.setJsonPath(jason_path)
+    shape_detector.loadModel()
 
 # Function to get the color of an object in the image
 def get_color(img:cv2.Mat) -> str:
@@ -68,6 +80,107 @@ def get_color(img:cv2.Mat) -> str:
     else:
         return 'red'
     
+def correct_boxes(img:cv2.Mat, detected_objects):
+    boxes = []
+
+    print("detected objects at first: ", len(detected_objects))
+
+    def non_max_suppression(boxes, overlapThresh = 0.4):
+        """
+        Function to determine non maximum suppression
+        Inputs:
+        - boxes: all the boxes detected by ai or contours.
+        - overlapThresh: the threshold of boxes overlapping.
+        
+        Return all the bouding boxes that are double
+        """
+        # if there are no boxes, return an empty list
+        if len(boxes) == 0:
+            return []
+        
+        # if the bounding boxes integers, convert them to floats --
+        # this is important since we'll be doing a bunch of divisions
+        if boxes.dtype.kind == "i":
+            boxes = boxes.astype("float")
+
+        # initialize the list of picked indexes	
+        pick = []
+
+        # grab the coordinates of the bounding boxes
+        x1 = boxes[:,0]
+        y1 = boxes[:,1]
+        x2 = boxes[:,2]
+        y2 = boxes[:,3]
+
+        # compute the area of the bounding boxes and sort the bounding
+        # boxes by the bottom-right y-coordinate of the bounding box
+        area = (x2 - x1 + 1) * (y2 - y1 + 1)
+        idxs = np.argsort(y2)
+
+        area_descend = (x2 - x1 + 1) * (y2 - y1 + 1)
+        area_descend[::-1].sort()
+            
+        # temp_index = [area_descend[0], area_descend[1], area_descend[2], area_descend[3]]
+
+        # keep looping while some indexes still remain in the indexes list
+        while len(idxs) > 0:
+            # grab the last index in the indexes list and add the
+            # index value to the list of picked indexes
+            last = len(idxs) - 1
+            i = idxs[last]
+            pick.append(i)
+            # find the largest (x, y) coordinates for the start of
+            # the bounding box and the smallest (x, y) coordinates
+            # for the end of the bounding box
+            xx1 = np.maximum(x1[i], x1[idxs[:last]])
+            yy1 = np.maximum(y1[i], y1[idxs[:last]])
+            xx2 = np.minimum(x2[i], x2[idxs[:last]])
+            yy2 = np.minimum(y2[i], y2[idxs[:last]])
+
+            # compute the width and height of the bounding box
+            w = np.maximum(0, xx2 - xx1 + 1)
+            h = np.maximum(0, yy2 - yy1 + 1)
+
+            # compute the ratio of overlap
+            overlap = (w * h) / area[idxs[:last]]
+
+            # delete all indexes from the index list that have
+            idxs = np.delete(idxs, np.concatenate(([last],
+                np.where(overlap > overlapThresh)[0])))
+            
+        # return only the bounding boxes that were picked using the
+        # integer data type
+        return boxes[pick].astype("int")
+
+    for obj in detected_objects:
+        x1, y1, x2, y2 = obj["box_points"]
+
+        bounding_box = [int(x1), int(y1), int(x2), int(y2)]
+        boxes.append(bounding_box)
+
+    boxes = np.array(boxes)
+    double_boxes = non_max_suppression(boxes)
+
+    print("detected objects after removel of duplicates: ", len(double_boxes))
+
+    for obj in double_boxes:
+        x1 = obj[0]
+        y1 = obj[1]
+        x2 = obj[2] 
+        y2 = obj[3]
+
+        obj_img = img[y1:y2, x1:x2]
+
+        # Call function to extract color data
+        color = get_color(obj_img)
+        # Color label text
+        color_label = ("color: " + color)
+        # Adding a text to the object 
+        # cv2.putText(img, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
+        cv2.rectangle(img, (x1, y1), (x2, y2), (255,0,0), 2)
+    
+    return img
+    
 def detect_shapes_with_ai(image):
     """
     Function to detect shapes via AI\n
@@ -76,195 +189,89 @@ def detect_shapes_with_ai(image):
 
     Returns annotated image.    
     """
-    # # Custom Object Detection
-    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'koen-best.pt')
-
-    shape_detector = CustomObjectDetection()
-    shape_detector.setModelTypeAsTinyYOLOv3()
-    shape_detector.setModelPath(model_custom_path)
-    shape_detector.setJsonPath(jason_path)
-    shape_detector.loadModel()
-
-    img, detected_objects = shape_detector.detectObjectsFromImage(input_image=image, 
-                                                    output_type="array",
-                                                    display_percentage_probability=True,
-                                                    display_object_name=True)
-    
-    annotate_detected_colors(img, detected_objects)
-    return img
-    
-def detect_shapes_with_contour(contours, image):
-    """
-    This function goes over all contours that have been read with cv2 
-    and will detect all the shapes that would have otherwise been marked as a 'circle'.
-    - contours: all contours read with cv2.contours
-
-    Returns an image and a list with details of all the shapes on the image.
-    """
-    # Create shape list_of_shapes
     list_of_shapes = []
-
-    # # Custom Object Detection
-    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'second-best.pt')
-
-    #Get the height, width and channel of the image
+    counter = 0
     img_height, img_width, channel = image.shape
     img_size = img_height*img_width
 
-    shape_detector = CustomObjectDetection()
-    shape_detector.setModelTypeAsTinyYOLOv3()
-    shape_detector.setModelPath(model_custom_path)
-    shape_detector.setJsonPath(jason_path)
-    shape_detector.loadModel()
+    img, detected_objects = shape_detector.detectObjectsFromImage(input_image=image, 
+                                                                output_type="array",
+                                                                minimum_percentage_probability=60,
+                                                                display_percentage_probability=True,
+                                                                display_object_name=True)
+    cv2.imshow("img", img)
+    img = correct_boxes(image, detected_objects)
+    
+    for obj in detected_objects:
+        counter +=1
+        x1, y1, x2, y2 = obj["box_points"]
+        obj_img = img[y1:y2, x1:x2]
 
-    def get_image_from_box(contour, img):
-        """
-        This function gives back just an image of one shape of the picture
-        - contour: contour of the shape in the image
-        - img: the whole image
-        
-        Returns an image of one shape of the whole picture
-        """
-        x,y,w,h = cv2.boundingRect(contour)
-        s_img = img[y:y+h,x:x+w] 
-        img_path = 'files\image_processing\example_white_background_960x560.jpg'
-        l_img = cv2.imread(img_path)
-        x_offset=y_offset=50
-        l_img[y_offset:y_offset+s_img.shape[0], x_offset:x_offset+s_img.shape[1]] = s_img
-        return l_img
+        middle_point_x = (x1+x2)/2
+        middle_point_y = (y1+y2)/2
 
+        width = x2 - x1
+        height = y2 - y1
 
-    def detect_shape_with_ai(box):
-        """
-        This function detects a shape out of a given image, this image should only contain one shape
-        - box: is an image of one shape 
-        
-        Returns the name of the shape, if no shape detected it will return "empty"
-        """
-        img, obj = shape_detector.detectObjectsFromImage(input_image=box, 
-                                                        output_type="array",
-                                                        display_percentage_probability=True,
-                                                        display_object_name=True)
-        annotate_detected_colors(img, obj)
-        cv2.imshow("img", img)
-        cv2.waitKey()
-        cv2.destroyAllWindows()
-        if not obj:
-            cv2.imshow("empty shape", box)
-            cv2.waitKey()
-            cv2.destroyAllWindows()
-            return "empty"
+        shape_size_to_volume = img_proc.get_volume_from_size(width*height, img_size)
+        shape_colorcode_to_bpm = img_proc.get_bpm_from_color(int(middle_point_x),int(middle_point_y),image)
+        shape_width_to_duration = img_proc.get_duration_from_width(width, img_width)
+        shape_ai = img_prop.Image("", counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), 0, obj["box_points"] )
+        # Call function to extract color data
+        # color = get_color(obj_img)
+        # obj["color"] = color
+        shape_ai.shape = obj["name"]
+
+        if obj["name"] == "half circle":
+            shape_ai.instrument = "flute"
+        elif obj["name"] == "heart": 
+            shape_ai.instrument = "piano"
+        elif obj["name"] == "circle":
+            shape_ai.instrument = "violin"
+        elif obj["name"] == "square":
+            shape_ai.instrument = "drum"
+        elif obj["name"] == "triangle":
+            shape_ai.instrument = "guitar"
+        elif obj["name"] == "star":
+            shape_ai.instrument = "cello"
         else:
-            cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            # TODO: return most common shape
-            return obj[0]["name"]
-        
-    counter = 0
-    # cv2.drawContours(image, contours, -1, (255,0,0), 3)
-    for contour in contours:
-        counter += 1
-        area1 = cv2.contourArea(contour)
+            shape_ai.instrument = "empty"
+        shape_ai.pitch = int(img_proc.get_pitch_from_size(height, img_height, shape_ai.instrument))
+        # obj["color"]
+        # obj["percentage_probability"]
+        list_of_shapes.append(shape_ai)
 
-        if area1 > 50:
-            # Get approx contour of shape
-            # Now you can use this function to approximate the shape. 
-            # In this, second argument is called epsilon, which is maximum distance from contour to approximated contour. 
-            # It is an accuracy parameter. 
-            # A wise selection of epsilon is needed to get the correct output.
-            epsilon = 0.01*cv2.arcLength(contour,True)
-            approx = cv2.approxPolyDP(contour,epsilon,True)
-            # approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
-
-            # minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
-            # It will create a rectangle around the shapes
-            rect = cv2.minAreaRect(contour)
-
-            
-
-            # box = cv2.boxPoints(rect)
-            # box = np.int0(box)
-            # cv2.drawContours(image,[box],0,(0,0,255),1)
-            (x, y), (width, height), angle = rect
-
-            shape_size_to_volume = ip.get_volume_from_size(width*height, img_size)
-            shape_colorcode_to_bpm = ip.get_bpm_from_color(int(x),int(y),image)
-            shape_width_to_duration = ip.get_duration_from_width(width, img_width)
-            shape = img_prop.Image("", counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), 0)
-
-            if len(approx) == 3:
-                # Shape is a triangle (Guitar)
-                shape.shape = "triangle"
-                shape.instrument = "guitar"
-                shape.pitch = int(ip.get_pitch_from_size(height, img_height, "guitar"))
-            elif len(approx) == 4 : 
-                x2, y2 , w, h = cv2.boundingRect(approx)
-                aspect_ratio = float(w)/h
-                if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
-                    shape.shape = "square"
-                    shape.instrument = "drum"
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum"))
-                    # Shape is a square (Drum Pads)
-                else:
-                    shape.shape = "rectangle"
-                    shape.instrument = "drum"
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum"))
-                    # Shape is a rectangle (Drum Pads)
-
-            elif len(approx) == 10 :
-                # Shape is a star (Cello)
-                shape.shape = "star"
-                shape.instrument = "cello"
-                shape.pitch = int(ip.get_pitch_from_size(height, img_height, "cello"))
-            else:
-                # Shape is half circle, circle or heart
-                shape_name = detect_shape_with_ai(get_image_from_box(contour, image))
-                if shape_name == "empty":
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "empty"))
-                    
-                    continue
-                else: 
-                    shape.shape = shape_name
-                    if shape_name == "half circle":
-                        shape_name = "flute"
-                    elif shape_name == "heart": 
-                        shape_name = "piano"
-                    elif shape_name == "circle":
-                        (x3,y3),radius = cv2.minEnclosingCircle(contour)
-                        center = (int(x3),int(y3))
-                        radius = int(radius)
-                        cv2.circle(image,center,radius,(0,255,0),1)
-
-                        print("x: ",x ,"x3: ", x3, "y: ", y, " y3: ", y3)
-                        shape_name = "violin"
-                    elif shape_name == "square":
-                        shape_name = "drum"
-                    elif shape_name == "triangle":
-                        shape_name = "guitar"
-                    elif shape_name == "star":
-                        shape_name = "cello"
-                    shape.instrument = shape_name
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, shape_name))
-
-            list_of_shapes.append(shape)
-            # cv2.putText(image, shape.shape, (x[0],y[0]), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            cv2.drawContours(image, contour, -1, (255,0,0), 1)
-        else:
-            continue
-
-    for shape in list_of_shapes:
-        print(shape.counter, 
-              "shape:", shape.shape, 
-              "instrument:", shape.instrument, 
-              "volume:", shape.volume, 
-              "bpm:", shape.bpm, 
-              "pitch:", shape.pitch, 
-              "duration:", shape.duration, 
+        print(shape_ai.counter, 
+              "shape:", shape_ai.shape, 
+              "instrument:", shape_ai.instrument, 
+              "volume:", shape_ai.volume, 
+              "bpm:", shape_ai.bpm, 
+              "pitch:", shape_ai.pitch, 
+              "duration:", shape_ai.duration, 
               sep='\t')
+    print("------------------------------------------------------------------------------------------------------")
+    return img, list_of_shapes
 
-    return image, list_of_shapes
-
+def detect_shape_with_ai(box):
+    """
+    This function detects a shape out of a given image, this image should only contain one shape
+    - box: is an image of one shape 
+    
+    Returns the name of the shape, if no shape detected it will return "empty"
+    """
+    img, obj = shape_detector.detectObjectsFromImage(input_image=box, 
+                                                    output_type="array",
+                                                    minimum_percentage_probability=60,
+                                                    display_percentage_probability=True,
+                                                    display_object_name=True)
+    annotate_detected_colors(img, obj)
+    if not obj:
+        return "empty"
+    else:
+        cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+        # TODO: return most common shape
+        return obj[0]["name"]
+   
 def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
     obj_last = []
     for obj in detected_objects:
