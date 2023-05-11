@@ -77,16 +77,15 @@ class MainCanvas(tkinter.Canvas):
             # Pick_up event did not happen in the pallet
             event.x -= pallet_width()
             for shape in self.list_of_canvas_shapes:
-                box = shape.annotation.box
-                if event.x < box.pos.x: continue                # Left of box  (out of range)
-                if event.x > box.pos.x + box.size.x: continue   # Right of box (out of range)
-                if event.y < box.pos.y: continue                # Top of box   (out of range)
-                if event.y > box.pos.y + box.size.y: continue   # Bottom of box(out of range)
+                if event.x < shape.box.pos.x: continue                      # Left of shape.box  (out of range)
+                if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of shape.box (out of range)
+                if event.y < shape.box.pos.y: continue                      # Top of shape.box   (out of range)
+                if event.y > shape.box.pos.y + shape.box.size.y: continue   # Bottom of shape.box(out of range)
 
                 self.in_hand.append(shape)
                 shape.remove_shape(self)
                 self.list_of_canvas_shapes.remove(shape)
-                if (self.verbose_events): print (f'Shape picked up from: {box}')
+                if (self.verbose_events): print (f'Shape picked up from: {shape.box}')
                 return
             if (self.verbose_events): print ('No shape in the region')
         def let_go(event):
