@@ -74,6 +74,7 @@ class MainCanvas(tkinter.Canvas):
                 self.in_hand.append(pallet_item)
                 if (self.verbose_events): print (f'Picked up {pallet_item.name}')
                 return
+            
             # Pick_up event did not happen in the pallet
             event.x -= pallet_width()
             for shape in self.list_of_canvas_shapes:
@@ -103,42 +104,35 @@ class MainCanvas(tkinter.Canvas):
             for item in self.in_hand:
                 # Relocate the shape        
                 if not isinstance(item, PalletItem):
-                    match (shapes.object_names_array[int(item.annotation.class_id)]):
+                    match (shapes.object_names_array[int(item.class_id)]):
                         case 'circle':
-                            new_shape = shapes.Circle(canvas_size(),
-                                                    center_pos=loc.Pos(event.x, event.y),
-                                                    size_in_pixels=item.size_in_pixels)
+                            new_shape = shapes.Circle(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                                                      fill_color=item.fill_color, outline_color=item.outline_color)
                         case 'half circle':
-                            new_shape = shapes.HalfCircle(canvas_size(),
-                                                    center_pos=loc.Pos(event.x, event.y),
-                                                    size_in_pixels=item.size_in_pixels,
+                            new_shape = shapes.HalfCircle(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                                                      fill_color=item.fill_color, outline_color=item.outline_color,
                                                     rotation_rad=item.rotation_rad)
                         case 'square':
-                            new_shape = shapes.Square(canvas_size(),
-                                                    center_pos=loc.Pos(event.x, event.y),
-                                                    size_in_pixels=item.size_in_pixels,
+                            new_shape = shapes.Square(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                                                      fill_color=item.fill_color, outline_color=item.outline_color,
                                                     rotation_rad=item.rotation_rad)
                         case 'heart':
-                            new_shape = shapes.Heart(canvas_size(),
-                                                    center_pos=loc.Pos(event.x, event.y),
-                                                    size_in_pixels=item.size_in_pixels,
+                            new_shape = shapes.Heart(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                                                      fill_color=item.fill_color, outline_color=item.outline_color,
                                                     rotation_rad=item.rotation_rad,
                                                     depth_percentage=item.depth_percentage)
                         case 'star':
-                            new_shape = shapes.Star(canvas_size(),
-                                                    center_pos=loc.Pos(event.x, event.y),
-                                                    size_in_pixels=item.size_in_pixels,
+                            new_shape = shapes.Star(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                                                      fill_color=item.fill_color, outline_color=item.outline_color,
                                                     rotation_rad=item.rotation_rad,
                                                     depth_percentage=item.depth_percentage)
                         case _: # 'triangle'
-                            new_shape = shapes.SymmetricTriangle(canvas_size(),
-                                                    center_pos=loc.Pos(event.x, event.y),
-                                                    size_in_pixels=item.size_in_pixels,
+                            new_shape = shapes.SymmetricTriangle(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                                                      fill_color=item.fill_color, outline_color=item.outline_color,
                                                     rotation_rad=item.rotation_rad)
                     self.list_of_canvas_shapes.append(new_shape)
                     new_shape.draw_shape(tkinter_canvas=self,
-                                            outline_color='gray', fill_color='gray', width_outline=1, # TODO: I loose the info of the `outline_color`, `fill_color`, `width_outline` !
-                                            location_offset=loc.Pos(x=pallet_width(), y=0))
+                                         location_offset=loc.Pos(x=pallet_width(), y=0))
                     self.in_hand.remove(item)
                     continue
                 
@@ -214,9 +208,9 @@ class MainCanvas(tkinter.Canvas):
         self.bind ('<ButtonRelease-1>', lambda event: let_go (event))
         # self.bind ('<Motion>',          lambda event: temp   (event))
 
-        self.list_of_canvas_shapes.append(shapes.Star(loc.Box(x=50, y=20, width=50, height=50), rotation_rad=2.0))
+        self.list_of_canvas_shapes.append(shapes.Star(loc.Box(x=50, y=20, width=50, height=50), 'red', 'black', rotation_rad=2.0))
         for shape in self.list_of_canvas_shapes:
-            shape.draw_shape(self, 'blue','red', width_outline=1, location_offset=loc.Pos(x=pallet_width(),y=0))
+            shape.draw_shape(self, location_offset=loc.Pos(x=pallet_width(),y=0))
         
         self.pack(side = 'left', fill = 'both', expand=True)
 class GuiActions(ttk.Frame):

@@ -10,7 +10,7 @@ class Annotation:
     the syntax of our annotation goes as follows `class_id x y width height`  
     the class_id points to what shape it is.
     the rest is a float between 0 - 1"""
-    def __init__(self, class_id:int, image_size:loc.Pos, coordinates:list) -> None:
+    def __init__(self, class_id:int, image_size:loc.Size, coordinates:list) -> None:
         """## Constructor
         `class_id` a int between  0 - n, wherein n is the amount of machine learning objects there are. See `object_names_array` in the machine learning training model for more info.
         
@@ -92,11 +92,13 @@ def angle_mirror_(rad_angle:float, mirror_vertical=False)->float:
 
 # Shapes
 class Shape:
-    def __init__(self, box):
+    def __init__(self, box:loc.Box, fill_color:str, outline_color:str):
         self.canvas_ids = []
         self.box = box
         self.center_pos = loc.Pos(x= box.pos.x + box.size.x/2,
                                   y= box.pos.y + box.size.y/2)
+        self.fill_color = fill_color
+        self.outline_color = outline_color
     def get_polygon_coordinates_(self, location_offset:loc.Pos) -> list:
         """Returns a list of coordinates that can be used by `tkinter` to draw a `polygon` on a `canvas`"""
         polygon_coordinates = []
@@ -104,14 +106,13 @@ class Shape:
             polygon_coordinates.append(  int(round(  node.x + location_offset.x,  0  ))  )
             polygon_coordinates.append(  int(round(  node.y + location_offset.y,  0  ))  )
         return polygon_coordinates
-    def draw_shape(self, tkinter_canvas:tkinter.Canvas, outline_color:str, fill_color:str, width_outline:int, location_offset:loc.Pos) -> int:
+    def draw_shape(self, tkinter_canvas:tkinter.Canvas, location_offset:loc.Pos) -> int:
         """Returns an `object_ID` of the shape drawn on the `tkinter_canvas`"""
-        if (width_outline < 0): raise RuntimeWarning('A `width_outline` cannot be negative.')
 
         id = tkinter_canvas.create_polygon(self.get_polygon_coordinates_(location_offset),
-                                             outline=outline_color, width=width_outline,
+                                             outline=self.outline_color, width=1,
                                              smooth=1 if isinstance(self, Heart) or isinstance(self, HalfCircle) else 0,
-                                             fill=fill_color)
+                                             fill=self.fill_color)
         self.canvas_ids.append(id) # store the id so we can remove the shape from the canvas later
         return id
     def draw_shadow(self, tkinter_canvas:tkinter.Canvas, depth_shadow_px:int, sun_rotation_rad:float, shadows_float=False) -> list[int]|None:
@@ -149,18 +150,19 @@ class Shape:
             tkinter_canvas.delete(id)
         self.canvas_ids.clear()
 class Star(Shape):
-    def __init__(self, box:loc.Box, rotation_rad=0.0, depth_percentage=50):
-        super().__init__(box)
+    def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0, depth_percentage=50):
+        super().__init__(box, fill_color, outline_color)
         self.rotation_rad = rotation_rad % (math.pi * 2 / 5) # Shape repeats every 72 degrees
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
         self.depth_percentage=depth_percentage
+        self.class_id = '4' # TODO: FIX this into the Annotation class
 
         # store the outline in a list
         self.outline_coordinates = []
 
         outer_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius / 2, rotation=rotation_rad)
         inner_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius / 200 * depth_percentage,
-                                         rotation=rotation_rad + (math.pi / float(5)))
+                                             rotation=rotation_rad + (math.pi / float(5)))
 
         self.outline_coordinates.append(outer_points[0])
         self.outline_coordinates.append(inner_points[0])
@@ -173,27 +175,30 @@ class Star(Shape):
         self.outline_coordinates.append(outer_points[4])
         self.outline_coordinates.append(inner_points[4])
 class Square(Shape):
-    def __init__(self, box:loc.Box, rotation_rad=0.0):
-        super().__init__(box)
+    def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0):
+        super().__init__(box, fill_color, outline_color)
         self.rotation_rad = rotation_rad % (math.pi * 2 / 4) # Shape repeats every 90 degrees
         self.radius = math.sqrt((self.box.size.x/2)**2 + (self.box.size.y/2)**2) # Pythagoras to the corner (rotation will be taken in account later)
+        self.class_id = '2' # TODO: FIX this into the Annotation class
 
         # store the outline in a list
         self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=4, length_traces=self.radius / 2, rotation=rotation_rad)
 class SymmetricTriangle(Shape):
-    def __init__(self, box:loc.Box, rotation_rad=0.0):
-        super().__init__(box)
+    def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0):
+        super().__init__(box, fill_color, outline_color)
         self.rotation_rad = rotation_rad % (math.pi * 2 / 3) # Shape repeats every 60 degrees
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
+        self.class_id = '5' # TODO: FIX this into the Annotation class
 
         # store the outline in a list
         self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=3, length_traces=self.radius / 2, rotation=rotation_rad) #BUG: Now self.box is not an annotation box !
 class Heart(Shape):
-    def __init__(self, box:loc.Box, rotation_rad=0.0, depth_percentage=50):
-        super().__init__(box)
+    def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0, depth_percentage=50):
+        super().__init__(box, fill_color, outline_color)
         self.rotation_rad = rotation_rad % (math.pi * 2) # Shape repeats every 360 degrees
         self.depth_percentage=min(95,max(40,depth_percentage)) # Limit depth percentage to 20-80
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
+        self.class_id = '3' # TODO: FIX this into the Annotation class
         pi = math.pi
 
         # store the outline in a list
@@ -246,10 +251,11 @@ class Heart(Shape):
         self.outline_coordinates.append(point_pos)
         self.outline_coordinates.append(point_pos)
 class HalfCircle(Shape):
-    def __init__(self, box:loc.Box, rotation_rad=0.0):
-        super().__init__(box)
+    def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0):
+        super().__init__(box, fill_color, outline_color)
         self.rotation_rad = rotation_rad % (math.pi * 2) # Shape repeats every 360 degrees
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
+        self.class_id = '1' # TODO: FIX this into the Annotation class
         pi = math.pi
 
         # store the outline in a list
@@ -282,9 +288,10 @@ class HalfCircle(Shape):
         self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
         self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
 class Circle(Shape):
-    def __init__(self, box:loc.Box):
-        super().__init__(box)
+    def __init__(self, box:loc.Box, fill_color:str, outline_color:str):
+        super().__init__(box, fill_color, outline_color)
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
+        self.class_id = '0' # TODO: FIX this into the Annotation class
         pi = math.pi
 
         # store the outline in a list
@@ -299,14 +306,13 @@ class Circle(Shape):
             arm_rotation, arm_length = shape_dict[dot]
             self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation))
 
-    def draw_shape(self, tkinter_canvas:tkinter.Canvas, outline_color:str, fill_color:str, width_outline:int, location_offset:loc.Pos) -> int:
+    def draw_shape(self, tkinter_canvas:tkinter.Canvas, location_offset:loc.Pos) -> int:
         """Returns an `object_ID` of the shape drawn on the `tkinter_canvas`"""
-        if (width_outline < 0): raise RuntimeWarning('A `width_outline` cannot be negative.')
 
         return tkinter_canvas.create_oval(self.box.pos.x + location_offset.x,
                                           self.box.pos.y + location_offset.y,
                                           self.box.pos.x + self.box.size.x + location_offset.x,
                                           self.box.pos.y + self.box.size.y + location_offset.y,
-                                          outline=outline_color,
+                                          outline=self.outline_color,
                                           width=1,
-                                          fill=fill_color)
+                                          fill=self.fill_color)
