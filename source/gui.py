@@ -106,33 +106,51 @@ class MainCanvas(tkinter.Canvas):
                 if not isinstance(item, PalletItem):
                     match (shapes.object_names_array[int(item.class_id)]):
                         case 'circle':
-                            new_shape = shapes.Circle(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                            new_shape = shapes.Circle(box=loc.Box(x=event.x - item.box.size.x / 2,
+                                                                y=event.y - item.box.size.y / 2,
+                                                                width=item.box.size.x,
+                                                                height=item.box.size.y),
                                                       fill_color=item.fill_color, outline_color=item.outline_color)
                         case 'half circle':
-                            new_shape = shapes.HalfCircle(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                            new_shape = shapes.HalfCircle(box=loc.Box(x=event.x - item.box.size.x / 2,
+                                                                y=event.y - item.box.size.y / 2,
+                                                                width=item.box.size.x,
+                                                                height=item.box.size.y),
                                                       fill_color=item.fill_color, outline_color=item.outline_color,
                                                     rotation_rad=item.rotation_rad)
                         case 'square':
-                            new_shape = shapes.Square(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                            new_shape = shapes.Square(box=loc.Box(x=event.x - item.box.size.x / 2,
+                                                                y=event.y - item.box.size.y / 2,
+                                                                width=item.box.size.x,
+                                                                height=item.box.size.y),
                                                       fill_color=item.fill_color, outline_color=item.outline_color,
                                                     rotation_rad=item.rotation_rad)
                         case 'heart':
-                            new_shape = shapes.Heart(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                            new_shape = shapes.Heart(box=loc.Box(x=event.x - item.box.size.x / 2,
+                                                                y=event.y - item.box.size.y / 2,
+                                                                width=item.box.size.x,
+                                                                height=item.box.size.y),
                                                       fill_color=item.fill_color, outline_color=item.outline_color,
                                                     rotation_rad=item.rotation_rad,
                                                     depth_percentage=item.depth_percentage)
                         case 'star':
-                            new_shape = shapes.Star(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
-                                                      fill_color=item.fill_color, outline_color=item.outline_color,
+                            new_shape = shapes.Star(box=loc.Box(x=event.x - item.box.size.x / 2,
+                                                                y=event.y - item.box.size.y / 2,
+                                                                width=item.box.size.x,
+                                                                height=item.box.size.y),
+                                                    fill_color=item.fill_color, outline_color=item.outline_color,
                                                     rotation_rad=item.rotation_rad,
                                                     depth_percentage=item.depth_percentage)
                         case _: # 'triangle'
-                            new_shape = shapes.SymmetricTriangle(box=loc.Box(x=event.x, y=event.y, width=item.box.size.x, height=item.box.size.y),
+                            new_shape = shapes.SymmetricTriangle(box=loc.Box(x=event.x - item.box.size.x / 2,
+                                                                y=event.y - item.box.size.y / 2,
+                                                                width=item.box.size.x,
+                                                                height=item.box.size.y),
                                                       fill_color=item.fill_color, outline_color=item.outline_color,
                                                     rotation_rad=item.rotation_rad)
                     self.list_of_canvas_shapes.append(new_shape)
                     new_shape.draw_shape(tkinter_canvas=self,
-                                         location_offset=loc.Pos(x=pallet_width(), y=0))
+                                         location_offset=loc.Pos(x=pallet_width(),y=0))
                     self.in_hand.remove(item)
                     continue
                 
