@@ -21,84 +21,44 @@ def MakeSong(list):
         else: 
             return pitch #return value as it was
 
-    def add_note (object, channel, pitch, time, duration, volume, instrument, melodie): # function for adding one note to midi file       
+    def add_note (object, channel, pitch, time, duration, volume, instrument): # function for adding one note to midi file       
         
-        # function variables
-        i = 0
+        match instrument:
+            case "kick":     
+                midi_kick.addNote(object, channel, pitch, time, duration, volume) # add a note
+            case "clap":
+                midi_clap.addNote(object, channel, pitch, time, duration, volume) # add a note 
 
-        for i in range(0,4): # go over all melodie moments (every second)
-            
-            if melodie[i] >= 1:
-                match instrument:
-                    case "kick":     
-                        midi_kick.addNote(object, channel, pitch, time + melodie[i], duration, volume) # add a note
-                    case "clap":
-                        midi_clap.addNote(object, channel, pitch, time + melodie[i], duration, volume) # add a note 
-
-        i += 1
-
-    def add_accord(object, channel, pitch, volume, instrument, melodie): # function for adding one accord to midi file       
-        
-        # init varibles
-        i = 0
-        time = 0
-        first_cycle = 1
-
-        for i in range(0,80): # check all the notes with steek of 20
-            
-            pitch_note_1 = pitch # input pitch level
-            pitch_note_2 = 0
-            pitch_note_3 = 0
-            duration_notes = 0
-
-            #add loop of 4 to check in one mate
-            i2 = 0
-            for i2 in range(0,4):
-
-                if first_cycle:
-                    time = time # don't update time
-                else:
-                    time = time + 0.25 # update time
-
-                if melodie[i + i2] > 0: # we need to add 3 notes now to make an accord
-                    
-                    pitch_note_1 = pitch_note_1 + melodie[i+4] #assign pitch value note 1
-                    pitch_note_2 = pitch_note_1 + melodie[i+8] #assign pitch value note 2
-                    pitch_note_3 = pitch_note_1 + melodie[i+12] #assign pitch value note 3
-
-                    duration_notes = duration_notes + melodie[i+16] #assing duration of notes
-
-                    match instrument:
-                        # ----- mid -----    
-                        case "piano":
-                            midi_piano.addNote(object, channel, pitch_note_1, time, duration_notes, volume) # make a note
-                            midi_piano.addNote(object, channel, pitch_note_2, time, duration_notes, volume) # make a note
-                            midi_piano.addNote(object, channel, pitch_note_3, time, duration_notes, volume) # make a note
-
-                        case "guitar":
-                            midi_guitar.addNote(object, channel, pitch_note_1, time, duration_notes, volume) # make a note
-                            midi_guitar.addNote(object, channel, pitch_note_2, time, duration_notes, volume) # make a note
-                            midi_guitar.addNote(object, channel, pitch_note_3, time, duration_notes, volume) # make a note
+    def add_accord (object, channel, pitch_1, pitch_2, pitch_3, time, duration, volume, instrument): # function for adding one accord to midi file       
     
-                    pitch_note_1 = pitch #input pitch level
-                    pitch_note_2 = 0
-                    pitch_note_3 = 0
-                    
-            i += 20       
+        match instrument:  
+            case "piano":
+                midi_piano.addNote(object, channel, pitch_1, time, duration, volume) # make a note
+                midi_piano.addNote(object, channel, pitch_2, time, duration, volume) # make a note
+                midi_piano.addNote(object, channel, pitch_3, time, duration, volume) # make a note
 
-    # --- melodies ---
-    # kick melodies 4 diff
-    kick_melodie0 = [0,0,0,0] #empty melodie
-    kick_melodie1 = [1,0,3,0] 
-    kick_melodie2 = [0,2,0,4] 
-    kick_melodie3 = [1,0,0,4] 
-    kick_melodie4 = [1,2,3,4] 
+            case "guitar":
+                midi_guitar.addNote(object, channel, pitch_1, time, duration, volume) # make a note
+                midi_guitar.addNote(object, channel, pitch_2, time, duration, volume) # make a note
+                midi_guitar.addNote(object, channel, pitch_3, time, duration, volume) # make a note
+    
+    def scale (percentage, instrument): # scale notes
+        flute_low = 50 # C???
+        flute_high = 100
+        violin_low = 1
+        violin_high = 100
+        match instrument:
+            case 'flute':
+                return forbidden_note (((percentage/100) * (flute_high - flute_low) + flute_low), flute_low, flute_high) # check if note is forbidden or not
+            case 'violin':
+                return forbidden_note (((percentage/100) * (violin_high - violin_low) + violin_low), violin_low, violin_high) # check if note is forbidden or not
 
-    # clap melodies 4 diff
-    clap_melodie0 = [0,0,0,0] #empty melodie
-    clap_melodie1 = [1,0,3,0] 
-    clap_melodie2 = [0,2,0,4] 
-    clap_melodie3 = [1,0,0,4] 
+    def guitar_notes (percentage, note_1, note_2, note_3): # sclae note for guitar
+        match percentage:
+            case range(50,60): # C?
+                note_1 = 60
+                note_2 = 67
+                note_3 = 73
 
     # --- declare variables
     model_custom_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_files')
@@ -130,26 +90,6 @@ def MakeSong(list):
     # --- bpm ---
     bpm = 0
     
-    # scale notes
-    def scale (percentage, instrument):
-        flute_low = 50 # C???
-        flute_high = 100
-        
-        match instrument:
-            case 'flute':
-                return forbidden_note (((percentage/100) * (flute_high - flute_low) + flute_low), flute_low, flute_high) # check if note is forbidden or not
-
-
-
-
-    # make list for forbidden notes
-    def guitar_notes (percentage, note_1, note_2, note_3):
-        match percentage:
-            case range(50,60): # C?
-                note_1 = 60
-                note_2 = 67
-                note_3 = 73
-
     forbidden_notes = [22,25,27,30,32,34,42,44,46,49,51,54,56,58,61,63,66,68,70,73,75,78,80,82,85,87,90,92,94,97,99,102,104,106]
 
     '''
@@ -169,6 +109,19 @@ def MakeSong(list):
                             1,0,0.5,0,  0,0,2,0,    7,0,5,0,    12,0,5,0,   0.25,0,0.5,0,   #maat 4 
                         ]
 
+            # --- melodies ---
+            # kick melodies 4 diff
+            kick_melodie0 = [0,0,0,0] #empty melodie
+            kick_melodie1 = [1,0,3,0] 
+            kick_melodie2 = [0,2,0,4] 
+            kick_melodie3 = [1,0,0,4] 
+            kick_melodie4 = [1,2,3,4] 
+
+            # clap melodies 4 diff
+            clap_melodie0 = [0,0,0,0] #empty melodie
+            clap_melodie1 = [1,0,3,0] 
+            clap_melodie2 = [0,2,0,4] 
+            clap_melodie3 = [1,0,0,4] 
                       
         melodie division = steek of 20 
         #0 t/m 3    -   20 t/m 23   -   => notes
@@ -309,7 +262,7 @@ def MakeSong(list):
             # getal
             flute_pitch = shape.duration
 
-            addnote(object_drum, channel_drum, drum_pitch, time_drum, shape.duration, shape.volume, "drum", melodie) #add melodie nodes to track#add melodie nodes to track
+            add_note(object_drum, channel_drum, drum_pitch, time_drum, shape.duration, shape.volume, "drum", melodie) #add melodie nodes to track#add melodie nodes to track
             object_drum +=1
 
 
