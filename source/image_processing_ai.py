@@ -227,7 +227,7 @@ def detect_shapes(img): ## OLD CODE
     # cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    train_custom_model(epochs=4, batch_size=50)
+    train_custom_model(epochs=4, batch_size=2)
     os_bedtime.computer_sleep(hibernate=True)
 
     # compare_all_models(img=None,
