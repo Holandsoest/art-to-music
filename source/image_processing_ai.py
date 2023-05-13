@@ -98,18 +98,20 @@ def load_custom_model(path) -> CustomObjectDetection:
 def train_custom_model(epochs:int, batch_size:int):
     """Trains the model with the data provided in the folders
     ---
-    - `epochs` [> 2] int, how many times the trainer may ajust the model
+    - `epochs` [> 2] int, how many times the trainer may adjust the model
     - `batch_size` [> 1] int, how many images should be run trough the ai in parallel
     """
     batch_size = max(2, batch_size)
     epochs = max(3, epochs)
-
     dataset_path = os.path.join(os.getcwd(), 'dataset')
 
-    amount_of_data = len(os.listdir(os.path.join(dataset_path, 'train', 'annotations'))) + len(os.listdir(os.path.join(dataset_path, 'validation', 'annotations')))
-    
-
+    training_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','train','annotations')))
+    validation_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','validation','annotations')))
+    estimation_duration = round( 4*training_count*epochs/30000/14   +   training_count/250000.0*2.25, 1)
+    estimated_completion = round( estimation_duration + time.localtime().tm_hour + time.localtime().tm_min/60.0 ,1)
+    print(f'Training the AI with {epochs}epochs and a batch_size of {batch_size}\nWith {training_count} training images and {validation_count} validation images\nIs estimated to take Brosha ~{estimation_duration} hours...\nEstimation reads to be done at ~{estimated_completion}\nScared?\n')
     print(f'Start training:\n\t{time.localtime().tm_year}-{time.localtime().tm_mon}-{time.localtime().tm_mday} {time.localtime().tm_hour}:{time.localtime().tm_min}:{time.localtime().tm_sec}\n\t{epochs} epochs\t{batch_size} batch_size')
+
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsTinyYOLOv3()
     trainer.setDataDirectory(data_directory=dataset_path)
@@ -119,6 +121,7 @@ def train_custom_model(epochs:int, batch_size:int):
                            ,train_from_pretrained_model=os.path.join(os.getcwd(), 'files', 'image_processing_ai', 'tiny-yolov3.pt')
                            )
     trainer.trainModel()
+
     print(f'Stopped training:\n\t{time.localtime().tm_year}-{time.localtime().tm_mon}-{time.localtime().tm_mday} {time.localtime().tm_hour}:{time.localtime().tm_min}:{time.localtime().tm_sec}')
 def compare_all_models(img:cv2.Mat|None, image_path:str|None, has_colors:bool) -> None:
     """Opens the image as it looks for each model, (and original), can also give a path to a folder with pictures instead and it will do all the pictures"""
@@ -224,24 +227,15 @@ def detect_shapes(img): ## OLD CODE
     # cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    # Training settings
-    os_bedtime.computer_sleep(hibernate=True, wake_up_events_disabled=True)
-    epochs = 4
-    batch_size = 25
-    training_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','train','annotations')))
-    validation_count = len(os.listdir(os.path.join(os.getcwd(),'dataset','validation','annotations')))
-    estimation_duration = round( 4*training_count*epochs/30000/14   +   training_count/250000.0*2.25, 1)
-    estimated_completion = round( estimation_duration + time.localtime().tm_hour + time.localtime().tm_min/60.0 ,1)
-    print(f'Training the AI with {epochs}epochs and a batch_size of {batch_size}\nWith {training_count} training images and {validation_count} validation images\nIs estimated to take Brosha ~{estimation_duration} hours...\nEstimation reads to be done at ~{estimated_completion}\nScared?\n')
-    train_custom_model(epochs, batch_size)
-    os_bedtime.computer_sleep(hibernate=True, wake_up_events_disabled=True)
+    train_custom_model(epochs=4, batch_size=16)
+    os_bedtime.computer_sleep(hibernate=True)
 
     # compare_all_models(img=None,
     #                    image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','500'),
     #                    has_colors=False)
-    compare_all_models(img=None,
-                       image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','1000'),
-                       has_colors=False)
+    # compare_all_models(img=None,
+    #                    image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','1000'),
+    #                    has_colors=False)
 
-    # Display to user
-    cv2.destroyAllWindows()
+    # # Display to user
+    # cv2.destroyAllWindows()
