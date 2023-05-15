@@ -230,12 +230,12 @@ if __name__ == "__main__":
     # train_custom_model(epochs=100, batch_size=2)
     # os_bedtime.computer_sleep(hibernate=True)
 
-    # compare_all_models(img=None,
-    #                    image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','500'),
-    #                    has_colors=False)
     compare_all_models(img=None,
-                       image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','1000'),
+                       image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','500'),
                        has_colors=False)
+    # compare_all_models(img=None,
+    #                    image_path=os.path.join(os.getcwd(),'files','image_processing_ai','manual_validation','1000'),
+    #                    has_colors=False)
 
     # Display to user
     cv2.destroyAllWindows()
