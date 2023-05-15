@@ -62,9 +62,8 @@ class MainCanvas(tkinter.Canvas):
             """Checks what was selected by the pointer and returns that object, as long as it is part of the pallet
             See `PalletItem` for options"""
             if canvas_pos.x > pallet_item_size().x: return PalletItem.NONE
-            pallet_item_number = int(canvas_pos.y * 13 / self.winfo_height()) # Gives the PalletItemNumber
+            pallet_item_number = int(canvas_pos.y / pallet_item_size().y) # Gives the PalletItemNumber
             return PalletItem(pallet_item_number)
-        # TODO: Add the shapes and colors here
 
         # Bind behavior https://www.pythontutorial.net/tkinter/tkinter-event-binding/
         self.pallet_elements = []
@@ -73,19 +72,20 @@ class MainCanvas(tkinter.Canvas):
             for shape in self.pallet_elements:
                 shape.remove_shape(self)
 
+            color = self.last_color.name.lower()
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 0,                      width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y=   pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'orange', 'orange'))
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 2*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'red', 'red'))
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 3*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'green', 'green'))
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 4*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'purple', 'purple'))
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 5*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'blue', 'blue'))
-            self.pallet_elements.append(shapes.Circle(           loc.Box(x=0, y= 6*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
-            self.pallet_elements.append(shapes.Square(           loc.Box(x=0, y= 7*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/4))
-            self.pallet_elements.append(shapes.SymmetricTriangle(loc.Box(x=0, y= 8*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/2))
-            self.pallet_elements.append(shapes.Star(             loc.Box(x=0, y= 9*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/2))
-            self.pallet_elements.append(shapes.Heart(            loc.Box(x=0, y=10*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
-            self.pallet_elements.append(shapes.HalfCircle(       loc.Box(x=0, y=11*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
-
+            self.pallet_elements.append(shapes.Circle(           loc.Box(x=0, y= 6*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
+            self.pallet_elements.append(shapes.HalfCircle(       loc.Box(x=0, y= 7*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
+            self.pallet_elements.append(shapes.Square(           loc.Box(x=0, y= 8*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color, rotation_rad=math.pi/4))
+            self.pallet_elements.append(shapes.Heart(            loc.Box(x=0, y= 9*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
+            self.pallet_elements.append(shapes.Star(             loc.Box(x=0, y=10*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color, rotation_rad=math.pi/2))
+            self.pallet_elements.append(shapes.SymmetricTriangle(loc.Box(x=0, y=11*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color, rotation_rad=math.pi/2))
+            
             for shape in self.pallet_elements:
                 shape.draw_shape(self, location_offset=loc.Pos())
             self.update()
@@ -120,7 +120,7 @@ class MainCanvas(tkinter.Canvas):
             pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
 
             if pallet_item == PalletItem.TRASH_CAN:
-                print ('Tossed:\n\t' + self.in_hand + '\nIn the garbage can.')
+                print (f"Tossed: {len(self.in_hand)} item's in the garbage can.")
                 self.in_hand.clear()
                 return
             
