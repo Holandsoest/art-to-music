@@ -69,7 +69,7 @@ def calculate_arm_point_(start_pos:loc.Pos, length_trace=1, rotation_rad=0.0) ->
         x= start_pos.x + length_trace * math.cos(rotation_rad),
         y= start_pos.y + length_trace * (-math.sin(rotation_rad)),
         force_int=True)
-def rotate_arm_(start_pos:loc.Pos, target_pos:loc.Pos, rotation_rad=0.0) -> loc.Pos:#BUG: SEE __name__==__main__
+def rotate_arm_(start_pos:loc.Pos, target_pos:loc.Pos, rotation_rad=0.0) -> loc.Pos:
     """Rotates the `target_pos` around the `start_pos` with the given `rotation_rad`
     and returns the resulting position"""
     arm_length = target_pos.distance(start_pos)
@@ -356,6 +356,12 @@ class RoundedRectangle(Shape):
                                                             box.pos.y + rounding_px),
                                                     rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    calculate_arm_point_(start_pos=loc.Pos(box.pos.x + rounding_px,
+                                                                                           box.pos.y + rounding_px),
+                                                                         length_trace=rounding_px,
+                                                                         rotation_rad=math.pi*3/4),
+                                                    rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
                                                     loc.Pos(box.pos.x + rounding_px,
                                                             box.pos.y),
                                                     rotation_rad))
@@ -372,6 +378,12 @@ class RoundedRectangle(Shape):
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
                                                     loc.Pos(box.pos.x + box.size.x - rounding_px,
                                                             box.pos.y),
+                                                    rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    calculate_arm_point_(start_pos=loc.Pos(box.pos.x + box.size.x - rounding_px,
+                                                                                           box.pos.y + rounding_px),
+                                                                         length_trace=rounding_px,
+                                                                         rotation_rad=math.pi*1/4),
                                                     rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
                                                     loc.Pos(box.pos.x + box.size.x,
@@ -392,6 +404,12 @@ class RoundedRectangle(Shape):
                                                             box.pos.y + box.size.y - rounding_px),
                                                     rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    calculate_arm_point_(start_pos=loc.Pos(box.pos.x + box.size.x - rounding_px,
+                                                                                           box.pos.y + box.size.y - rounding_px),
+                                                                         length_trace=rounding_px,
+                                                                         rotation_rad=math.pi*7/4),
+                                                    rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
                                                     loc.Pos(box.pos.x + box.size.x - rounding_px,
                                                             box.pos.y + box.size.y),
                                                     rotation_rad))
@@ -408,6 +426,12 @@ class RoundedRectangle(Shape):
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
                                                     loc.Pos(box.pos.x + rounding_px,
                                                             box.pos.y + box.size.y),
+                                                    rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    calculate_arm_point_(start_pos=loc.Pos(box.pos.x + rounding_px,
+                                                                                           box.pos.y + box.size.y - rounding_px),
+                                                                         length_trace=rounding_px,
+                                                                         rotation_rad=math.pi*5/4),
                                                     rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
                                                     loc.Pos(box.pos.x,
