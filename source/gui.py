@@ -67,6 +67,29 @@ class MainCanvas(tkinter.Canvas):
         # TODO: Add the shapes and colors here
 
         # Bind behavior https://www.pythontutorial.net/tkinter/tkinter-event-binding/
+        self.pallet_elements = []
+        def redraw_pallet_elements() -> None:
+            """Redraw the UI if you need to due to a resize or something"""
+            for shape in self.pallet_elements:
+                shape.remove_shape(self)
+
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 0,                      width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y=   pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'orange', 'orange'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 2*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'red', 'red'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 3*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'green', 'green'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 4*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'purple', 'purple'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 5*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'blue', 'blue'))
+            self.pallet_elements.append(shapes.Circle(           loc.Box(x=0, y= 6*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
+            self.pallet_elements.append(shapes.Square(           loc.Box(x=0, y= 7*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/4))
+            self.pallet_elements.append(shapes.SymmetricTriangle(loc.Box(x=0, y= 8*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/2))
+            self.pallet_elements.append(shapes.Star(             loc.Box(x=0, y= 9*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/2))
+            self.pallet_elements.append(shapes.Heart(            loc.Box(x=0, y=10*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
+            self.pallet_elements.append(shapes.HalfCircle(       loc.Box(x=0, y=11*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
+
+            for shape in self.pallet_elements:
+                shape.draw_shape(self, location_offset=loc.Pos())
+            self.update()
+        redraw_pallet_elements()
         def pick_up(event):
             if (self.verbose_events): print(f'<pick_up> at {event.x},{event.y}')
             pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
@@ -221,24 +244,8 @@ class MainCanvas(tkinter.Canvas):
         self.bind ('<ButtonRelease-1>', lambda event: let_go (event))
         # self.bind ('<Motion>',          lambda event: temp   (event))
 
-        self.list_of_canvas_shapes.append(shapes.RoundedRectangle( loc.Box(x=0, y= 0,                      width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
-        self.list_of_canvas_shapes.append(shapes.RoundedRectangle( loc.Box(x=0, y=   pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'orange', 'orange'))
-        self.list_of_canvas_shapes.append(shapes.RoundedRectangle( loc.Box(x=0, y= 2*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'red', 'red'))
-        self.list_of_canvas_shapes.append(shapes.RoundedRectangle( loc.Box(x=0, y= 3*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'green', 'green'))
-        self.list_of_canvas_shapes.append(shapes.RoundedRectangle( loc.Box(x=0, y= 4*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'purple', 'purple'))
-        self.list_of_canvas_shapes.append(shapes.RoundedRectangle( loc.Box(x=0, y= 5*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'blue', 'blue'))
-        self.list_of_canvas_shapes.append(shapes.Circle(           loc.Box(x=0, y= 6*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
-        self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y= 7*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/4))
-        self.list_of_canvas_shapes.append(shapes.SymmetricTriangle(loc.Box(x=0, y= 8*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/2))
-        self.list_of_canvas_shapes.append(shapes.Star(             loc.Box(x=0, y= 9*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/2))
-        self.list_of_canvas_shapes.append(shapes.Heart(            loc.Box(x=0, y=10*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
-        self.list_of_canvas_shapes.append(shapes.HalfCircle(       loc.Box(x=0, y=11*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
+
         
-        self.list_of_canvas_shapes.append(shapes.RoundedRectangle( loc.Box(x=100, y= 100, width=50, height=75), 'blue', 'blue', rounding_px=10))
-        
-        for shape in self.list_of_canvas_shapes:
-            shape.draw_shape(self, location_offset=loc.Pos())
-        self.update()
         
 class GuiActions(ttk.Frame):
     def __init__(self, master, background_color:str):
