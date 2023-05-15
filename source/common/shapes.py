@@ -191,13 +191,15 @@ class Circle(Shape):
     def draw_shape(self, tkinter_canvas:tkinter.Canvas, location_offset:loc.Pos) -> int:
         """Returns an `object_ID` of the shape drawn on the `tkinter_canvas`"""
 
-        return tkinter_canvas.create_oval(self.box.pos.x + location_offset.x,
-                                          self.box.pos.y + location_offset.y,
-                                          self.box.pos.x + self.box.size.x + location_offset.x,
-                                          self.box.pos.y + self.box.size.y + location_offset.y,
-                                          outline=self.outline_color,
-                                          width=1,
-                                          fill=self.fill_color)
+        id = tkinter_canvas.create_oval(self.box.pos.x + location_offset.x,
+                                        self.box.pos.y + location_offset.y,
+                                        self.box.pos.x + self.box.size.x + location_offset.x,
+                                        self.box.pos.y + self.box.size.y + location_offset.y,
+                                        outline=self.outline_color,
+                                        width=1,
+                                        fill=self.fill_color)
+        self.canvas_ids.append(id) # store the id so we can remove the shape from the canvas later
+        return id
 class HalfCircle(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0):
         super().__init__(box, fill_color, outline_color)
@@ -416,6 +418,7 @@ class RoundedRectangle(Shape):
                                                             box.pos.y + box.size.y - rounding_px),
                                                     rotation_rad))
 
+# Testing purposes
 if __name__=='__main__':
     center = loc.Pos(100,150)
     target = loc.Pos(50, 175)
