@@ -223,7 +223,7 @@ class MainCanvas(tkinter.Canvas):
         self.bind ('<ButtonRelease-1>', lambda event: let_go (event))
         # self.bind ('<Motion>',          lambda event: temp   (event))
 
-        self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y= 0,                      width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/4))
+        self.list_of_canvas_shapes.append(shapes.RoundedRectangle( loc.Box(x=0, y= 0,                      width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/4))
         self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y=   pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'orange', 'orange', rotation_rad=math.pi/4))
         self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y= 2*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'red', 'red', rotation_rad=math.pi/4))
         self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y= 3*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'green', 'green', rotation_rad=math.pi/4))

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Common functions and classes about sizes and positions"""
+import math
 
 class Pos:
     """A simple class that can be used to store an x & y variables as a position or as a size."""
@@ -38,7 +39,11 @@ class Pos:
     def count(self) -> int | float:
         """returns x * y"""
         return self.x * self.y
-    
+    def distance(self, other) -> int | float:
+        """return the distance between the 2 points"""
+        difference = Pos(x= abs(self.x - other.x),
+                         y= abs(self.y - other.y))
+        return math.sqrt( ( difference.x )**2 + ( difference.y )**2 )
     # Parsing outwards
     def get_as_list(self) -> list:
         return [self.x, self.y]

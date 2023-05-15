@@ -69,6 +69,26 @@ def calculate_arm_point_(start_pos:loc.Pos, length_trace=1, rotation_rad=0.0) ->
         x= start_pos.x + length_trace * math.cos(rotation_rad),
         y= start_pos.y + length_trace * (-math.sin(rotation_rad)),
         force_int=True)
+def rotate_arm_(start_pos:loc.Pos, target_pos:loc.Pos, rotation_rad=0.0) -> loc.Pos:
+    """Rotates the `target_pos` around the `start_pos` with the given `rotation_rad`
+    and returns the resulting position"""
+    arm_length = target_pos.distance(start_pos)
+
+    # rotate back arm to 0 rads and add the rotation to get a desired final_rotation_rad
+    current_rotation_rad = 0.0
+    if start_pos.x <= target_pos.x and start_pos.y >= target_pos.y: # First quadrant
+        current_rotation_rad = math.asin( abs( start_pos.y - target_pos.y ) /arm_length)
+    elif start_pos.x >= target_pos.x and start_pos.y >= target_pos.y: # Second quadrant
+        current_rotation_rad = math.pi - math.asin( abs( start_pos.y - target_pos.y ) /arm_length)
+    elif start_pos.x >= target_pos.x and start_pos.y <= target_pos.y: # Third quadrant
+        current_rotation_rad = math.pi - math.asin( abs( start_pos.y - target_pos.y ) /arm_length)
+    else: # Forth quadrant
+        current_rotation_rad = 2.0 * math.pi - math.asin( abs( start_pos.y - target_pos.y ) /arm_length)
+
+    final_rotation_rad = (rotation_rad + current_rotation_rad) % (math.pi * 2)
+
+    output = calculate_arm_point_(start_pos, arm_length, final_rotation_rad)
+    return output
 def calculate_shape_arms_(center_pos:loc.Pos, traces= 4, length_traces=10, rotation=0) -> list:
     """Calculates multiple arms out of one point that give a outline"""
     output = []
@@ -111,7 +131,7 @@ class Shape:
 
         id = tkinter_canvas.create_polygon(self.get_polygon_coordinates_(location_offset),
                                              outline=self.outline_color, width=1,
-                                             smooth=1 if isinstance(self, Heart) or isinstance(self, HalfCircle) else 0,
+                                             smooth=1 if isinstance(self, Heart) or isinstance(self, HalfCircle) or isinstance(self, RoundedRectangle) else 0,
                                              fill=self.fill_color)
         self.canvas_ids.append(id) # store the id so we can remove the shape from the canvas later
         return id
@@ -319,9 +339,76 @@ class SymmetricTriangle(Shape):
 
 # Pretty shapes
 class RoundedRectangle(Shape):
-    def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0):
+    def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0, rounding_px=5):
         super().__init__(box, fill_color, outline_color)
         self.rotation_rad = rotation_rad % math.pi # Shape repeats every 180 degrees
 
         self.outline_coordinates = []
-        self.outline_coordinates.append(calculate_arm_point_(start_pos=self.center_pos, length_trace=math.sqrt((box.size.x/2)**2 + (box.size.y/2)**2), rotation_rad=0+math.pi/4))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + rounding_px,
+                                                                       box.pos.y),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + rounding_px,
+                                                                       box.pos.y),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + box.size.x - rounding_px,
+                                                                       box.pos.y),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + box.size.x - rounding_px,
+                                                                       box.pos.y),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + box.size.x,
+                                                                       box.pos.y + rounding_px),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + box.size.x,
+                                                                       box.pos.y + rounding_px),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + box.size.x,
+                                                                       box.pos.y + box.size.y - rounding_px),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + box.size.x,
+                                                                       box.pos.y + box.size.y - rounding_px),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + box.size.x - rounding_px,
+                                                                       box.pos.y + box.size.y),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + box.size.x - rounding_px,
+                                                                       box.pos.y + box.size.y),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + rounding_px,
+                                                                       box.pos.y + box.size.y),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x + rounding_px,
+                                                                       box.pos.y + box.size.y),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x,
+                                                                       box.pos.y + box.size.y - rounding_px),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x,
+                                                                       box.pos.y + box.size.y - rounding_px),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x,
+                                                                       box.pos.y + rounding_px),
+                                                    rotation_rad=rotation_rad))
+        self.outline_coordinates.append(rotate_arm_(self.center_pos,
+                                                    target_pos=loc.Pos(box.pos.x,
+                                                                       box.pos.y + rounding_px),
+                                                    rotation_rad=rotation_rad))
+
+if __name__ == '__main__':
+    position = rotate_arm_(loc.Pos(50,100),target_pos=loc.Pos(55,105),rotation_rad=math.pi/4)
+    print (position)
