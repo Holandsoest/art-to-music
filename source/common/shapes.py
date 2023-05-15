@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Defines how to draw shapes and their bounding boxes."""
-import location as loc
+import common.location as loc
 import tkinter
 import math
 
@@ -81,7 +81,7 @@ def rotate_arm_(start_pos:loc.Pos, target_pos:loc.Pos, rotation_rad=0.0) -> loc.
     elif start_pos.x >= target_pos.x and start_pos.y >= target_pos.y: # Second quadrant
         current_rotation_rad = math.pi - math.asin( abs( start_pos.y - target_pos.y ) /arm_length)
     elif start_pos.x >= target_pos.x and start_pos.y <= target_pos.y: # Third quadrant
-        current_rotation_rad = math.pi - math.asin( abs( start_pos.y - target_pos.y ) /arm_length)
+        current_rotation_rad = math.pi + math.asin( abs( start_pos.y - target_pos.y ) /arm_length)
     else: # Forth quadrant
         current_rotation_rad = 2.0 * math.pi - math.asin( abs( start_pos.y - target_pos.y ) /arm_length)
 
@@ -417,11 +417,3 @@ class RoundedRectangle(Shape):
                                                     loc.Pos(box.pos.x,
                                                             box.pos.y + box.size.y - rounding_px),
                                                     rotation_rad))
-
-# Testing purposes
-if __name__=='__main__':
-    center = loc.Pos(100,150)
-    target = loc.Pos(50, 175)
-    print(center)
-    print(target)
-    print(rotate_arm_(center, target, 0))
