@@ -123,8 +123,8 @@ class MainCanvas(tkinter.Canvas):
                 print ('Tossed:\n\t' + self.in_hand + '\nIn the garbage can.')
                 self.in_hand.clear()
                 return
+            
             if pallet_item != PalletItem.NONE: return
-
             # Let go on the canvas
             event.x -= pallet_item_size().x
             for item in self.in_hand:
@@ -158,10 +158,10 @@ class MainCanvas(tkinter.Canvas):
 
                 # Apply properties to shape
                 found = False
-                for shape in self.list_of_canvas_shapes:
-                    if event.x < shape.box.pos.x: continue                # Left of box  (out of range)
+                for shape in self.list_of_canvas_shapes: # Find a shape where we drop
+                    if event.x < shape.box.pos.x: continue                      # Left of box  (out of range)
                     if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of box (out of range)
-                    if event.y < shape.box.pos.y: continue                # Top of box   (out of range)
+                    if event.y < shape.box.pos.y: continue                      # Top of box   (out of range)
                     if event.y > shape.box.pos.y + shape.box.size.y: continue   # Bottom of box(out of range)
 
                     new_shape_shape = shapes.object_names_array[int(shape.class_id)].replace(' ', '_')
@@ -172,7 +172,7 @@ class MainCanvas(tkinter.Canvas):
                     self.list_of_canvas_shapes.remove(shape)
 
                     found = True
-                if not found and PalletItem.YELLOW.value <= pallet_item.value <= PalletItem.BLUE.value:
+                if not found and PalletItem.YELLOW.value <= item.value <= PalletItem.BLUE.value:
                     self.in_hand.remove(item) # TODO: Implement background
                     continue
 
