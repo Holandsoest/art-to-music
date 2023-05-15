@@ -5,7 +5,7 @@ import common.shapes as shapes
 import common.location as loc
 
 from enum import Enum # Keep enums UPPER_CASE according to https://docs.python.org/3/howto/enum.html  
-
+import math
 import tkinter
 from tkinter import ttk
 
@@ -26,6 +26,8 @@ class Gui(tkinter.Tk):
 class MainCanvas(tkinter.Canvas):
     def __init__(self, master, background_color:str):
         super().__init__(master, background=background_color, borderwidth=2, relief='raised')
+        self.pack(side = 'left', fill = 'both', expand=True)
+        self.update()
 
         # Declare
         self.list_of_canvas_shapes = []
@@ -49,16 +51,17 @@ class MainCanvas(tkinter.Canvas):
             HALF_CIRCLE = 11
             TRASH_CAN = 12
         self.last_color = PalletItem.YELLOW
-        def pallet_width() -> int:
-            """Returns the width of the pallet as a integer"""
-            return 64
+        def pallet_item_size() -> loc.Size:
+            """Returns the size of each tool from the pallet"""
+            return loc.Size(x= 64,  #TODO: Magic number
+                            y= self.winfo_height()/(len(PalletItem)-1))
         def canvas_size() -> loc.Size:
             """Returns the usable space of the canvas (exclusive the pallet)"""
-            return loc.Size(x=self.winfo_width()-pallet_width(), y=self.winfo_height())
+            return loc.Size(x=self.winfo_width()-pallet_item_size().x, y=self.winfo_height())
         def get_pallet_item(canvas_pos:loc.Pos) -> PalletItem:
             """Checks what was selected by the pointer and returns that object, as long as it is part of the pallet
             See `PalletItem` for options"""
-            if canvas_pos.x > pallet_width(): return PalletItem.NONE
+            if canvas_pos.x > pallet_item_size().x: return PalletItem.NONE
             pallet_item_number = int(canvas_pos.y * 13 / self.winfo_height()) # Gives the PalletItemNumber
             return PalletItem(pallet_item_number)
         # TODO: Add the shapes and colors here
@@ -76,7 +79,7 @@ class MainCanvas(tkinter.Canvas):
                 return
             
             # Pick_up event did not happen in the pallet
-            event.x -= pallet_width()
+            event.x -= pallet_item_size().x
             for shape in self.list_of_canvas_shapes:
                 if event.x < shape.box.pos.x: continue                      # Left of shape.box  (out of range)
                 if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of shape.box (out of range)
@@ -100,7 +103,7 @@ class MainCanvas(tkinter.Canvas):
             if pallet_item != PalletItem.NONE: return
 
             # Let go on the canvas
-            event.x -= pallet_width()
+            event.x -= pallet_item_size().x
             for item in self.in_hand:
                 # Relocate the shape        
                 if not isinstance(item, PalletItem):
@@ -150,7 +153,7 @@ class MainCanvas(tkinter.Canvas):
                                                     rotation_rad=item.rotation_rad)
                     self.list_of_canvas_shapes.append(new_shape)
                     new_shape.draw_shape(tkinter_canvas=self,
-                                         location_offset=loc.Pos(x=pallet_width(),y=0))
+                                         location_offset=loc.Pos(x=pallet_item_size().x,y=0))
                     self.in_hand.remove(item)
                     continue
                 
@@ -212,7 +215,7 @@ class MainCanvas(tkinter.Canvas):
                                                     fill_color=self.last_color.name.lower(), outline_color=self.last_color.name.lower(),
                                                 rotation_rad=0)
                 new_shape.draw_shape(tkinter_canvas=self,
-                                     location_offset=loc.Pos(x=pallet_width(),y=0))
+                                     location_offset=loc.Pos(x=pallet_item_size().x,y=0))
                 self.list_of_canvas_shapes.append(new_shape)
                 self.in_hand.remove(item)
 
@@ -220,11 +223,22 @@ class MainCanvas(tkinter.Canvas):
         self.bind ('<ButtonRelease-1>', lambda event: let_go (event))
         # self.bind ('<Motion>',          lambda event: temp   (event))
 
-        self.list_of_canvas_shapes.append(shapes.Star(loc.Box(x=50, y=20, width=50, height=50), 'red', 'black', rotation_rad=2.0))
+        self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y= 0,                      width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/4))
+        self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y=   pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'orange', 'orange', rotation_rad=math.pi/4))
+        self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y= 2*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'red', 'red', rotation_rad=math.pi/4))
+        self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y= 3*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'green', 'green', rotation_rad=math.pi/4))
+        self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y= 4*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'purple', 'purple', rotation_rad=math.pi/4))
+        self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y= 5*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'blue', 'blue', rotation_rad=math.pi/4))
+        self.list_of_canvas_shapes.append(shapes.Circle(           loc.Box(x=0, y= 6*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
+        self.list_of_canvas_shapes.append(shapes.Square(           loc.Box(x=0, y= 7*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/4))
+        self.list_of_canvas_shapes.append(shapes.SymmetricTriangle(loc.Box(x=0, y= 8*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/2))
+        self.list_of_canvas_shapes.append(shapes.Star(             loc.Box(x=0, y= 9*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow', rotation_rad=math.pi/2))
+        self.list_of_canvas_shapes.append(shapes.Heart(            loc.Box(x=0, y=10*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
+        self.list_of_canvas_shapes.append(shapes.HalfCircle(       loc.Box(x=0, y=11*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
         for shape in self.list_of_canvas_shapes:
-            shape.draw_shape(self, location_offset=loc.Pos(x=pallet_width(),y=0))
+            shape.draw_shape(self, location_offset=loc.Pos())
+        self.update()
         
-        self.pack(side = 'left', fill = 'both', expand=True)
 class GuiActions(ttk.Frame):
     def __init__(self, master, background_color:str):
         super().__init__(master, borderwidth=2, relief='groove')
