@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Defines how to draw shapes and their bounding boxes."""
-import common.location as loc
+import location as loc
 import tkinter
 import math
 
@@ -69,7 +69,7 @@ def calculate_arm_point_(start_pos:loc.Pos, length_trace=1, rotation_rad=0.0) ->
         x= start_pos.x + length_trace * math.cos(rotation_rad),
         y= start_pos.y + length_trace * (-math.sin(rotation_rad)),
         force_int=True)
-def rotate_arm_(start_pos:loc.Pos, target_pos:loc.Pos, rotation_rad=0.0) -> loc.Pos:
+def rotate_arm_(start_pos:loc.Pos, target_pos:loc.Pos, rotation_rad=0.0) -> loc.Pos:#BUG: SEE __name__==__main__
     """Rotates the `target_pos` around the `start_pos` with the given `rotation_rad`
     and returns the resulting position"""
     arm_length = target_pos.distance(start_pos)
@@ -344,71 +344,81 @@ class RoundedRectangle(Shape):
         self.rotation_rad = rotation_rad % math.pi # Shape repeats every 180 degrees
 
         self.outline_coordinates = []
+        # Left top
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + rounding_px,
-                                                                       box.pos.y),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x,
+                                                            box.pos.y + rounding_px),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + rounding_px,
-                                                                       box.pos.y),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x,
+                                                            box.pos.y + rounding_px),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + box.size.x - rounding_px,
-                                                                       box.pos.y),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + rounding_px,
+                                                            box.pos.y),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + box.size.x - rounding_px,
-                                                                       box.pos.y),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + rounding_px,
+                                                            box.pos.y),
+                                                    rotation_rad))
+        
+        # Top right
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + box.size.x,
-                                                                       box.pos.y + rounding_px),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + box.size.x - rounding_px,
+                                                            box.pos.y),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + box.size.x,
-                                                                       box.pos.y + rounding_px),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + box.size.x - rounding_px,
+                                                            box.pos.y),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + box.size.x,
-                                                                       box.pos.y + box.size.y - rounding_px),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + box.size.x,
+                                                            box.pos.y + rounding_px),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + box.size.x,
-                                                                       box.pos.y + box.size.y - rounding_px),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + box.size.x,
+                                                            box.pos.y + rounding_px),
+                                                    rotation_rad))
+        
+        # Right Bottom
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + box.size.x - rounding_px,
-                                                                       box.pos.y + box.size.y),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + box.size.x,
+                                                            box.pos.y + box.size.y - rounding_px),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + box.size.x - rounding_px,
-                                                                       box.pos.y + box.size.y),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + box.size.x,
+                                                            box.pos.y + box.size.y - rounding_px),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + rounding_px,
-                                                                       box.pos.y + box.size.y),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + box.size.x - rounding_px,
+                                                            box.pos.y + box.size.y),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x + rounding_px,
-                                                                       box.pos.y + box.size.y),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + box.size.x - rounding_px,
+                                                            box.pos.y + box.size.y),
+                                                    rotation_rad))
+        
+        # Bottom left
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x,
-                                                                       box.pos.y + box.size.y - rounding_px),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + rounding_px,
+                                                            box.pos.y + box.size.y),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x,
-                                                                       box.pos.y + box.size.y - rounding_px),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x + rounding_px,
+                                                            box.pos.y + box.size.y),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x,
-                                                                       box.pos.y + rounding_px),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x,
+                                                            box.pos.y + box.size.y - rounding_px),
+                                                    rotation_rad))
         self.outline_coordinates.append(rotate_arm_(self.center_pos,
-                                                    target_pos=loc.Pos(box.pos.x,
-                                                                       box.pos.y + rounding_px),
-                                                    rotation_rad=rotation_rad))
+                                                    loc.Pos(box.pos.x,
+                                                            box.pos.y + box.size.y - rounding_px),
+                                                    rotation_rad))
 
-if __name__ == '__main__':
-    position = rotate_arm_(loc.Pos(50,100),target_pos=loc.Pos(55,105),rotation_rad=math.pi/4)
-    print (position)
+if __name__=='__main__':
+    center = loc.Pos(100,150)
+    target = loc.Pos(50, 175)
+    print(center)
+    print(target)
+    print(rotate_arm_(center, target, 0))
