@@ -217,7 +217,7 @@ class MainCanvas(tkinter.Canvas):
             match (new_shape_type):
                 case 'circle':
                     new_shape = shapes.Circle(box=new_box, fill_color=new_color, outline_color=new_color)
-                case 'half circle':
+                case 'half_circle':
                     new_shape = shapes.HalfCircle(box=new_box, fill_color=new_color, outline_color=new_color,
                                                   rotation_rad=rotation_rad)
                 case 'square':
