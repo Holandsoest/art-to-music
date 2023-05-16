@@ -31,17 +31,17 @@ def MakeSong(list):
 
         match instrument:
             case 'flute':
-                return forbidden_note (((percentage/100) * (flute_high - flute_low) + flute_low), flute_low, flute_high) # check if note is forbidden or not
+                return forbidden_note (int(((percentage/100) * (flute_high - flute_low) + flute_low)), flute_low, flute_high) # check if note is forbidden or not
             case 'violin':
-                return forbidden_note (((percentage/100) * (violin_high - violin_low) + violin_low), violin_low, violin_high) # check if note is forbidden or not
+                return forbidden_note (int(((percentage/100) * (violin_high - violin_low) + violin_low)), violin_low, violin_high) # check if note is forbidden or not
             case 'piano':
-                return forbidden_note (((percentage/100) * (piano_high - piano_low) + piano_low), piano_low, piano_high) # check if note is forbidden or not
+                return forbidden_note (int(((percentage/100) * (piano_high - piano_low) + piano_low)), piano_low, piano_high) # check if note is forbidden or not
             case 'guitar':
-                return forbidden_note (((percentage/100) * (guitar_high - guitar_low) + guitar_low), guitar_low, guitar_high) # check if note is forbidden or not
+                return forbidden_note (int(((percentage/100) * (guitar_high - guitar_low) + guitar_low)), guitar_low, guitar_high) # check if note is forbidden or not
             case 'saxophone':
-                return forbidden_note (((percentage/100) * (saxophone_high - saxophone_low) + saxophone_low), saxophone_low, saxophone_high) # check if note is forbidden or not
+                return forbidden_note (int(((percentage/100) * (saxophone_high - saxophone_low) + saxophone_low)), saxophone_low, saxophone_high) # check if note is forbidden or not
 
-    def piano_notes (input_note, note_1, note_2, note_3): # sclae note for guitar
+    def piano_notes (input_note): # sclae note for guitar
         match input_note:
             case 72: #C5
                 note_1 = 72 #C5
@@ -71,8 +71,9 @@ def MakeSong(list):
                 note_1 = 83 #B4 
                 note_2 = 79 #G5
                 note_3 = 76 #E5
+            case _: pass
 
-        return note_1, note_2, note_3 
+        return [note_1, note_2, note_3]
 
     # --- declare variables
     model_custom_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_files') #path of the audio files save location
@@ -133,155 +134,114 @@ def MakeSong(list):
             case 'clap':   
                 amount_of_clap += 1
                 bpm = bpm + shape.bpm 
-            
             case _: pass        
 
     bpm = bpm/amount_of_instruments # determen bpm of composition
 
     # make midi file for every instrument
-    midi_flute          = MIDIFile(amount_of_flute,     removeDuplicates=False) # high
-    midi_violin         = MIDIFile(amount_of_violin,    removeDuplicates=False) # high 
-    midi_guitar         = MIDIFile(amount_of_guitar,    removeDuplicates=False) # mid
-    midi_piano          = MIDIFile(amount_of_piano,     removeDuplicates=False) # mid
-    midi_drum           = MIDIFile(amount_of_drum,      removeDuplicates=False) # low     
-    midi_saxophone      = MIDIFile(amount_of_saxophone, removeDuplicates=False) # low     
-    midi_kick           = MIDIFile(amount_of_kick,      removeDuplicates=False) # kick
-    midi_clap           = MIDIFile(amount_of_clap,      removeDuplicates=False) # clap
+    midi_flute          = MIDIFile(1, removeDuplicates=False) # high
+    midi_violin         = MIDIFile(1, removeDuplicates=False) # high 
+    midi_guitar         = MIDIFile(1, removeDuplicates=False) # mid
+    midi_piano          = MIDIFile(1, removeDuplicates=False) # mid
+    midi_drum           = MIDIFile(1, removeDuplicates=False) # low     
+    midi_saxophone      = MIDIFile(1, removeDuplicates=False) # low     
+    midi_kick           = MIDIFile(1, removeDuplicates=False) # kick
+    midi_clap           = MIDIFile(1, removeDuplicates=False) # clap
     
-    # -----------flute / high-----------
-    # add tracks
-    time_flute = 0 # time to zero
-    channel_flute = 0 #channel to zero
-
-    # create ass many tracks as objects on the board    
-    midi_flute.addTrackName(object_flute, time_flute, f"Track{object_flute}") # give track a name
-    midi_flute.addTempo(object_flute, time_flute, bpm) # set bpm
-    midi_flute.addProgramChange(object_flute, 0, time_flute, 1) # add instrument = shape.instrument = 1
+    # -----------flute / high-----------  
+    midi_flute.addTrackName(0, 0, "Track 0") # give track a name
+    midi_flute.addTempo(0, 0, bpm) # set bpm
+    midi_flute.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
 
     # -----------violin / high-----------
-    # add tracks
-    time_violin = 0 # time to zero
-    channel_violin = 0 #channel to zero
-
-    # create ass many tracks as objects on the board    
-    midi_flute.addTrackName(object_violin, time_violin, f"Track{object_violin}") # give track a name
-    midi_flute.addTempo(object_violin, time_violin, bpm) # set bpm
-    midi_flute.addProgramChange(object_violin, 0, time_violin, 1) # add instrument = shape.instrument = 1
+    midi_violin.addTrackName(0, 0, "Track0") # give track a name
+    midi_violin.addTempo(0, 0, bpm) # set bpm
+    midi_violin.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
 
     # -----------guitar / mid-----------
-    # add tracks
-    time_guitar = 0 # time to zero
-    channel_guitar = 0 #channel to zero
-
-    # create ass many tracks as objects on the board    
-    midi_guitar.addTrackName(object_guitar, time_guitar, f"Track{object_guitar}") # give track a name
-    midi_guitar.addTempo(object_guitar, time_guitar, bpm) # set bpm
-    midi_guitar.addProgramChange(object_guitar, 0, time_guitar, 1) # add instrument = shape.instrument = 1
+    midi_guitar.addTrackName(0, 0, "Track0") # give track a name
+    midi_guitar.addTempo(0, 0, bpm) # set bpm
+    midi_guitar.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
 
     # -----------piano / mid-----------
-    # add tracks
-    time_piano = 0 # time to zero
-    channel_piano = 0 #channel to zero
-
-    # create ass many tracks as objects on the board    
-    midi_piano.addTrackName(object_piano, time_piano, f"Track{object_piano}") # give track a name
-    midi_piano.addTempo(object_piano, time_piano, bpm) # set bpm
-    midi_piano.addProgramChange(object_piano, 0, time_piano, 1) # add instrument = shape.instrument = 1
+    midi_piano.addTrackName(0, 0, "Track0") # give track a name
+    midi_piano.addTempo(0, 0, bpm) # set bpm
+    midi_piano.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
 
     # -----------drum / low-----------
-    # add tracks
-    time_drum = 0 # time to zero
-    channel_drum = 0 #channel to zero
+    midi_drum.addTrackName(0, 0, "Track0") # give track a name
+    midi_drum.addTempo(0, 0, bpm) # set bpm
+    midi_drum.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
 
-    # create ass many tracks as objects on the board    
-    midi_drum.addTrackName(object_drum, time_drum, f"Track{object_drum}") # give track a name
-    midi_drum.addTempo(object_drum, time_drum, bpm) # set bpm
-    midi_drum.addProgramChange(object_drum, 0, time_drum, 1) # add instrument = shape.instrument = 1
-
-    # -----------saxophone / low-----------
-    # add tracks
-    time_saxophone = 0 # time to zero
-    channel_saxophone = 0 #channel to zero
-
-    # create ass many tracks as objects on the board    
-    midi_saxophone.addTrackName(object_saxophone, time_saxophone, f"Track{object_saxophone}") # give track a name
-    midi_saxophone.addTempo(object_saxophone, time_saxophone, bpm) # set bpm
-    midi_saxophone.addProgramChange(object_saxophone, 0, time_saxophone, 1) # add instrument = shape.instrument = 1
+    # -----------saxophone / low----------- 
+    midi_saxophone.addTrackName(0, 0,"Track0") # give track a name
+    midi_saxophone.addTempo(0, 0, bpm) # set bpm
+    midi_saxophone.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
 
     # -----------kick-----------
-    # add tracks
-    time_kick = 0 # time to zero
-    channel_kick = 0 #channel to zero
-
-    # create ass many tracks as objects on the board    
-    midi_kick.addTrackName(object_kick, time_kick, f"Track{object_kick}") # give track a name
-    midi_kick.addTempo(object_kick, time_kick, bpm) # set bpm
-    midi_kick.addProgramChange(object_kick, 0, time_kick, 1) # add instrument = shape.instrument = 1
+    midi_kick.addTrackName(0, 0, "Track0") # give track a name
+    midi_kick.addTempo(0, 0, bpm) # set bpm
+    midi_kick.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
 
     # -----------clap-----------
-    # add tracks
-    time_clap = 0 # time to zero
-    channel_clap = 0 #channel to zero
-    # create ass many tracks as objects on the board    
-    midi_clap.addTrackName(object_clap, time_clap, f"Track{object_clap}") # give track a name
-    midi_clap.addTempo(object_clap, time_clap, bpm) # set bpm
-    midi_clap.addProgramChange(object_clap, 0, time_clap, 1) # add instrument = shape.instrument = 1
-    
+    midi_clap.addTrackName(0, 0, "Track0") # give track a name
+    midi_clap.addTempo(0, 0, bpm) # set bpm
+    midi_clap.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
+
     #fill midi files with notes
     for shape in list:
         
         #add flute notes
         if amount_of_flute > 0 and shape.instrument == "flute":
             
-            midi_flute.addNote(object_flute, channel_flute, scale(shape.pitch, "flute"), shape.note_placement, 1, shape.volume) # add a note
+            midi_flute.addNote(0, 0, scale(shape.pitch, "flute"), shape.note_placement, 1, shape.volume) # add a note
 
             object_drum +=1
 
         #add violin notes
         if amount_of_violin > 0 and shape.instrument == "violin":
 
-            midi_violin.addNote(object_violin, channel_violin, scale(shape.pitch, "violin"), shape.note_placement, 1, shape.volume) # add a note
+            midi_violin.addNote(0, 0, scale(shape.pitch, "violin"), shape.note_placement, 1, shape.volume) # add a note
 
             object_violin += 1
 
         #add guitar notes
         if amount_of_guitar > 0 and shape.instrument == "guitar":
             
-            midi_guitar.addNote(object_guitar, channel_guitar, scale(shape.pitch, "guitar"), shape.note_placement, 1, shape.volume) # add a note
+            midi_guitar.addNote(0, 0, scale(shape.pitch, "guitar"), shape.note_placement, 1, shape.volume) # add a note
 
             object_guitar += 1
 
         #add piano notes
         if amount_of_piano > 0 and shape.instrument == "piano":
             
-            
-            piano_pitch_note_1, piano_pitch_note_2, piano_pitch_note_3 = piano_notes(scale(shape.pitch, "piano"))
+            notes = piano_notes(scale(shape.pitch, "piano"))
 
             # add an accord
-            midi_piano.addNote(object_piano, channel_piano, piano_pitch_note_1, shape.note_placement, 1, shape.volume) # add a note
-            midi_piano.addNote(object_piano, channel_piano, piano_pitch_note_2, shape.note_placement, 1, shape.volume) # add a note
-            midi_piano.addNote(object_piano, channel_piano, piano_pitch_note_3, shape.note_placement, 1, shape.volume) # add a note
+            midi_piano.addNote(0, 0, notes[0], shape.note_placement, 1, shape.volume) # add a note
+            midi_piano.addNote(0, 0, notes[1], shape.note_placement, 1, shape.volume) # add a note
+            midi_piano.addNote(0, 0, notes[2], shape.note_placement, 1, shape.volume) # add a note
 
             object_piano += 1
 
         #add drum notes
         if amount_of_drum > 0 and shape.instrument == "drum":
             
-            midi_drum.addNote(object_drum, channel_drum, 84, shape.note_placement, 1, shape.volume) # add a note
+            midi_drum.addNote(0, 0, 84, shape.note_placement, 1, shape.volume) # add a note
 
             object_drum +=1
 
         #add saxophone notes
         if amount_of_saxophone > 0 and shape.instrument == "saxophone":
             
-            midi_saxophone.addNote(object_saxophone, channel_saxophone, scale(shape.pitch, "saxophone"), shape.note_placement, 1, shape.volume) # add a note
+            midi_saxophone.addNote(0, 0, scale(shape.pitch, "saxophone"), shape.note_placement, 1, shape.volume) # add a note
 
             object_saxophone +=1
 
         #add kick notes
         if amount_of_kick > 0 and shape.instrument == "kick":
             
-            midi_kick.addNote(object_kick, channel_kick, 84, shape.note_placement, 1, shape.volume) # add a note
+            midi_kick.addNote(0, 0, 84, shape.note_placement, 1, shape.volume) # add a note
 
             object_kick +=1
         
@@ -295,21 +255,21 @@ def MakeSong(list):
         #Mmake wav files of all the midi's when al nodes are added
         if amount_of_instruments -1 == iteration:
             if amount_of_flute == 0:
-                midi_flute.addNote(object_flute, channel_flute, 0, 0, 0, 0) #clear track
+                midi_flute.addNote(0, 0, 0, 1, 1, 120) #clear track
             if amount_of_violin == 0:
-                midi_violin.addNote(object_violin, channel_violin, 0, 0, 0, 0) #clear track 
+                midi_violin.addNote(0, 0, 0, 1, 1, 120) #clear track 
             if amount_of_guitar == 0:
-                midi_guitar.addNote(object_guitar, channel_guitar, 0, 0, 0, 0) #clear track
+                midi_guitar.addNote(0, 0, 0, 1, 1, 120) #clear track
             if amount_of_piano == 0:
-                midi_piano.addNote(object_piano, channel_piano, 0, 0, 0, 0) #clear track
+                midi_piano.addNote(0, 0, 0, 1, 1, 120) #clear track
             if amount_of_drum == 0:
-                midi_drum.addNote(object_drum, channel_drum, 0, 0, 0, 0) #clear track 
+                midi_drum.addNote(0, 0, 0, 1, 1, 120) #clear track 
             if amount_of_saxophone == 0:
-                midi_saxophone.addNote(object_saxophone, channel_saxophone, 0, 0, 0, 0) #clear track
+                midi_saxophone.addNote(0, 0, 0, 1, 1, 120) #clear track
             if amount_of_kick == 0:
-                midi_kick.addNote(object_kick, channel_kick, 0, 0, 0, 0) #clear track
+                midi_kick.addNote(0, 0, 0, 1, 1, 120) #clear track
             if amount_of_clap == 0:
-                midi_clap.addNote(object_clap, channel_clap, 0, 0, 0, 0) #clear track
+                midi_clap.addNote(0, 0, 0, 1, 1, 120) #clear track
 
             #write all the midi files
             with open(model_custom_path + "\\flute_output.mid", "wb") as output_file1: 

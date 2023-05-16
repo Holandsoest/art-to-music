@@ -18,7 +18,7 @@ def drum(list_of_objects, amount_of_drum):
             synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
             synth.load_state(model_preset_path + "\\kick.fxb")
-            synth.open_editor()
+            #synth.open_editor()
             synth.load_midi(model_midi_path + "\\drum_output.mid", clear_previous=False, beats=False, all_events=False) 
             engine.load_graph([
                             (synth,[])
@@ -167,7 +167,8 @@ def audio_rendering():
     combined_sound5 = overlap_part4.overlay(combined_sound4)
     combined_sound6 = overlap_part5.overlay(combined_sound5)
 
+    combined_sound7 = (combined_sound6 + combined_sound6)*2
     # Export the combined audio to an MP3 file
     with open("files\\audio_generator\\created_song.mp3", "wb") as output_file1:
-                combined_sound6.export(output_file1, format = "mp3")
+                combined_sound7.export(output_file1, format = "mp3")
 

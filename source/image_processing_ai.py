@@ -191,7 +191,6 @@ def detect_shapes_with_ai(image): # -> image, list
                                                                 minimum_percentage_probability=60,
                                                                 display_percentage_probability=True,
                                                                 display_object_name=True)
-    cv2.imshow('imgai',img)
     img, boxes = correct_boxes(image, detected_objects)
 
     for counter, box in enumerate (boxes):
