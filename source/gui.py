@@ -119,12 +119,11 @@ class MainCanvas(tkinter.Canvas):
             if (self.verbose_events): print(f'<let_go> at {event.x},{event.y}')
             pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
 
-            if pallet_item == PalletItem.TRASH_CAN:
+            if pallet_item != PalletItem.NONE:
                 print (f"Tossed: {len(self.in_hand)} item's in the garbage can.")
                 self.in_hand.clear()
                 return
             
-            if pallet_item != PalletItem.NONE: return
             # Let go on the canvas
             event.x -= pallet_item_size().x
             for item in self.in_hand:
