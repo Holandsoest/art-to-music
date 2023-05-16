@@ -9,6 +9,7 @@ img_proc_ai.setup_ai()
 
 if __name__ == "__main__":
     while(1):
+        #change
         img_counter = 0
         img_path = 'files\\image_processing\\test_shapes_with_camera0.png'
         img_path = 'files\image_processing\opencv_fram_5.png'
