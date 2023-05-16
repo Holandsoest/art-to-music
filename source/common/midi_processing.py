@@ -13,11 +13,12 @@ model_plugin_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'Stupi
 
 def drum(list_of_objects, amount_of_drum):
     for shape in list_of_objects:
-        if amount_of_drum == 1:
+        if amount_of_drum == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
             synth.load_state(model_preset_path + "\\kick.fxb")
+            synth.open_editor()
             synth.load_midi(model_midi_path + "\\drum_output.mid", clear_previous=False, beats=False, all_events=False) 
             engine.load_graph([
                             (synth,[])
@@ -30,7 +31,7 @@ def drum(list_of_objects, amount_of_drum):
 
 def guitar(list_of_objects, amount_of_guitar):      
     for shape in list_of_objects:  
-        if amount_of_guitar == 1:
+        if amount_of_guitar == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
@@ -48,7 +49,7 @@ def guitar(list_of_objects, amount_of_guitar):
 
 def violin (list_of_objects, amount_of_violin):
     for shape in list_of_objects:
-        if amount_of_violin == 1:
+        if amount_of_violin == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
@@ -66,7 +67,7 @@ def violin (list_of_objects, amount_of_violin):
 
 def flute (list_of_objects, amount_of_flute):
     for shape in list_of_objects:
-        if amount_of_flute == 1:
+        if amount_of_flute == 0:
             engine = daw.RenderEngine(sample_rate, buffer_size)
             synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
@@ -108,7 +109,6 @@ def saxophone (list_of_objects, amount_of_saxophone):
             synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
             synth.load_state(model_preset_path + "\\saxophone.fxb")
-            synth.open_editor()
             synth.load_midi(model_midi_path + "\\saxophone_output.mid", clear_previous=False, beats=False, all_events=False) 
 
             engine.load_graph([
@@ -127,7 +127,6 @@ def clap (list_of_objects, amount_of_clap):
             synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
             assert synth.get_name() == "my_synth"
             synth.load_state(model_preset_path + "\\clap.fxb")
-            synth.open_editor()
             synth.load_midi(model_midi_path + "\\clap_output.mid", clear_previous=False, beats=False, all_events=False) 
 
             engine.load_graph([
@@ -168,9 +167,7 @@ def audio_rendering():
     combined_sound5 = overlap_part4.overlay(combined_sound4)
     combined_sound6 = overlap_part5.overlay(combined_sound5)
 
-    combined_sound7 = (combined_sound6 + combined_sound6) * 2
-
     # Export the combined audio to an MP3 file
     with open("files\\audio_generator\\created_song.mp3", "wb") as output_file1:
-                combined_sound7.export(output_file1, format = "mp3")
+                combined_sound6.export(output_file1, format = "mp3")
 
