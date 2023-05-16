@@ -21,7 +21,7 @@ class Image:
         self.instrument = name
         self.volume = size
         self.bpm = color
-        self.duration = x_axis
+        self.note_placement = x_axis
         self.pitch = y_axis
         self.box = box
 

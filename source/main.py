@@ -9,7 +9,7 @@ img_proc_ai.setup_ai()
 
 if __name__ == "__main__":
     img_counter = 0
-    img_path = 'files\\image_processing\\test_shapes_with_camera0.png'
+    img_path = 'files\image_processing\opencv_fram_5.png'
     img = cv2.imread(img_path)
     assert img is not None, "file could not be read, check with os.path.exists()"
 
@@ -23,6 +23,7 @@ if __name__ == "__main__":
     #     cv2.imshow("Result", img)
 
     #     if cv2.waitKey(1) & 0xFF == ord('w'):
+    #         print("Getting list of shapes... Please wait...")
     #         img_path = "opencv_fram_{}.png".format(img_counter)
     #         cv2.imwrite(img_path, img)
     #         print("screenshot taken")

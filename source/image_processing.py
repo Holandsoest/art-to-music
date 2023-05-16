@@ -1,8 +1,4 @@
-import cv2
-import os
-import image_processing_ai as img_proc_ai
-import common.image_properties as img_prop
-# import pandas as pd
+import math
 
 def get_bpm_from_color(x_axis, y_axis, image):
     """
@@ -45,24 +41,18 @@ def get_bpm_from_color(x_axis, y_axis, image):
     else:
         return bpm
 
-def get_duration_from_width(obj_width, img_width):
+def get_placement_of_note(x_axis_middlepoint, img_width):
     """
-    This function scales the width of an object in an image relative to the width of the entire image.
+    This function finds the ratio between the middle point of a shape and the total image width.
     It takes two arguments:
-    - obj_width: the width of the object in pixels
-    - img_width: the width of the entire image in pixels
+    - x_axis: the x_axis middle_point of the shape in the image
+    - img_width: the width of the entire image
     
-    It returns a scaled value between 1 and 4 based on the ratio of obj_width to img_width.
+    It returns a scaled value between 0 and 4 based on the ratio of x_axis to img_width in steps of 0.25
     """
-    ratio = obj_width / img_width
-    if ratio < 0.25:
-        return 1
-    elif ratio < 0.5:
-        return 2
-    elif ratio < 0.75:
-        return 3
-    else:
-        return 4
+    ratio = x_axis_middlepoint / img_width
+    scaled_value = min(math.ceil(ratio * 16) / 4, 4.0)
+    return scaled_value
 
 def get_volume_from_size(obj_size, img_size):
     """
@@ -76,46 +66,16 @@ def get_volume_from_size(obj_size, img_size):
     """
     return min((((obj_size)+(img_size*0.2))/img_size)*255, 255)
 
-def get_pitch_from_size(obj_height, img_height, shape_name):
+def get_pitch_from_y_axis(y_axis, img_height):
     """
-    This function scales the size of an object in an image relative to the size of the entire image.img_size
+    This function scales the y_axis to the image height
     It takes two arguments:
-    - obj_size: the size of the object in pixels
-    - img_size: the size of the entire image in pixels
+    - y_axis: the size of the object
+    - img_height: the size of the entire image
     
-    It returns a scaled value between 20 - 255 based on the ratio of obj_size to img_size.
-    It starts at 20 otherwise the smaller objects wouldn't even make a sound.
+    It returns a scaled value between 0 - 100
     """
-    match shape_name:
-        case "guitar":
-            # represents a (triangle) guitar, the pitch of this instrument should be in between 74 and 96
-            return min((((obj_height)+(img_height*0.74))/img_height)*96, 96)
-        
-        case "drum":
-            # represents a (square / rectangle) drumpads, the pitch of this instrument should be in between 69 and 86
-            return min((((obj_height)+(img_height*0.69))/img_height)*86, 86)
-        
-        case "cello":
-            # represents a (star) cello, the pitch of this instrument should be in between 48 and 77
-            return min((((obj_height)+(img_height*0.48))/img_height)*77, 77)
-        
-        case "flute":
-            # represents a (half circle) flute, the pitch of this instrument should be in between 72 and 108
-            return min((((obj_height)+(img_height*0.2))/img_height)*108, 108)
-        
-        case "piano":
-            # represents a (heart) piano, the pitch of this instrument should be in between 0 and 100   
-            return min((((obj_height)+(img_height))/img_height)*100, 100)
-        
-        case "violin":
-            # represents a (circle) violin, the pitch of this instrument should be in between 76 and 103
-            return min((((obj_height)+(img_height*0.76))/img_height)*103, 103)
-        
-        case "empty":
-            return 0
-        
-        case _:
-            return 0
+    return (y_axis/img_height)*100
 
 def display_list_of_shapes(list_of_shapes):
     for shape in list_of_shapes:
@@ -125,7 +85,7 @@ def display_list_of_shapes(list_of_shapes):
               "volume:", shape.volume, 
               "bpm:", shape.bpm, 
               "pitch:", shape.pitch, 
-              "duration:", shape.duration, 
+              "note_placement:", shape.note_placement, 
               sep='\t')
     
     return list_of_shapes

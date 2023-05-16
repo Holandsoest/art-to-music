@@ -192,6 +192,7 @@ def detect_shapes_with_ai(image):
                                                                 minimum_percentage_probability=60,
                                                                 display_percentage_probability=True,
                                                                 display_object_name=True)
+    cv2.imshow('imgai',img)
     img, boxes = correct_boxes(image, detected_objects)
 
     for box in boxes:
@@ -204,58 +205,34 @@ def detect_shapes_with_ai(image):
         width = int(x2) - int(x1)
         height = int(y2) - int(y1)
 
-        shape_size_to_volume = img_proc.get_volume_from_size(width*height, img_size)
-        shape_colorcode_to_bpm = img_proc.get_bpm_from_color(int(middle_point_x),int(middle_point_y),image)
-        shape_width_to_duration = img_proc.get_duration_from_width(width, img_width)
         shape_ai = img_prop.Image("", 
                                   counter, 
                                   0, 
-                                  int(shape_size_to_volume), 
-                                  int(shape_colorcode_to_bpm), 
-                                  int(shape_width_to_duration), 
-                                  0, 
+                                  int(img_proc.get_volume_from_size(width*height, img_size)), 
+                                  int(img_proc.get_bpm_from_color(int(middle_point_x),int(middle_point_y),image)), 
+                                  float(img_proc.get_placement_of_note(middle_point_x, img_width)), 
+                                  int(img_proc.get_pitch_from_y_axis(middle_point_y, img_height)), 
                                   (int(x1), int(y1), int(x2), int(y2)) )
         shape_ai.shape = box_name
         cv2.putText(img, str(counter), (int(middle_point_x), int(middle_point_y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (125, 0, 0), 2)
 
-        if box_name == "half circle":
-            shape_ai.instrument = "flute"
-        elif box_name == "heart": 
-            shape_ai.instrument = "piano"
-        elif box_name == "circle":
+        if box_name == "circle":
             shape_ai.instrument = "violin"
+        elif box_name == "half circle":
+            shape_ai.instrument = "flute"
         elif box_name == "square":
             shape_ai.instrument = "drum"
+        elif box_name == "heart": 
+            shape_ai.instrument = "piano"
+        elif box_name == "star":
+            shape_ai.instrument = "saxophone"
         elif box_name == "triangle":
             shape_ai.instrument = "guitar"
-        elif box_name == "star":
-            shape_ai.instrument = "cello"
         else:
             shape_ai.instrument = "empty"
-        shape_ai.pitch = int(img_proc.get_pitch_from_size(height, img_height, shape_ai.instrument))
         list_of_shapes.append(shape_ai)
 
     return img, list_of_shapes
-
-def detect_shape_with_ai(box):
-    """
-    This function detects a shape out of a given image, this image should only contain one shape
-    - box: is an image of one shape 
-    
-    Returns the name of the shape, if no shape detected it will return "empty"
-    """
-    img, obj = shape_detector.detectObjectsFromImage(input_image=box, 
-                                                    output_type="array",
-                                                    minimum_percentage_probability=60,
-                                                    display_percentage_probability=True,
-                                                    display_object_name=True)
-    annotate_detected_colors(img, obj)
-    if not obj:
-        return "empty"
-    else:
-        cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-        # TODO: return most common shape
-        return obj[0]["name"]
    
 def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
     obj_last = []
