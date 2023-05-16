@@ -240,12 +240,12 @@ class HalfCircle(Shape):
 class Square(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0):
         super().__init__(box, fill_color, outline_color)
-        self.rotation_rad = rotation_rad % (math.pi * 2 / 4) # Shape repeats every 90 degrees
+        self.rotation_rad = (rotation_rad + math.pi/4) % (math.pi * 2 / 4) # Shape repeats every 90 degrees
         self.radius = math.sqrt((self.box.size.x/2)**2 + (self.box.size.y/2)**2) # Pythagoras to the corner (rotation will be taken in account later)
         self.class_id = '2' # TODO: FIX this into the Annotation class
 
         # store the outline in a list
-        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=4, length_traces=self.radius, rotation=rotation_rad)
+        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=4, length_traces=self.radius, rotation=self.rotation_rad)
 class Heart(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0, depth_percentage=50):
         super().__init__(box, fill_color, outline_color)
@@ -307,7 +307,7 @@ class Heart(Shape):
 class Star(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0, depth_percentage=50):
         super().__init__(box, fill_color, outline_color)
-        self.rotation_rad = rotation_rad % (math.pi * 2 / 5) # Shape repeats every 72 degrees
+        self.rotation_rad = (rotation_rad + math.pi/2) % (math.pi * 2 / 5) # Shape repeats every 72 degrees
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
         self.depth_percentage=depth_percentage
         self.class_id = '4' # TODO: FIX this into the Annotation class
@@ -315,9 +315,9 @@ class Star(Shape):
         # store the outline in a list
         self.outline_coordinates = []
 
-        outer_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius, rotation=rotation_rad)
+        outer_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius, rotation=self.rotation_rad)
         inner_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius / 100 * depth_percentage,
-                                             rotation=rotation_rad + (math.pi / float(5)))
+                                             rotation=self.rotation_rad + (math.pi / 5.0))
 
         self.outline_coordinates.append(outer_points[0])
         self.outline_coordinates.append(inner_points[0])
@@ -332,12 +332,12 @@ class Star(Shape):
 class SymmetricTriangle(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0):
         super().__init__(box, fill_color, outline_color)
-        self.rotation_rad = rotation_rad % (math.pi * 2 / 3) # Shape repeats every 60 degrees
+        self.rotation_rad = (rotation_rad + math.pi/4) % (math.pi * 2 / 3) # Shape repeats every 60 degrees
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
         self.class_id = '5' # TODO: FIX this into the Annotation class
 
         # store the outline in a list
-        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=3, length_traces=self.radius, rotation=rotation_rad) #BUG: Now self.box is not an annotation box !
+        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=3, length_traces=self.radius, rotation=self.rotation_rad) #BUG: Now self.box is not an annotation box !
 
 # Pretty shapes
 class RoundedRectangle(Shape):

@@ -81,10 +81,10 @@ class MainCanvas(tkinter.Canvas):
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 5*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'blue', 'blue'))
             self.pallet_elements.append(shapes.Circle(           loc.Box(x=0, y= 6*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
             self.pallet_elements.append(shapes.HalfCircle(       loc.Box(x=0, y= 7*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
-            self.pallet_elements.append(shapes.Square(           loc.Box(x=0, y= 8*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color, rotation_rad=math.pi/4))
+            self.pallet_elements.append(shapes.Square(           loc.Box(x=0, y= 8*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
             self.pallet_elements.append(shapes.Heart(            loc.Box(x=0, y= 9*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
-            self.pallet_elements.append(shapes.Star(             loc.Box(x=0, y=10*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color, rotation_rad=math.pi/2))
-            self.pallet_elements.append(shapes.SymmetricTriangle(loc.Box(x=0, y=11*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color, rotation_rad=math.pi/2))
+            self.pallet_elements.append(shapes.Star(             loc.Box(x=0, y=10*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
+            self.pallet_elements.append(shapes.SymmetricTriangle(loc.Box(x=0, y=11*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
             
             for shape in self.pallet_elements:
                 shape.draw_shape(self, location_offset=loc.Pos())
