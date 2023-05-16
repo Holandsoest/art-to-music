@@ -31,25 +31,25 @@ if __name__ == "__main__":
     #         break
 
     midi_creation.MakeSong(list_of_shapes) 
-
-    process1 = mp.Process(target=midi_processing.drum, args=(list_of_shapes, 0))
-    process2 = mp.Process(target=midi_processing.violin, args=(list_of_shapes, 0))
-    process3 = mp.Process(target=midi_processing.guitar, args=(list_of_shapes, 0))
-    process4 = mp.Process(target=midi_processing.flute, args=(list_of_shapes, 0))
-    process5 = mp.Process(target=midi_processing.cello, args=(list_of_shapes, 0))
-
+    
     if __name__ == "__main__":
-        process1.start()
-        process2.start()
-        process3.start()
-        process4.start()
-        process5.start()
+        processes = [
+            mp.Process(target=midi_processing.drum, args=(list_of_shapes, 0)),
+            mp.Process(target=midi_processing.violin, args=(list_of_shapes, 0)),
+            mp.Process(target=midi_processing.guitar, args=(list_of_shapes, 0)),
+            mp.Process(target=midi_processing.flute, args=(list_of_shapes, 0)),
+            mp.Process(target=midi_processing.saxophone, args=(list_of_shapes, 0)),
+            mp.Process(target=midi_processing.clap, args=(list_of_shapes, 0)),
+            mp.Process(target=midi_processing.piano, args=(list_of_shapes, 0))
+        ]
+        
+        # Start all processes
+        for process in processes:
+            process.start()
 
-        process1.join()
-        process2.join()
-        process3.join()
-        process4.join()
-        process5.join() 
-
+        # Wait for all processes to finish
+        for process in processes:
+            process.join()
+        
     midi_processing.audio_rendering()
     cv2.destroyAllWindows()
