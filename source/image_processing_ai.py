@@ -80,12 +80,11 @@ def get_color(img:cv2.Mat) -> str:
     else:
         return 'red'
     
-def correct_boxes(img:cv2.Mat, detected_objects):
+def correct_boxes(img:cv2.Mat, detected_objects): # -> image, boxpoints
     boxes = []
+    boxes_w_names = []
 
-    print("detected objects at first: ", len(detected_objects))
-
-    def non_max_suppression(boxes, overlapThresh = 0.4):
+    def non_max_suppression(boxes, boxes_w_names, overlapThresh = 0.4): # -> boxpoints
         """
         Function to determine non maximum suppression
         Inputs:
@@ -119,8 +118,6 @@ def correct_boxes(img:cv2.Mat, detected_objects):
 
         area_descend = (x2 - x1 + 1) * (y2 - y1 + 1)
         area_descend[::-1].sort()
-            
-        # temp_index = [area_descend[0], area_descend[1], area_descend[2], area_descend[3]]
 
         # keep looping while some indexes still remain in the indexes list
         while len(idxs) > 0:
@@ -150,47 +147,42 @@ def correct_boxes(img:cv2.Mat, detected_objects):
             
         # return only the bounding boxes that were picked using the
         # integer data type
-        return boxes[pick].astype("int")
+        return boxes_w_names[pick]
 
     for obj in detected_objects:
         x1, y1, x2, y2 = obj["box_points"]
+        box_name = obj["name"]
 
+        bounding_box_w_names = [int(x1), int(y1), int(x2), int(y2), str(box_name)]
         bounding_box = [int(x1), int(y1), int(x2), int(y2)]
         boxes.append(bounding_box)
+        boxes_w_names.append(bounding_box_w_names)
 
+    boxes_w_names = np.array(boxes_w_names)
     boxes = np.array(boxes)
-    double_boxes = non_max_suppression(boxes)
-
-    print("detected objects after removel of duplicates: ", len(double_boxes))
+    double_boxes = non_max_suppression(boxes, boxes_w_names)
 
     for obj in double_boxes:
         x1 = obj[0]
         y1 = obj[1]
         x2 = obj[2] 
         y2 = obj[3]
+        box_name = obj[4]
 
-        obj_img = img[y1:y2, x1:x2]
-
-        # Call function to extract color data
-        color = get_color(obj_img)
-        # Color label text
-        color_label = ("color: " + color)
         # Adding a text to the object 
-        # cv2.putText(img, color_label, (x1, y1-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
-        cv2.rectangle(img, (x1, y1), (x2, y2), (255,0,0), 2)
+        cv2.rectangle(img, (int(x1), int(y1)), (int(x2), int(y2)), (255,0,0), 2)
     
-    return img
+    return img, double_boxes
     
-def detect_shapes_with_ai(image):
+def detect_shapes_with_ai(image): # -> image, list
     """
-    Function to detect shapes via AI\n
+    Function to detect shapes via AI
     Input:
     - image: the image loaded in via opencv2
 
     Returns annotated image.    
     """
     list_of_shapes = []
-    counter = 0
     img_height, img_width, channel = image.shape
     img_size = img_height*img_width
 
@@ -199,64 +191,46 @@ def detect_shapes_with_ai(image):
                                                                 minimum_percentage_probability=60,
                                                                 display_percentage_probability=True,
                                                                 display_object_name=True)
-    cv2.imshow("img", img)
-    img = correct_boxes(image, detected_objects)
-    
-    for obj in detected_objects:
-        counter +=1
-        x1, y1, x2, y2 = obj["box_points"]
-        obj_img = img[y1:y2, x1:x2]
+    cv2.imshow('imgai',img)
+    img, boxes = correct_boxes(image, detected_objects)
 
-        middle_point_x = (x1+x2)/2
-        middle_point_y = (y1+y2)/2
+    for counter, box in enumerate (boxes):
+        x1, y1, x2, y2, box_name = box
 
-        width = x2 - x1
-        height = y2 - y1
+        middle_point_x = (int(x1)+int(x2))/2
+        middle_point_y = (int(y1)+int(y2))/2
 
-        shape_size_to_volume = img_proc.get_volume_from_size(width*height, img_size)
-        shape_colorcode_to_bpm = img_proc.get_bpm_from_color(int(middle_point_x),int(middle_point_y),image)
-        shape_width_to_duration = img_proc.get_duration_from_width(width, img_width)
-        shape_ai = img_prop.Image("", counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), 0, obj["box_points"] )
-        shape_ai.shape = obj["name"]
+        width = int(x2) - int(x1)
+        height = int(y2) - int(y1)
 
-        if obj["name"] == "half circle":
-            shape_ai.instrument = "flute"
-        elif obj["name"] == "heart": 
-            shape_ai.instrument = "piano"
-        elif obj["name"] == "circle":
+        shape_ai = img_prop.Shape("", 
+                                  counter, 
+                                  0, 
+                                  int(img_proc.get_volume_from_size(width*height, img_size)), 
+                                  int(img_proc.get_bpm_from_color(int(middle_point_x),int(middle_point_y),image)), 
+                                  float(img_proc.get_placement_of_note(middle_point_x, img_width)), 
+                                  int(img_proc.get_pitch_from_y_axis(middle_point_y, img_height)), 
+                                  (int(x1), int(y1), int(x2), int(y2)) )
+        shape_ai.shape = box_name
+        cv2.putText(img, str(counter), (int(middle_point_x), int(middle_point_y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (125, 0, 0), 2)
+
+        if box_name == "circle":
             shape_ai.instrument = "violin"
-        elif obj["name"] == "square":
+        elif box_name == "half circle":
+            shape_ai.instrument = "flute"
+        elif box_name == "square":
             shape_ai.instrument = "drum"
-        elif obj["name"] == "triangle":
+        elif box_name == "heart": 
+            shape_ai.instrument = "piano"
+        elif box_name == "star":
+            shape_ai.instrument = "saxophone"
+        elif box_name == "triangle":
             shape_ai.instrument = "guitar"
-        elif obj["name"] == "star":
-            shape_ai.instrument = "cello"
         else:
             shape_ai.instrument = "empty"
-        shape_ai.pitch = int(img_proc.get_pitch_from_size(height, img_height, shape_ai.instrument))
         list_of_shapes.append(shape_ai)
-        
-    return img, list_of_shapes
 
-def detect_shape_with_ai(box):
-    """
-    This function detects a shape out of a given image, this image should only contain one shape
-    - box: is an image of one shape 
-    
-    Returns the name of the shape, if no shape detected it will return "empty"
-    """
-    img, obj = shape_detector.detectObjectsFromImage(input_image=box, 
-                                                    output_type="array",
-                                                    minimum_percentage_probability=60,
-                                                    display_percentage_probability=True,
-                                                    display_object_name=True)
-    annotate_detected_colors(img, obj)
-    if not obj:
-        return "empty"
-    else:
-        cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-        # TODO: return most common shape
-        return obj[0]["name"]
+    return img, list_of_shapes
    
 def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
     obj_last = []
@@ -314,7 +288,7 @@ def load_custom_model(path) -> CustomObjectDetection:
     shape_detector.loadModel()
     return shape_detector
 
-def train_custom_model():
+def train_custom_model() -> None:
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsTinyYOLOv3()
     dataset_path = os.path.join(os.getcwd(), 'dataset')
