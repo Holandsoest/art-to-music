@@ -1,8 +1,8 @@
 # Todo
 
 - [x] fix: make circle and heart same size as others  
-- [] fix: drag color to shape  
-- [] add: make pallet resize  
+- [x] fix: drag color to shape  
+- [>] add: make pallet resize  
 - [] add: item dragging overlay
 - [] add: rotate tooly  
 - [] add: resize tooly  

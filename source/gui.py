@@ -171,13 +171,25 @@ class MainCanvas(tkinter.Canvas):
                     self.list_of_canvas_shapes.remove(shape)
 
                     found = True
-                if not found and PalletItem.YELLOW.value <= item.value <= PalletItem.BLUE.value:
-                    self.in_hand.remove(item) # TODO: Implement background
-                    continue
-
-                new_shape = get_new_shape(shape=item,
-                                          center_pos=loc.Pos(event.x, event.y),
-                                          size=None, color=None)
+                # Create a new shape
+                new_shape=None
+                if not found:
+                    if PalletItem.YELLOW.value <= item.value <= PalletItem.BLUE.value: # TODO: Change background
+                        self.in_hand.remove(item)
+                        continue
+                    # else place a new shape
+                    new_shape = get_new_shape(shape=item,
+                                              center_pos=loc.Pos(event.x, event.y),
+                                              size=None, color=None)
+                else:# So we did find it
+                    if PalletItem.YELLOW.value <= item.value <= PalletItem.BLUE.value: # Apply color to shape 
+                        new_shape = get_new_shape(shape=PalletItem(int(shape.class_id)+PalletItem.CIRCLE.value),
+                                                  center_pos=shape.center_pos,
+                                                  size=shape.box.size, color=item)
+                    else: # Apply shape to shape 
+                        new_shape = get_new_shape(shape=item,
+                                                  center_pos=shape.center_pos,
+                                                  size=shape.box.size, color=PalletItem[shape.fill_color.upper()])
                 new_shape.draw_shape(tkinter_canvas=self,
                                      location_offset=loc.Pos(x=pallet_item_size().x,y=0))
                 self.list_of_canvas_shapes.append(new_shape)
