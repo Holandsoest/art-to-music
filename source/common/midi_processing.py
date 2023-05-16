@@ -62,7 +62,7 @@ def violin (list_of_objects, amount_of_violin):
             engine.set_bpm(shape.bpm)
             engine.render(render_time)  
             audio = engine.get_audio()  
-            wavfile.write(model_wav_path + "\\violin.wav",  sample_rate, audio.transpose())
+            wavfile.write(model_wav_path + "\\violin.wav",  sample_rate, audio.transpose()) 
             amount_of_violin +=1
 
 def flute (list_of_objects, amount_of_flute):

@@ -5,9 +5,21 @@ from imageai.Detection.Custom import DetectionModelTrainer
 import cv2 
 import numpy as np 
 import os
-import image_processing as ip
-import common.image_properties as i_prop
 from enum import Enum
+import common.image_properties as img_prop
+import image_processing as img_proc
+
+shape_detector = CustomObjectDetection()
+
+def setup_ai():
+    # # Custom Object Detection
+    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'dataset_version_mAP-0.63917.pt')
+
+    shape_detector.setModelTypeAsTinyYOLOv3()
+    shape_detector.setModelPath(model_custom_path)
+    shape_detector.setJsonPath(jason_path)
+    shape_detector.loadModel()
 
 # Function to get the color of an object in the image
 def get_color(img:cv2.Mat) -> str:
@@ -68,175 +80,158 @@ def get_color(img:cv2.Mat) -> str:
     else:
         return 'red'
     
-def detect_shapes_with_ai(image):
+def correct_boxes(img:cv2.Mat, detected_objects): # -> image, boxpoints
+    boxes = []
+    boxes_w_names = []
+
+    def non_max_suppression(boxes, boxes_w_names, overlapThresh = 0.4): # -> boxpoints
+        """
+        Function to determine non maximum suppression
+        Inputs:
+        - boxes: all the boxes detected by ai or contours.
+        - overlapThresh: the threshold of boxes overlapping.
+        
+        Return all the bouding boxes that are double
+        """
+        # if there are no boxes, return an empty list
+        if len(boxes) == 0:
+            return []
+        
+        # if the bounding boxes integers, convert them to floats --
+        # this is important since we'll be doing a bunch of divisions
+        if boxes.dtype.kind == "i":
+            boxes = boxes.astype("float")
+
+        # initialize the list of picked indexes	
+        pick = []
+
+        # grab the coordinates of the bounding boxes
+        x1 = boxes[:,0]
+        y1 = boxes[:,1]
+        x2 = boxes[:,2]
+        y2 = boxes[:,3]
+
+        # compute the area of the bounding boxes and sort the bounding
+        # boxes by the bottom-right y-coordinate of the bounding box
+        area = (x2 - x1 + 1) * (y2 - y1 + 1)
+        idxs = np.argsort(y2)
+
+        area_descend = (x2 - x1 + 1) * (y2 - y1 + 1)
+        area_descend[::-1].sort()
+
+        # keep looping while some indexes still remain in the indexes list
+        while len(idxs) > 0:
+            # grab the last index in the indexes list and add the
+            # index value to the list of picked indexes
+            last = len(idxs) - 1
+            i = idxs[last]
+            pick.append(i)
+            # find the largest (x, y) coordinates for the start of
+            # the bounding box and the smallest (x, y) coordinates
+            # for the end of the bounding box
+            xx1 = np.maximum(x1[i], x1[idxs[:last]])
+            yy1 = np.maximum(y1[i], y1[idxs[:last]])
+            xx2 = np.minimum(x2[i], x2[idxs[:last]])
+            yy2 = np.minimum(y2[i], y2[idxs[:last]])
+
+            # compute the width and height of the bounding box
+            w = np.maximum(0, xx2 - xx1 + 1)
+            h = np.maximum(0, yy2 - yy1 + 1)
+
+            # compute the ratio of overlap
+            overlap = (w * h) / area[idxs[:last]]
+
+            # delete all indexes from the index list that have
+            idxs = np.delete(idxs, np.concatenate(([last],
+                np.where(overlap > overlapThresh)[0])))
+            
+        # return only the bounding boxes that were picked using the
+        # integer data type
+        return boxes_w_names[pick]
+
+    for obj in detected_objects:
+        x1, y1, x2, y2 = obj["box_points"]
+        box_name = obj["name"]
+
+        bounding_box_w_names = [int(x1), int(y1), int(x2), int(y2), str(box_name)]
+        bounding_box = [int(x1), int(y1), int(x2), int(y2)]
+        boxes.append(bounding_box)
+        boxes_w_names.append(bounding_box_w_names)
+
+    boxes_w_names = np.array(boxes_w_names)
+    boxes = np.array(boxes)
+    double_boxes = non_max_suppression(boxes, boxes_w_names)
+
+    for obj in double_boxes:
+        x1 = obj[0]
+        y1 = obj[1]
+        x2 = obj[2] 
+        y2 = obj[3]
+        box_name = obj[4]
+
+        # Adding a text to the object 
+        cv2.rectangle(img, (int(x1), int(y1)), (int(x2), int(y2)), (255,0,0), 2)
+    
+    return img, double_boxes
+    
+def detect_shapes_with_ai(image): # -> image, list
     """
-    Function to detect shapes via AI\n
+    Function to detect shapes via AI
     Input:
     - image: the image loaded in via opencv2
 
-    Returns nothing.    
+    Returns annotated image.    
     """
-    # # Custom Object Detection
-    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'koen-best.pt')
-
-    shape_detector = CustomObjectDetection()
-    shape_detector.setModelTypeAsTinyYOLOv3()
-    shape_detector.setModelPath(model_custom_path)
-    shape_detector.setJsonPath(jason_path)
-    shape_detector.loadModel()
-
-    img, detected_objects = shape_detector.detectObjectsFromImage(input_image=image, 
-                                                    output_type="array",
-                                                    display_percentage_probability=True,
-                                                    display_object_name=True)
-    
-    annotate_detected_colors(img, detected_objects)
-    return img
-    
-def detect_shapes_with_contour(contours, image):
-    """
-    This function goes over all contours that have been read with cv2 
-    and will detect all the shapes that would have otherwise been marked as a 'circle'.
-    - contours: all contours read with cv2.contours
-
-    Returns nothing.
-    """
-    # Create shape list_of_shapes
     list_of_shapes = []
-
-    # # Custom Object Detection
-    jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'koen-best.pt')
-
-    #Get the height, width and channel of the image
     img_height, img_width, channel = image.shape
     img_size = img_height*img_width
 
-    shape_detector = CustomObjectDetection()
-    shape_detector.setModelTypeAsTinyYOLOv3()
-    shape_detector.setModelPath(model_custom_path)
-    shape_detector.setJsonPath(jason_path)
-    shape_detector.loadModel()
+    img, detected_objects = shape_detector.detectObjectsFromImage(input_image=image, 
+                                                                output_type="array",
+                                                                minimum_percentage_probability=60,
+                                                                display_percentage_probability=True,
+                                                                display_object_name=True)
+    cv2.imshow('imgai',img)
+    img, boxes = correct_boxes(image, detected_objects)
 
-    def get_image_from_box(contour, img):
-        """
-        This function gives back just an image of one shape of the picture
-        - contour: contour of the shape in the image
-        - img: the whole image
-        
-        Returns just an image of one shape of the whole picture
-        """
-        x,y,w,h = cv2.boundingRect(contour)
-        s_img = img[y:y+h,x:x+w] 
-        img_path = 'files\image_processing\example_white_background.jpg'
-        l_img = cv2.imread(img_path)
-        x_offset=y_offset=500
-        l_img[y_offset:y_offset+s_img.shape[0], x_offset:x_offset+s_img.shape[1]] = s_img
+    for counter, box in enumerate (boxes):
+        x1, y1, x2, y2, box_name = box
 
-        return l_img
+        middle_point_x = (int(x1)+int(x2))/2
+        middle_point_y = (int(y1)+int(y2))/2
 
+        width = int(x2) - int(x1)
+        height = int(y2) - int(y1)
 
-    def detect_shape_with_ai(box):
-        """
-        This function detects a shape out of a given image, this image should only contain one shape
-        - box: is an image of one shape 
-        
-        Returns "empty" if nothing is detected, else it will detect the name of the shape.
-        """
-        img, obj = shape_detector.detectObjectsFromImage(input_image=box, 
-                                                        output_type="array",
-                                                        display_percentage_probability=True,
-                                                        display_object_name=True)
-        annotate_detected_colors(img, obj)
-        # cv2.imshow("img", img)
-        if not obj:
-            return "empty"
+        shape_ai = img_prop.Shape("", 
+                                  counter, 
+                                  0, 
+                                  int(img_proc.get_volume_from_size(width*height, img_size)), 
+                                  int(img_proc.get_bpm_from_color(int(middle_point_x),int(middle_point_y),image)), 
+                                  float(img_proc.get_placement_of_note(middle_point_x, img_width)), 
+                                  int(img_proc.get_pitch_from_y_axis(middle_point_y, img_height)), 
+                                  (int(x1), int(y1), int(x2), int(y2)) )
+        shape_ai.shape = box_name
+        cv2.putText(img, str(counter), (int(middle_point_x), int(middle_point_y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (125, 0, 0), 2)
+
+        if box_name == "circle":
+            shape_ai.instrument = "violin"
+        elif box_name == "half circle":
+            shape_ai.instrument = "flute"
+        elif box_name == "square":
+            shape_ai.instrument = "drum"
+        elif box_name == "heart": 
+            shape_ai.instrument = "piano"
+        elif box_name == "star":
+            shape_ai.instrument = "saxophone"
+        elif box_name == "triangle":
+            shape_ai.instrument = "guitar"
         else:
-            # cv2.putText(img, "color_label", (10, 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            return obj[0]["name"]
-        
-    counter = 0
-    cv2.drawContours(image, contours, -1, (255,0,0), 3)
-    for contour in contours:
-        counter += 1
-        area1 = cv2.contourArea(contour)
+            shape_ai.instrument = "empty"
+        list_of_shapes.append(shape_ai)
 
-        # area_min = cv2.getTrackbarPos("Area", "Parameters")
-        # if area1 > area_min:
-        if area1 > 40:
-            # Get approx contour of shape
-            approx = cv2.approxPolyDP(contour, 0.01* cv2.arcLength(contour, True), True)
-
-            # minAreaRect calculates and returns the minimum-area bounding rectangle for a specified point set
-            # It will create a rectangle around the shapes
-            box = cv2.minAreaRect(contour)
-            (x, y), (width, height), angle = box
-            shape_size_to_volume = ip.get_volume_from_size(width*height, img_size)
-            shape_colorcode_to_bpm = ip.get_bpm_from_color(int(x),int(y),image)
-            shape_width_to_duration = ip.get_duration_from_width(width, img_width)
-            shape = i_prop.Image("", counter, 0, int(shape_size_to_volume), int(shape_colorcode_to_bpm), int(shape_width_to_duration), 0)
-
-            if len(approx) == 3:
-                # Shape is a triangle (Guitar)
-                shape.shape = "triangle"
-                shape.instrument = "guitar"
-                shape.pitch = int(ip.get_pitch_from_size(height, img_height, "guitar"))
-
-            elif len(approx) == 4 : 
-                x2, y2 , w, h = cv2.boundingRect(approx)
-                aspect_ratio = float(w)/h
-                if aspect_ratio >= 0.95 and aspect_ratio < 1.05:
-                    shape.shape = "square   "
-                    shape.instrument = "drum"
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum"))
-                    # Shape is a square (Drum Pads)
-                else:
-                    shape.shape = "rectangle"
-                    shape.instrument = "drum"
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "drum"))
-                    # Shape is a rectangle (Drum Pads)
-
-            elif len(approx) == 10 :
-                # Shape is a star (Cello)
-                shape.shape = "star      "
-                shape.instrument = "cello"
-                shape.pitch = int(ip.get_pitch_from_size(height, img_height, "cello"))
-
-            else:
-                # Shape is half circle, circle or heart
-                shape_name = detect_shape_with_ai(get_image_from_box(contour, image))
-                if shape_name == "empty":
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, "empty"))
-                    continue
-                else: 
-                    shape.shape = shape_name
-                    if shape_name == "half circle":
-                        shape_name = "flute"
-                    elif shape_name == "heart": 
-                        shape_name = "piano"
-                    elif shape_name == "circle":
-                        shape_name = "violin"
-                    shape.instrument = shape_name
-                    shape.pitch = int(ip.get_pitch_from_size(height, img_height, shape_name))
-                # Run camera in loop
-
-            list_of_shapes.append(shape)
-        else:
-            continue
-
-    for shape in list_of_shapes:
-        print(shape.counter, 
-              "shape:", shape.shape, 
-              "instrument:", shape.instrument, 
-              "volume:", shape.volume, 
-              "bpm:", shape.bpm, 
-              "pitch:", shape.pitch, 
-              "duration:", shape.duration, 
-              sep='\t')
-
-    return image, list_of_shapes
-
+    return img, list_of_shapes
+   
 def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
     obj_last = []
     for obj in detected_objects:
@@ -293,7 +288,7 @@ def load_custom_model(path) -> CustomObjectDetection:
     shape_detector.loadModel()
     return shape_detector
 
-def train_custom_model():
+def train_custom_model() -> None:
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsTinyYOLOv3()
     dataset_path = os.path.join(os.getcwd(), 'dataset')
