@@ -2,7 +2,7 @@
 
 - [x] fix: make circle and heart same size as others  
 - [x] fix: drag color to shape  
-- [>] add: make pallet resize  
+- [x] add: make pallet resize  
 - [] add: item dragging overlay
 - [] add: rotate tooly  
 - [] add: resize tooly  

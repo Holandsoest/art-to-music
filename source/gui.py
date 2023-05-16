@@ -67,10 +67,13 @@ class MainCanvas(tkinter.Canvas):
 
         # Bind behavior https://www.pythontutorial.net/tkinter/tkinter-event-binding/
         self.pallet_elements = []
-        def redraw_pallet_elements() -> None:
+        def redraw_pallet_elements(event) -> None:
             """Redraw the UI if you need to due to a resize or something"""
             for shape in self.pallet_elements:
                 shape.remove_shape(self)
+            self.pallet_elements.clear()
+            self.update()
+            
 
             color = self.last_color.name.lower()
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 0,                      width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
@@ -79,17 +82,17 @@ class MainCanvas(tkinter.Canvas):
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 3*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'green', 'green'))
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 4*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'purple', 'purple'))
             self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 5*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'blue', 'blue'))
-            self.pallet_elements.append(shapes.Circle(           loc.Box(x=0, y= 6*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
-            self.pallet_elements.append(shapes.HalfCircle(       loc.Box(x=0, y= 7*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
-            self.pallet_elements.append(shapes.Square(           loc.Box(x=0, y= 8*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
-            self.pallet_elements.append(shapes.Heart(            loc.Box(x=0, y= 9*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
-            self.pallet_elements.append(shapes.Star(             loc.Box(x=0, y=10*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
-            self.pallet_elements.append(shapes.SymmetricTriangle(loc.Box(x=0, y=11*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, color))
+            self.pallet_elements.append(shapes.Circle(           loc.Box(x=0, y= 6*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.HalfCircle(       loc.Box(x=0, y= 7*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.Square(           loc.Box(x=0, y= 8*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.Heart(            loc.Box(x=0, y= 9*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.Star(             loc.Box(x=0, y=10*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.SymmetricTriangle(loc.Box(x=0, y=11*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
             
             for shape in self.pallet_elements:
                 shape.draw_shape(self, location_offset=loc.Pos())
             self.update()
-        redraw_pallet_elements()
+        redraw_pallet_elements('init')
         def pick_up(event):
             if (self.verbose_events): print(f'<pick_up> at {event.x},{event.y}')
             pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
@@ -254,6 +257,7 @@ class MainCanvas(tkinter.Canvas):
         self.bind ('<Button-1>',        lambda event: pick_up(event))
         self.bind ('<ButtonRelease-1>', lambda event: let_go (event))
         # self.bind ('<Motion>',          lambda event: temp   (event))
+        self.bind("<Configure>", redraw_pallet_elements)
 
 
         
