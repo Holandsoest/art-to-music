@@ -2,12 +2,6 @@ from midiutil.MidiFile import MIDIFile
 from midiutil.MidiFile import *
 import os
 
-'''
-alle bpm naar geiddelde 60 naar 120 
-size is volume
-we gaan niet meer naar melodie maar naar losse noot
-'''
-
 def MakeSong(list):
 
     # --- define functions ---
@@ -20,48 +14,68 @@ def MakeSong(list):
                 return pitch - 1 #value closer to low limit so - value
         else: 
             return pitch #return value as it was
-
-    def add_note (object, channel, pitch, time, duration, volume, instrument): # function for adding one note to midi file       
-        
-        match instrument:
-            case "kick":     
-                midi_kick.addNote(object, channel, pitch, time, duration, volume) # add a note
-            case "clap":
-                midi_clap.addNote(object, channel, pitch, time, duration, volume) # add a note 
-
-    def add_accord (object, channel, pitch_1, pitch_2, pitch_3, time, duration, volume, instrument): # function for adding one accord to midi file       
-    
-        match instrument:  
-            case "piano":
-                midi_piano.addNote(object, channel, pitch_1, time, duration, volume) # make a note
-                midi_piano.addNote(object, channel, pitch_2, time, duration, volume) # make a note
-                midi_piano.addNote(object, channel, pitch_3, time, duration, volume) # make a note
-
-            case "guitar":
-                midi_guitar.addNote(object, channel, pitch_1, time, duration, volume) # make a note
-                midi_guitar.addNote(object, channel, pitch_2, time, duration, volume) # make a note
-                midi_guitar.addNote(object, channel, pitch_3, time, duration, volume) # make a note
     
     def scale (percentage, instrument): # scale notes
-        flute_low = 50 # C???
-        flute_high = 100
-        violin_low = 1
-        violin_high = 100
+
+        # lower and upperbound
+        flute_low = 79 #G5
+        flute_high = 101 #F7
+        violin_low = 72 #C5
+        violin_high = 96 #C7
+        piano_low = 72 #C5
+        piano_high = 84 #C6
+        guitar_low = 55 #G3
+        guitar_high = 67 #G4
+        saxophone_low = 84 #C6
+        saxophone_high = 96 #C7
+
         match instrument:
             case 'flute':
                 return forbidden_note (((percentage/100) * (flute_high - flute_low) + flute_low), flute_low, flute_high) # check if note is forbidden or not
             case 'violin':
                 return forbidden_note (((percentage/100) * (violin_high - violin_low) + violin_low), violin_low, violin_high) # check if note is forbidden or not
+            case 'piano':
+                return forbidden_note (((percentage/100) * (piano_high - piano_low) + piano_low), piano_low, piano_high) # check if note is forbidden or not
+            case 'guitar':
+                return forbidden_note (((percentage/100) * (guitar_high - guitar_low) + guitar_low), guitar_low, guitar_high) # check if note is forbidden or not
+            case 'saxophone':
+                return forbidden_note (((percentage/100) * (saxophone_high - saxophone_low) + saxophone_low), saxophone_low, saxophone_high) # check if note is forbidden or not
 
-    def guitar_notes (percentage, note_1, note_2, note_3): # sclae note for guitar
-        match percentage:
-            case range(50,60): # C?
-                note_1 = 60
-                note_2 = 67
-                note_3 = 73
+    def piano_notes (input_note, note_1, note_2, note_3): # sclae note for guitar
+        match input_note:
+            case 72: #C5
+                note_1 = 72 #C5
+                note_2 = 69 #A4 
+                note_3 = 65 #F4
+            case 74: #D5
+                note_1 = 74 #D5 
+                note_2 = 71 #B4 
+                note_3 = 67 #G4
+            case 76: #E5
+                note_1 = 76 #E5 
+                note_2 = 72 #C5
+                note_3 = 69 #A4
+            case 77: #F5
+                note_1 = 77 #F5 
+                note_2 = 74 #D5
+                note_3 = 70 #A#4
+            case 79: #G5
+                note_1 = 79 #G5 
+                note_2 = 76 #E5
+                note_3 = 72 #C5
+            case 81: #A5
+                note_1 = 81 #A5 
+                note_2 = 77 #F5
+                note_3 = 74 #D5
+            case 83: #B4
+                note_1 = 83 #B4 
+                note_2 = 79 #G5
+                note_3 = 76 #E5
+
+        return note_1, note_2, note_3 
 
     # --- declare variables
-    model_custom_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_files')
+    model_custom_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_files') #path of the audio files save location
     amount_of_instruments = len(list) # number of object on the screen  
     iteration = 0 # used to go over all the shapes in the pictures   
     
@@ -91,46 +105,6 @@ def MakeSong(list):
     bpm = 0
     
     forbidden_notes = [22,25,27,30,32,34,42,44,46,49,51,54,56,58,61,63,66,68,70,73,75,78,80,82,85,87,90,92,94,97,99,102,104,106]
-
-    '''
-        #high melodies. 
-
-        #mid melodies. 
-
-        #low melodies. 
-        low_melodie0 = [    0,0,0,0,    0,0,0,0,    0,0,0,0,    0,0,0,0,   0,0,0,0,   #maat 1 
-                            0,0,0,0,    0,0,0,0,    0,0,0,0,    0,0,0,0,   0,0,0,0,   #maat 2 
-                            0,0,0,0,    0,0,0,0,    0,0,0,0,    0,0,0,0,   0,0,0,0,   #maat 3 
-                            0,0,0,0,    0,0,0,0,    0,0,0,0,    0,0,0,0,   0,0,0,0,   #maat 4 
-                        ]
-        low_melodie1 = [    1,0,0,0,    0,0,0,0,    7,0,0,0,    12,0,0,0,   0.5,0,0,0,      #maat 1  eerste stuk van viva la vida
-                            1,0,0,0,    0,0,0,0,    7,0,0,0,    12,0,0,0,   0.25,0,0,0,     #maat 2 
-                            1,0,0,0,    0,0,0,0,    7,0,0,0,    12,0,0,0,   0.25,0,0,0,     #maat 3 
-                            1,0,0.5,0,  0,0,2,0,    7,0,5,0,    12,0,5,0,   0.25,0,0.5,0,   #maat 4 
-                        ]
-
-            # --- melodies ---
-            # kick melodies 4 diff
-            kick_melodie0 = [0,0,0,0] #empty melodie
-            kick_melodie1 = [1,0,3,0] 
-            kick_melodie2 = [0,2,0,4] 
-            kick_melodie3 = [1,0,0,4] 
-            kick_melodie4 = [1,2,3,4] 
-
-            # clap melodies 4 diff
-            clap_melodie0 = [0,0,0,0] #empty melodie
-            clap_melodie1 = [1,0,3,0] 
-            clap_melodie2 = [0,2,0,4] 
-            clap_melodie3 = [1,0,0,4] 
-                      
-        melodie division = steek of 20 
-        #0 t/m 3    -   20 t/m 23   -   => notes
-        #4 t/m 7    -   24 t/m 27   -   => pitch note 1 
-        #8 t/m 11   -   28 t/m 31   -   => pitch diffence note 2
-        #12 t/m 15  -   32 t/m 35   -   => pitch diffence note 3
-        #16 t/m 19  -   36 t/m 39   -   => durations of notes
-        
-    '''
     
     # determine the amount of shapes with the same instrument in the list
     for shape in list:
@@ -259,124 +233,102 @@ def MakeSong(list):
         #add flute notes
         if amount_of_flute > 0 and shape.instrument == "flute":
             
-            # getal
-            flute_pitch = shape.duration
+            midi_flute.addNote(object_flute, channel_flute, scale(shape.pitch, "flute"), shape.note_placement, 1, shape.volume) # add a note
 
-            add_note(object_drum, channel_drum, drum_pitch, time_drum, shape.duration, shape.volume, "drum", melodie) #add melodie nodes to track#add melodie nodes to track
             object_drum +=1
 
+        #add violin notes
+        if amount_of_violin > 0 and shape.instrument == "violin":
 
-        #add kick notes
-        if amount_of_kick > 0 and shape.instrument == "kick":
-            
-            drum_pitch = 100
+            midi_violin.addNote(object_violin, channel_violin, scale(shape.pitch, "violin"), shape.note_placement, 1, shape.volume) # add a note
 
-            
-
-            addnote(object_drum, channel_drum, drum_pitch, time_drum, shape.duration, shape.volume, "drum", melodie) #add melodie nodes to track#add melodie nodes to track
-            object_drum +=1
+            object_violin += 1
 
         #add guitar notes
         if amount_of_guitar > 0 and shape.instrument == "guitar":
             
-            #check for forbidden notes between 74 and 96
-            guitar_pitch = note(shape.pitch, 74, 96)
+            midi_guitar.addNote(object_guitar, channel_guitar, scale(shape.pitch, "guitar"), shape.note_placement, 1, shape.volume) # add a note
 
-            #choose melodie
-            if shape.duration == 1: #Q1
-                melodie = melodie
-            elif shape.duration == 2: #Q2
-                melodie = melodie
-            elif shape.duration == 3: #Q3
-                melodie = melodie
-            elif shape.duration == 4: #Q4
-                melodie = melodie
+            object_guitar += 1
 
-            addnote(object_guitar, channel_guitar, guitar_pitch, time_guitar, shape.duration, shape.volume, "guitar", melodie) #add melodie nodes to track
-            object_guitar +=1
-
-        #add flute notes
-        if amount_of_flute > 0 and shape.instrument == "flute":
+        #add piano notes
+        if amount_of_piano > 0 and shape.instrument == "piano":
             
-            #check for forbidden notes between 72 and 108
-            flute_pitch = note(shape.pitch, 72, 108)
-
-            #choose melodie
-            if shape.duration == 1: #Q1
-                melodie = melodie
-            elif shape.duration == 2: #Q2
-                melodie = melodie
-            elif shape.duration == 3: #Q3
-                melodie = melodie
-            elif shape.duration == 4: #Q4
-                melodie = melodie
-
-            addnote(object_flute, channel_flute, flute_pitch, time_flute, shape.duration, shape.volume, "flute", melodie) #add melodie nodes to track
-            object_flute +=1
-
-        #add violin notes
-        if amount_of_violin > 0 and shape.instrument == "violin":
             
-            #check for forbidden notes between 76 and 103
-            violin_pitch = note(shape.pitch, 76, 103)
+            piano_pitch_note_1, piano_pitch_note_2, piano_pitch_note_3 = piano_notes(scale(shape.pitch, "piano"))
 
-            #choose melodie
-            if shape.duration == 1: #Q1
-                melodie = melodie
-            elif shape.duration == 2: #Q2
-                melodie = melodie
-            elif shape.duration == 3: #Q3
-                melodie = melodie
-            elif shape.duration == 4: #Q4
-                melodie = melodie
+            # add an accord
+            midi_piano.addNote(object_piano, channel_piano, piano_pitch_note_1, shape.note_placement, 1, shape.volume) # add a note
+            midi_piano.addNote(object_piano, channel_piano, piano_pitch_note_2, shape.note_placement, 1, shape.volume) # add a note
+            midi_piano.addNote(object_piano, channel_piano, piano_pitch_note_3, shape.note_placement, 1, shape.volume) # add a note
 
-            addnote(object_violin, channel_kick, violin_pitch, time_kick, shape.duration, shape.volume, "violin", melodie) #add melodie nodes to track
-            object_violin +=1
+            object_piano += 1
+
+        #add drum notes
+        if amount_of_drum > 0 and shape.instrument == "drum":
+            
+            midi_drum.addNote(object_drum, channel_drum, 84, shape.note_placement, 1, shape.volume) # add a note
+
+            object_drum +=1
+
+        #add saxophone notes
+        if amount_of_saxophone > 0 and shape.instrument == "saxophone":
+            
+            midi_saxophone.addNote(object_saxophone, channel_saxophone, scale(shape.pitch, "saxophone"), shape.note_placement, 1, shape.volume) # add a note
+
+            object_saxophone +=1
+
+        #add kick notes
+        if amount_of_kick > 0 and shape.instrument == "kick":
+            
+            midi_kick.addNote(object_kick, channel_kick, 84, shape.note_placement, 1, shape.volume) # add a note
+
+            object_kick +=1
         
-        #add cello notes
-        if amount_of_cello > 0 and shape.instrument == "cello":
-            
-            #check for forbidden notes between 48 and 77
-            cello_pitch = note(shape.pitch, 48, 77)
+        #add clap notes
+        if amount_of_clap > 0 and shape.instrument == "clap":
+        
+            midi_clap.addNote(object_clap, channel_clap, 84, shape.note_placement, 1, shape.volume) # add a note
 
-            #choose melodie
-            if shape.duration == 1: #Q1
-                melodie = melodie
-            elif shape.duration == 2: #Q2
-                melodie = melodie
-            elif shape.duration == 3: #Q3
-                melodie = melodie
-            elif shape.duration == 4: #Q4
-                melodie = melodie
-                        
-            addnote(object_cello, channel_clap, cello_pitch, time_clap, shape.duration, shape.volume, "cello", melodie)#add melodie nodes to track
-            object_cello +=1    
+            object_clap +=1
         
         #Mmake wav files of all the midi's when al nodes are added
         if amount_of_instruments -1 == iteration:
-            if amount_of_drum == 0:
-                addnote(object_drum, channel_drum, 0, time_drum, 0, 0, "drum", melodie0) #clear track
-            if amount_of_guitar == 0:
-                addnote(object_guitar, channel_guitar, 0, time_guitar, 0, 0, "guitar", melodie0) #clear track
             if amount_of_flute == 0:
-                addnote(object_flute, channel_flute, 0, time_flute, 0, 0, "flute", melodie0) #clear track
+                midi_flute.addNote(object_flute, channel_flute, 0, 0, 0, 0) #clear track
             if amount_of_violin == 0:
-                addnote(object_violin, channel_kick, 0, time_kick, 0, 0, "violin", melodie0) #clear track
-            if amount_of_cello == 0:
-                addnote(object_cello, channel_clap, 0, time_clap, 0, 0, "cello", melodie0) #clear track
+                midi_violin.addNote(object_violin, channel_violin, 0, 0, 0, 0) #clear track 
+            if amount_of_guitar == 0:
+                midi_guitar.addNote(object_guitar, channel_guitar, 0, 0, 0, 0) #clear track
+            if amount_of_piano == 0:
+                midi_piano.addNote(object_piano, channel_piano, 0, 0, 0, 0) #clear track
+            if amount_of_drum == 0:
+                midi_drum.addNote(object_drum, channel_drum, 0, 0, 0, 0) #clear track 
+            if amount_of_saxophone == 0:
+                midi_saxophone.addNote(object_saxophone, channel_saxophone, 0, 0, 0, 0) #clear track
+            if amount_of_kick == 0:
+                midi_kick.addNote(object_kick, channel_kick, 0, 0, 0, 0) #clear track
+            if amount_of_clap == 0:
+                midi_clap.addNote(object_clap, channel_clap, 0, 0, 0, 0) #clear track
 
             #write all the midi files
-            with open(model_custom_path + "\\drum_output.mid", "wb") as output_file1: 
-                midi_drum.writeFile(output_file1)
-            with open(model_custom_path + "\\guitar_output.mid", "wb") as output_file2:
-                midi_guitar.writeFile(output_file2)
-            with open(model_custom_path + "\\flute_output.mid", "wb") as output_file3:
-                midi_flute.writeFile(output_file3)
-            with open(model_custom_path + "\\violin_output.mid", "wb") as output_file4:
+            with open(model_custom_path + "\\flute_output.mid", "wb") as output_file1: 
+                midi_flute.writeFile(output_file1)
+            with open(model_custom_path + "\\violin_output.mid", "wb") as output_file2:
+                midi_violin.writeFile(output_file2)
+            with open(model_custom_path + "\\piano_output.mid", "wb") as output_file3:
+                midi_guitar.writeFile(output_file3)
+            with open(model_custom_path + "\\guitar_output.mid", "wb") as output_file4:
                 midi_violin.writeFile(output_file4)
-            with open(model_custom_path + "\\cello_output.mid", "wb") as output_file5:
-                midi_cello.writeFile(output_file5)
-            
+            with open(model_custom_path + "\\drum_output.mid", "wb") as output_file5:
+                midi_drum.writeFile(output_file5)
+            with open(model_custom_path + "\\saxophone_output.mid", "wb") as output_file6: 
+                midi_saxophone.writeFile(output_file6)
+            with open(model_custom_path + "\\kick_output.mid", "wb") as output_file7:
+                midi_kick.writeFile(output_file7)
+            with open(model_custom_path + "\\clap_output.mid", "wb") as output_file8:
+                midi_clap.writeFile(output_file8)
+
         iteration += 1
 
     
