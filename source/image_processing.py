@@ -1,6 +1,6 @@
 import math
 
-def get_bpm_from_color(x_axis, y_axis, image):
+def get_bpm_from_color(x_axis, y_axis, image) -> int:
     """
     This function gets the RGB values of a pixel on the (x,y)-coordinates of an image and scales this to a number of the table of 30.
     It takes three arguments:
@@ -41,7 +41,7 @@ def get_bpm_from_color(x_axis, y_axis, image):
     else:
         return bpm
 
-def get_placement_of_note(x_axis_middlepoint, img_width):
+def get_placement_of_note(x_axis_middlepoint, img_width) -> int | float:
     """
     This function finds the ratio between the middle point of a shape and the total image width.
     It takes two arguments:
@@ -54,7 +54,7 @@ def get_placement_of_note(x_axis_middlepoint, img_width):
     scaled_value = min(math.ceil(ratio * 16) / 4, 4.0)
     return scaled_value
 
-def get_volume_from_size(obj_size, img_size):
+def get_volume_from_size(obj_size, img_size) -> int:
     """
     This function scales the size of an object in an image relative to the size of the entire image.img_size
     It takes two arguments:
@@ -66,7 +66,7 @@ def get_volume_from_size(obj_size, img_size):
     """
     return min((((obj_size)+(img_size*0.2))/img_size)*255, 255)
 
-def get_pitch_from_y_axis(y_axis, img_height):
+def get_pitch_from_y_axis(y_axis, img_height) -> int:
     """
     This function scales the y_axis to the image height
     It takes two arguments:
@@ -77,7 +77,7 @@ def get_pitch_from_y_axis(y_axis, img_height):
     """
     return (y_axis/img_height)*100
 
-def display_list_of_shapes(list_of_shapes):
+def display_list_of_shapes(list_of_shapes) -> None:
     for shape in list_of_shapes:
         print(shape.counter, 
               "shape:", shape.shape, 
@@ -87,5 +87,3 @@ def display_list_of_shapes(list_of_shapes):
               "pitch:", shape.pitch, 
               "note_placement:", shape.note_placement, 
               sep='\t')
-    
-    return list_of_shapes

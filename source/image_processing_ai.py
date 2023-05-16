@@ -80,11 +80,11 @@ def get_color(img:cv2.Mat) -> str:
     else:
         return 'red'
     
-def correct_boxes(img:cv2.Mat, detected_objects):
+def correct_boxes(img:cv2.Mat, detected_objects): # -> image, boxpoints
     boxes = []
     boxes_w_names = []
 
-    def non_max_suppression(boxes, boxes_w_names, overlapThresh = 0.4):
+    def non_max_suppression(boxes, boxes_w_names, overlapThresh = 0.4): # -> boxpoints
         """
         Function to determine non maximum suppression
         Inputs:
@@ -174,16 +174,15 @@ def correct_boxes(img:cv2.Mat, detected_objects):
     
     return img, double_boxes
     
-def detect_shapes_with_ai(image):
+def detect_shapes_with_ai(image): # -> image, list
     """
-    Function to detect shapes via AI\n
+    Function to detect shapes via AI
     Input:
     - image: the image loaded in via opencv2
 
     Returns annotated image.    
     """
     list_of_shapes = []
-    counter = 0
     img_height, img_width, channel = image.shape
     img_size = img_height*img_width
 
@@ -195,9 +194,8 @@ def detect_shapes_with_ai(image):
     cv2.imshow('imgai',img)
     img, boxes = correct_boxes(image, detected_objects)
 
-    for box in boxes:
+    for counter, box in enumerate (boxes):
         x1, y1, x2, y2, box_name = box
-        counter +=1
 
         middle_point_x = (int(x1)+int(x2))/2
         middle_point_y = (int(y1)+int(y2))/2
@@ -205,7 +203,7 @@ def detect_shapes_with_ai(image):
         width = int(x2) - int(x1)
         height = int(y2) - int(y1)
 
-        shape_ai = img_prop.Image("", 
+        shape_ai = img_prop.Shape("", 
                                   counter, 
                                   0, 
                                   int(img_proc.get_volume_from_size(width*height, img_size)), 
@@ -290,7 +288,7 @@ def load_custom_model(path) -> CustomObjectDetection:
     shape_detector.loadModel()
     return shape_detector
 
-def train_custom_model():
+def train_custom_model() -> None:
     trainer = DetectionModelTrainer()
     trainer.setModelTypeAsTinyYOLOv3()
     dataset_path = os.path.join(os.getcwd(), 'dataset')
