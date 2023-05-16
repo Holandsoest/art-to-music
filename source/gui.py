@@ -3,11 +3,41 @@
 # Want to learn about Tkinter gui tool? https://youtu.be/mop6g-c5HEY It coverers about everything. ;)
 import common.shapes as shapes
 import common.location as loc
+import image_processing
 
 from enum import Enum # Keep enums UPPER_CASE according to https://docs.python.org/3/howto/enum.html  
 import math
 import tkinter
 from tkinter import ttk
+
+
+class PalletItem(Enum):
+    NONE = -1
+    YELLOW = 0
+    ORANGE = 1
+    RED = 2
+    GREEN = 3
+    PURPLE = 4
+    BLUE = 5
+    CIRCLE = 6
+    HALF_CIRCLE = 7
+    SQUARE = 8
+    HEART = 9
+    STAR = 10
+    TRIANGLE = 11
+    TRASH_CAN = 12
+def pallet_item_to_rgb(pallet_item:PalletItem) -> tuple:
+    """Returns the color in `(int,int,int)`"""
+    match (pallet_item):
+        case PalletItem.YELLOW: return (255,255,0)
+        case PalletItem.ORANGE: return (255,165,0)
+        case PalletItem.RED:    return (255,0,0)
+        case PalletItem.GREEN:  return (0,255,0)
+        case PalletItem.PURPLE: return (255,0,255)
+        case PalletItem.BLUE:   return (0,0,255)
+        case _:
+            raise RuntimeError(f'{pallet_item.name} is not a color!')
+        
 
 class Gui(tkinter.Tk):
     def __init__(self) -> None:
@@ -23,6 +53,7 @@ class Gui(tkinter.Tk):
         # Declare objects
         self.canvas = MainCanvas(master=self, background_color='white')
         self.actions = GuiActions(master=self, background_color='white')
+        self.actions.play.configure(command=lambda : self.canvas.play_music(bypass_ai=True) )
 class MainCanvas(tkinter.Canvas):
     def __init__(self, master, background_color:str):
         super().__init__(master, background=background_color, borderwidth=2, relief='raised')
@@ -34,40 +65,17 @@ class MainCanvas(tkinter.Canvas):
         self.in_hand = []
         self.verbose_events = True
 
-        # Defining the Pallet
-        class PalletItem(Enum):
-            NONE = -1
-            YELLOW = 0
-            ORANGE = 1
-            RED = 2
-            GREEN = 3
-            PURPLE = 4
-            BLUE = 5
-            CIRCLE = 6
-            HALF_CIRCLE = 7
-            SQUARE = 8
-            HEART = 9
-            STAR = 10
-            TRIANGLE = 11
-            TRASH_CAN = 12
         self.last_color = PalletItem.YELLOW
-        def pallet_item_size() -> loc.Size:
-            """Returns the size of each tool from the pallet"""
-            return loc.Size(x= 64,  #TODO: Magic number
-                            y= self.winfo_height()/(len(PalletItem)-1))
-        def canvas_size() -> loc.Size:
-            """Returns the usable space of the canvas (exclusive the pallet)"""
-            return loc.Size(x=self.winfo_width()-pallet_item_size().x, y=self.winfo_height())
         def get_pallet_item(canvas_pos:loc.Pos) -> PalletItem:
             """Checks what was selected by the pointer and returns that object, as long as it is part of the pallet
             See `PalletItem` for options"""
-            if canvas_pos.x > pallet_item_size().x: return PalletItem.NONE
-            pallet_item_number = int(canvas_pos.y / pallet_item_size().y) # Gives the PalletItemNumber
+            if canvas_pos.x > self.pallet_item_size().x: return PalletItem.NONE
+            pallet_item_number = int(canvas_pos.y / self.pallet_item_size().y) # Gives the PalletItemNumber
             return PalletItem(pallet_item_number)
 
         # Bind behavior https://www.pythontutorial.net/tkinter/tkinter-event-binding/
         self.pallet_elements = []
-        def redraw_pallet_elements(event) -> None:
+        def redraw_pallet_elements() -> None:
             """Redraw the UI if you need to due to a resize or something"""
             for shape in self.pallet_elements:
                 shape.remove_shape(self)
@@ -76,23 +84,23 @@ class MainCanvas(tkinter.Canvas):
             
 
             color = self.last_color.name.lower()
-            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 0,                      width=pallet_item_size().x, height=pallet_item_size().y), 'yellow', 'yellow'))
-            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y=   pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'orange', 'orange'))
-            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 2*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'red', 'red'))
-            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 3*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'green', 'green'))
-            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 4*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'purple', 'purple'))
-            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 5*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), 'blue', 'blue'))
-            self.pallet_elements.append(shapes.Circle(           loc.Box(x=0, y= 6*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
-            self.pallet_elements.append(shapes.HalfCircle(       loc.Box(x=0, y= 7*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
-            self.pallet_elements.append(shapes.Square(           loc.Box(x=0, y= 8*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
-            self.pallet_elements.append(shapes.Heart(            loc.Box(x=0, y= 9*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
-            self.pallet_elements.append(shapes.Star(             loc.Box(x=0, y=10*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
-            self.pallet_elements.append(shapes.SymmetricTriangle(loc.Box(x=0, y=11*pallet_item_size().y, width=pallet_item_size().x, height=pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 0,                      width=self.pallet_item_size().x, height=self.pallet_item_size().y), 'yellow', 'yellow'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y=   self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), 'orange', 'orange'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 2*self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), 'red', 'red'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 3*self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), 'green', 'green'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 4*self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), 'purple', 'purple'))
+            self.pallet_elements.append(shapes.RoundedRectangle( loc.Box(x=0, y= 5*self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), 'blue', 'blue'))
+            self.pallet_elements.append(shapes.Circle(           loc.Box(x=0, y= 6*self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.HalfCircle(       loc.Box(x=0, y= 7*self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.Square(           loc.Box(x=0, y= 8*self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.Heart(            loc.Box(x=0, y= 9*self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.Star(             loc.Box(x=0, y=10*self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), color, 'black'))
+            self.pallet_elements.append(shapes.SymmetricTriangle(loc.Box(x=0, y=11*self.pallet_item_size().y, width=self.pallet_item_size().x, height=self.pallet_item_size().y), color, 'black'))
             
             for shape in self.pallet_elements:
                 shape.draw_shape(self, location_offset=loc.Pos())
             self.update()
-        redraw_pallet_elements('init')
+        redraw_pallet_elements()
         def pick_up(event):
             if (self.verbose_events): print(f'<pick_up> at {event.x},{event.y}')
             pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
@@ -105,7 +113,7 @@ class MainCanvas(tkinter.Canvas):
                 return
             
             # Pick_up event did not happen in the pallet
-            event.x -= pallet_item_size().x
+            event.x -= self.pallet_item_size().x
             for shape in self.list_of_canvas_shapes:
                 if event.x < shape.box.pos.x: continue                      # Left of shape.box  (out of range)
                 if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of shape.box (out of range)
@@ -128,7 +136,7 @@ class MainCanvas(tkinter.Canvas):
                 return
             
             # Let go on the canvas
-            event.x -= pallet_item_size().x
+            event.x -= self.pallet_item_size().x
             for item in self.in_hand:
                 # Relocate the shape        
                 if not isinstance(item, PalletItem):
@@ -146,7 +154,7 @@ class MainCanvas(tkinter.Canvas):
                                               depth_percentage=depth_percentage)
                     self.list_of_canvas_shapes.append(new_shape)
                     new_shape.draw_shape(tkinter_canvas=self,
-                                         location_offset=loc.Pos(x=pallet_item_size().x,y=0))
+                                         location_offset=loc.Pos(x=self.pallet_item_size().x,y=0))
                     self.in_hand.remove(item)
                     continue
                 
@@ -194,7 +202,7 @@ class MainCanvas(tkinter.Canvas):
                                                   center_pos=shape.center_pos,
                                                   size=shape.box.size, color=PalletItem[shape.fill_color.upper()])
                 new_shape.draw_shape(tkinter_canvas=self,
-                                     location_offset=loc.Pos(x=pallet_item_size().x,y=0))
+                                     location_offset=loc.Pos(x=self.pallet_item_size().x,y=0))
                 self.list_of_canvas_shapes.append(new_shape)
                 self.in_hand.remove(item)
         
@@ -257,18 +265,56 @@ class MainCanvas(tkinter.Canvas):
         self.bind ('<Button-1>',        lambda event: pick_up(event))
         self.bind ('<ButtonRelease-1>', lambda event: let_go (event))
         # self.bind ('<Motion>',          lambda event: temp   (event))
-        self.bind("<Configure>", redraw_pallet_elements)
+        self.bind("<Configure>", lambda event: redraw_pallet_elements())
+    def pallet_item_size(self) -> loc.Size:
+        """Returns the size of each tool from the pallet"""
+        return loc.Size(x= 64,  #TODO: Magic number
+                        y= self.winfo_height()/(len(PalletItem)-1))
+    def canvas_size(self) -> loc.Size:
+        """Returns the usable space of the canvas (exclusive the pallet)"""
+        return loc.Size(x=self.winfo_width()-self.pallet_item_size().x, y=self.winfo_height())
+    def play_music(self, bypass_ai=False) -> None:
+        if not bypass_ai: raise RuntimeError("no u cannot do that yet :'( i dont know how the ai works ;-;")
 
-
+        import common.midi_creation
+        import image_processing
         
-        
+        notes = []
+        sounds = {
+            '0' : 81,   # circle
+            '1' : 74,   # half circle
+            '2' : 119,  # square
+            '3' : 2,    # heart
+            '4' : 43,   # star
+            '5' : 30,   # triangle
+        }
+        def rgb_to_bpm(r:int, g:int, b:int) -> int: #TODO: Replace when `image_processing.py` has a better implementation
+            average = (r + g + b) / 3
+            bpm = int(((average + 29) // 30) * 30)
+            bpm = min(240, bpm)
+            bpm = max(30,  bpm)
+            return bpm
+        if bypass_ai:
+            for shape in self.list_of_canvas_shapes:
+                r, g, b = pallet_item_to_rgb(PalletItem[shape.fill_color.upper()])
+                note = image_processing.ip.Image(name=     0,
+                                                 size=     image_processing.get_volume_from_size(obj_size=shape.box.size.x * shape.box.size.y, 
+                                                                                                 img_size=self.canvas_size().x * self.canvas_size().y),
+                                                 color=    rgb_to_bpm(r, g, b),
+                                                 x_axis=   image_processing.get_duration_from_width(obj_width=shape.box.size.x,
+                                                                                                     img_width=self.canvas_size().x),
+                                                 y_axis=   image_processing.get_volume_from_size(obj_size=shape.box.pos.y,
+                                                                                                 img_size=self.canvas_size().y))
+                note.instrument = sounds[shape.class_id]
+                notes.append(note)
+        common.midi_creation.MakeSong(notes)
 class GuiActions(ttk.Frame):
     def __init__(self, master, background_color:str):
         super().__init__(master, borderwidth=2, relief='groove')
 
         # Declare
         self.settings_frame = ttk.Frame(master=self, borderwidth=2, relief='groove')
-        self.play  =ttk.Label(master=self.settings_frame, text = 'Play' ,background = background_color)
+        self.play  =tkinter.Button(master=self.settings_frame, text = 'Play')# command in parent
         self.ai  =ttk.Label(master=self.settings_frame, text = 'AI' ,background = background_color)
         self.play.pack (expand=True, fill='both', pady=3)
         self.ai.pack   (expand=True, fill='both', pady=3)

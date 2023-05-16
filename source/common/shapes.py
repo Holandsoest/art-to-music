@@ -10,7 +10,7 @@ class Annotation:
     the syntax of our annotation goes as follows `class_id x y width height`  
     the class_id points to what shape it is.
     the rest is a float between 0 - 1"""
-    def __init__(self, class_id:int, image_size:loc.Size, coordinates:list) -> None:
+    def __init__(self, class_id:int, image_size:loc.Size, coordinates:list[loc.Pos]) -> None:
         """## Constructor
         `class_id` a int between  0 - n, wherein n is the amount of machine learning objects there are. See `object_names_array` in the machine learning training model for more info.
         

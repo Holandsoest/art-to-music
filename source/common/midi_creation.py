@@ -22,7 +22,7 @@ def MakeSong(list):
     iteration = 0
 
     # determine the amount of shapes with the same instrument
-    for shape in listOfShapes:
+    for shape in list:
         match shape.instrument:
             case 'Piano':   amount_of_piano += 1
             case 'Drum':    amount_of_drum += 1
