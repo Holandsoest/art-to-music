@@ -342,7 +342,7 @@ class SymmetricTriangle(Shape):
         self.class_id = '5' # TODO: FIX this into the Annotation class
 
         # store the outline in a list
-        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=3, length_traces=self.radius, rotation=self.rotation_rad + math.pi/4) #BUG: Now self.box is not an annotation box !
+        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=3, length_traces=self.radius, rotation=self.rotation_rad + math.pi/2) #BUG: Now self.box is not an annotation box !
 
 # Pretty shapes
 class RoundedRectangle(Shape):
