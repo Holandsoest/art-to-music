@@ -108,6 +108,7 @@ class MainCanvas(tkinter.Canvas):
             if pallet_item != PalletItem.NONE:
                 if PalletItem.YELLOW.value <= pallet_item.value <= PalletItem.BLUE.value: # It is an color
                     self.last_color = pallet_item
+                    redraw_pallet_elements()
                 self.in_hand.append(pallet_item)
                 if (self.verbose_events): print (f'Picked up {pallet_item.name}')
                 return
