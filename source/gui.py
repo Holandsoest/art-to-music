@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""A library that covers how the GUI should respond / work"""
+"""A library that covers how the GUI should respond / work
+
+Use `app = Gui()` to get started.
+
+In this version you cannot rotate & resize the shapes yet"""
 # Want to learn about Tkinter gui tool? https://youtu.be/mop6g-c5HEY It coverers about everything. ;)
 import common.shapes as shapes
 import common.location as loc
@@ -12,6 +16,7 @@ from tkinter import ttk
 
 
 class PalletItem(Enum):
+    """The pallet in on the left. This are the items that are on it."""
     NONE = -1
     YELLOW = 0
     ORANGE = 1
@@ -27,7 +32,7 @@ class PalletItem(Enum):
     TRIANGLE = 11
     TRASH_CAN = 12
 def pallet_item_to_rgb(pallet_item:PalletItem) -> tuple:
-    """Returns the color in `(int,int,int)`"""
+    """Returns the color in `tuple(int,int,int)` `0-255`"""
     match (pallet_item):
         case PalletItem.YELLOW: return (255,255,0)
         case PalletItem.ORANGE: return (255,165,0)
@@ -40,12 +45,10 @@ def pallet_item_to_rgb(pallet_item:PalletItem) -> tuple:
         
 
 class Gui(tkinter.Tk):
+    """This is the whole GUI of the art-to-music application. And is of course separate standalone from the real webcam/camera implementation.
+    
+    `app.mainloop()` to run it (blocking, will continue after `alt + F4` was pressed)"""
     def __init__(self) -> None:
-        """The GUI of the art-to-music application.
-        - #### `size`   The size of the GUI.
-            Possible options:  
-            - `None`    Take up the size of screen_0 (full-screen).
-            - `Size`    The screen will become this size, but placed anywhere on the screen."""
         super().__init__()
         self.title('art-to-music')
         self.minsize(width=528,height=360)
@@ -324,6 +327,6 @@ class GuiActions(ttk.Frame):
         self.settings_frame.pack(expand=True, fill='y')
         self.pack(side = 'left', fill = 'y', padx = 3, pady = 3)
 
-
-app = Gui()
-app.mainloop()
+if __name__ == '__main__':
+    app = Gui()
+    app.mainloop()
