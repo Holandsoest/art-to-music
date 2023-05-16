@@ -245,7 +245,7 @@ class Square(Shape):
         self.class_id = '2' # TODO: FIX this into the Annotation class
 
         # store the outline in a list
-        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=4, length_traces=self.radius / 2, rotation=rotation_rad)
+        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=4, length_traces=self.radius, rotation=rotation_rad)
 class Heart(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0, depth_percentage=50):
         super().__init__(box, fill_color, outline_color)
@@ -315,8 +315,8 @@ class Star(Shape):
         # store the outline in a list
         self.outline_coordinates = []
 
-        outer_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius / 2, rotation=rotation_rad)
-        inner_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius / 200 * depth_percentage,
+        outer_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius, rotation=rotation_rad)
+        inner_points = calculate_shape_arms_(center_pos=self.center_pos, traces=5, length_traces=self.radius / 100 * depth_percentage,
                                              rotation=rotation_rad + (math.pi / float(5)))
 
         self.outline_coordinates.append(outer_points[0])
@@ -337,7 +337,7 @@ class SymmetricTriangle(Shape):
         self.class_id = '5' # TODO: FIX this into the Annotation class
 
         # store the outline in a list
-        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=3, length_traces=self.radius / 2, rotation=rotation_rad) #BUG: Now self.box is not an annotation box !
+        self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=3, length_traces=self.radius, rotation=rotation_rad) #BUG: Now self.box is not an annotation box !
 
 # Pretty shapes
 class RoundedRectangle(Shape):
