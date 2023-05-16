@@ -112,13 +112,18 @@ def angle_mirror_(rad_angle:float, mirror_vertical=False)->float:
 
 # Shapes
 class Shape:
-    def __init__(self, box:loc.Box, fill_color:str, outline_color:str):
+    def __init__(self, box:loc.Box, fill_color:str, outline_color:str, keep_aspect=False):
         self.canvas_ids = []
         self.box = box
         self.center_pos = loc.Pos(x= box.pos.x + box.size.x/2,
                                   y= box.pos.y + box.size.y/2)
         self.fill_color = fill_color
         self.outline_color = outline_color
+        if keep_aspect:
+            self.box.size.x = self.box.size.min()
+            self.box.size.y = self.box.size.x
+            self.box.pos.x = self.center_pos.x - self.box.size.x/2
+            self.box.pos.y = self.center_pos.y - self.box.size.x/2
     def get_polygon_coordinates_(self, location_offset:loc.Pos) -> list:
         """Returns a list of coordinates that can be used by `tkinter` to draw a `polygon` on a `canvas`"""
         polygon_coordinates = []
@@ -171,8 +176,8 @@ class Shape:
         self.canvas_ids.clear()
 class Circle(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str):
-        super().__init__(box, fill_color, outline_color)
-        self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
+        super().__init__(box, fill_color, outline_color, keep_aspect=True)
+        self.radius = self.box.size.x/2
         self.class_id = '0' # TODO: FIX this into the Annotation class
         pi = math.pi
 
@@ -202,7 +207,7 @@ class Circle(Shape):
         return id
 class HalfCircle(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0):
-        super().__init__(box, fill_color, outline_color)
+        super().__init__(box, fill_color, outline_color, keep_aspect=True)
         self.rotation_rad = rotation_rad % (math.pi * 2) # Shape repeats every 360 degrees
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
         self.class_id = '1' # TODO: FIX this into the Annotation class
@@ -239,7 +244,7 @@ class HalfCircle(Shape):
         self.outline_coordinates.append(calculate_arm_point_(self.center_pos, arm_length, arm_rotation + self.rotation_rad))
 class Square(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0):
-        super().__init__(box, fill_color, outline_color)
+        super().__init__(box, fill_color, outline_color, keep_aspect=True)
         self.rotation_rad = (rotation_rad + math.pi/4) % (math.pi * 2 / 4) # Shape repeats every 90 degrees
         self.radius = math.sqrt((self.box.size.x/2)**2 + (self.box.size.y/2)**2) # Pythagoras to the corner (rotation will be taken in account later)
         self.class_id = '2' # TODO: FIX this into the Annotation class
@@ -248,7 +253,7 @@ class Square(Shape):
         self.outline_coordinates = calculate_shape_arms_(center_pos=self.center_pos, traces=4, length_traces=self.radius, rotation=self.rotation_rad)
 class Heart(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0, depth_percentage=50):
-        super().__init__(box, fill_color, outline_color)
+        super().__init__(box, fill_color, outline_color, keep_aspect=True)
         self.rotation_rad = rotation_rad % (math.pi * 2) # Shape repeats every 360 degrees
         self.depth_percentage=min(95,max(40,depth_percentage)) # Limit depth percentage to 20-80
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
@@ -306,7 +311,7 @@ class Heart(Shape):
         self.outline_coordinates.append(point_pos)
 class Star(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0, depth_percentage=50):
-        super().__init__(box, fill_color, outline_color)
+        super().__init__(box, fill_color, outline_color, keep_aspect=True)
         self.rotation_rad = (rotation_rad + math.pi/2) % (math.pi * 2 / 5) # Shape repeats every 72 degrees
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
         self.depth_percentage=depth_percentage
@@ -331,7 +336,7 @@ class Star(Shape):
         self.outline_coordinates.append(inner_points[4])
 class SymmetricTriangle(Shape):
     def __init__(self, box:loc.Box, fill_color:str, outline_color:str, rotation_rad=0.0):
-        super().__init__(box, fill_color, outline_color)
+        super().__init__(box, fill_color, outline_color, keep_aspect=True)
         self.rotation_rad = (rotation_rad + math.pi/4) % (math.pi * 2 / 3) # Shape repeats every 60 degrees
         self.radius = self.box.size.add() /4 # take half of the average of the size x and y components
         self.class_id = '5' # TODO: FIX this into the Annotation class
