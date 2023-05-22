@@ -164,8 +164,8 @@ class MainCanvas(tkinter.Canvas):
                 
                 # Data for new shape
                 new_shape_color = self.last_color.name.lower()
-                new_shape_shape = ''        # ILLEGAL
-                new_shape_pos   = loc.Pos() # ILLEGAL
+                new_shape_shape = ''        # Declared here as empty to be filled in later
+                new_shape_pos   = loc.Pos() # Declared here as empty to be filled in later
                 new_shape_radius=10
                 new_shape_rot_rad=0.0
                 new_shape_depth =70
