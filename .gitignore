@@ -51,6 +51,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# Threshold values
+files\image_processing\threshold_values.txt
+
 # Translations
 *.mo
 *.pot
@@ -79,6 +82,12 @@ target/
 
 # Output
 output.mid
+
+# Stuff for training the AI, Way to big...
+dataset/train/annotations/*
+dataset/train/images/*
+dataset/validation/annotations/*
+dataset/validation/images/*
 
 # IPython
 profile_default/
@@ -116,6 +125,11 @@ venv.bak/
 # Spyder project settings
 .spyderproject
 .spyproject
+
+# Created audio files
+files\audio_generator\created_song.mp3
+files\audio_generator\midi_files
+files\audio_generator\wav_files
 
 # Rope project settings
 .ropeproject
