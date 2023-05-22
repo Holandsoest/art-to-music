@@ -8,6 +8,7 @@ In this version you cannot rotate & resize the shapes yet"""
 import common.shapes as shapes
 import common.location as loc
 import image_processing
+import common.midi_creation
 
 from enum import Enum # Keep enums UPPER_CASE according to https://docs.python.org/3/howto/enum.html  
 import math
@@ -279,9 +280,6 @@ class MainCanvas(tkinter.Canvas):
         return loc.Size(x=self.winfo_width()-self.pallet_item_size().x, y=self.winfo_height())
     def play_music(self, bypass_ai=False) -> None:
         if not bypass_ai: raise RuntimeError("no u cannot do that yet :'( i dont know how the ai works ;-;")
-
-        import common.midi_creation
-        import image_processing
         
         notes = []
         sounds = {
