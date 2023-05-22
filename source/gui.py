@@ -104,7 +104,7 @@ class MainCanvas(tkinter.Canvas):
                 shape.draw_shape(self, location_offset=loc.Pos())
             self.update()
         redraw_pallet_elements()
-        def pick_up(event):
+        def pick_up(event) -> None:
             if (self.verbose_events): print(f'<pick_up> at {event.x},{event.y}')
             pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
 
@@ -130,7 +130,7 @@ class MainCanvas(tkinter.Canvas):
                 if (self.verbose_events): print (f'Shape picked up from: {shape.box}')
                 return
             if (self.verbose_events): print ('No shape in the region')
-        def let_go(event):
+        def let_go(event) -> None:
             if (self.verbose_events): print(f'<let_go> at {event.x},{event.y}')
             pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
 
