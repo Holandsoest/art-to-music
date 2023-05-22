@@ -2,13 +2,20 @@ import dawdreamer as daw
 from scipy.io import wavfile
 from pydub import AudioSegment
 
+import psutil
+
 def AudiRenderPlugin(list):
     sample_rate = 44100
     buffer_size = 128
 
+    
+    if psutil.WINDOWS:  absolute_path_plugin = 'C:\\Program Files\\Common Files\\VST3\\BBC Symphony Orchestra (64 Bit).vst3'
+    elif psutil.LINUX:  absolute_path_plugin = '' # BUG TODO: 19-invalid-path
+    else: raise RuntimeError('That operating system has not been accounted for. Sound.py')
+
     for instrument in list:
         engine = daw.RenderEngine(sample_rate, buffer_size)
-        synth = engine.make_plugin_processor("my_synth", r"C:\Program Files\Common Files\VST3\BBC Symphony Orchestra (64 Bit).vst3")
+        synth = engine.make_plugin_processor("my_synth", absolute_path_plugin)
         assert synth.get_name() == "my_synth"
         synth.load_state(instrument + "_preset")
         synth.load_midi(instrument +".mid", clear_previous=False, beats=False, all_events=False)
