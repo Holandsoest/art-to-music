@@ -11,7 +11,7 @@ img_proc_ai.setup_ai()
 import os
 
 if __name__ == "__main__":
-    absolute_img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes ().png')
+    absolute_img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes (1).png')
     img = cv2.imread(absolute_img_path)
     assert img is not None, "file could not be read, check with os.path.exists()"
 
