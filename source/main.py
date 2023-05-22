@@ -2,8 +2,11 @@ import cv2
 import image_processing as img_proc
 import common.midi_creation as mc
 
+import os
+
 if __name__ == "__main__":
-    img = cv2.imread('files\image_processing\ExampleShapes6.png')
+    absolute_path = os.path.join(os.getcwd(), 'files','image_processing','ExampleShapes6.png')
+    img = cv2.imread(absolute_path)
 
     list_of_shapes = img_proc.readImage(img)
 
