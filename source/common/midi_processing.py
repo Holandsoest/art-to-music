@@ -171,4 +171,5 @@ def audio_rendering():
     # Export the combined audio to an MP3 file
     with open(os.path.join("files','audio_generator','created_song.mp3"), "wb") as output_file1:
                 combined_sound7.export(output_file1, format = "mp3")
-
+if __name__ == "__main__":
+    audio_rendering()
