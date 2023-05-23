@@ -222,13 +222,6 @@ def MakeSong(list):
 
             object_piano += 1
 
-        #add drum notes
-        #if amount_of_drum > 0 and shape.instrument == "drum":
-            
-        #   midi_drum.addNote(0, 0, 84, shape.note_placement, 1, shape.volume) # add a note
-
-        #   object_drum +=1
-
         #add saxophone notes
         if amount_of_saxophone > 0 and shape.instrument == "saxophone":
             
@@ -236,15 +229,7 @@ def MakeSong(list):
 
             object_saxophone +=1
 
-        #add clap notes
-        #if amount_of_clap > 0 and shape.instrument == "clap":
-        
-        #    midi_clap.addNote(object_clap, 0, 84, shape.note_placement, 1, shape.volume) # add a note
-
-         #   object_clap +=1
-        
         #Make wav files of all the midi's when al nodes are added
-
         if amount_of_instruments -1 == iteration:
             if amount_of_flute == 0:
                 midi_flute.addNote(0, 0, 0, 1, 1, 120) #clear track
@@ -254,12 +239,8 @@ def MakeSong(list):
                 midi_guitar.addNote(0, 0, 0, 1, 1, 120) #clear track
             if amount_of_piano == 0:
                 midi_piano.addNote(0, 0, 0, 1, 1, 120) #clear track
-            #if amount_of_drum == 0:
-            #    midi_drum.addNote(0, 0, 0, 1, 1, 120) #clear track 
             if amount_of_saxophone == 0:
                 midi_saxophone.addNote(0, 0, 0, 1, 1, 120) #clear track
-            #if amount_of_clap == 0:
-            #    midi_clap.addNote(0, 0, 0, 1, 1, 120) #clear track
 
             #write all the midi files
             with open(model_custom_path + "\\flute_output.mid", "wb") as output_file1: 
