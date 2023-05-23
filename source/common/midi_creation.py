@@ -248,7 +248,7 @@ def MakeSong(list):
         #add clap notes
         if amount_of_clap > 0 and shape.instrument == "clap":
         
-            midi_clap.addNote(object_clap, channel_clap, 84, shape.note_placement, 1, shape.volume) # add a note
+            midi_clap.addNote(object_clap, 0, 84, shape.note_placement, 1, shape.volume) # add a note
 
             object_clap +=1
         
