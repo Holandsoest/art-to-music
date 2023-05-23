@@ -9,7 +9,7 @@ cap = cv2.VideoCapture(0)
 img_proc_ai.setup_ai()
 
 if __name__ == "__main__":
-    img_path = 'files\image_processing\example_shapes ().png'
+    img_path = 'files\image_processing\star.png'
     img = cv2.imread(img_path)
     assert img is not None, "file could not be read, check with os.path.exists()"
 
@@ -20,16 +20,16 @@ if __name__ == "__main__":
     img_proc_ai.detect_shapes_with_ai(img)
     img_proc.display_list_of_shapes(list_of_shapes)
 
-    midi_creation.MakeSong(list_of_shapes) 
+    bpm = midi_creation.MakeSong(list_of_shapes) 
     
     processes = [
-        mp.Process(target=midi_processing.drum, args=(list_of_shapes, 0)),
-        mp.Process(target=midi_processing.violin, args=(list_of_shapes, 0)),
-        mp.Process(target=midi_processing.guitar, args=(list_of_shapes, 0)),
-        mp.Process(target=midi_processing.flute, args=(list_of_shapes, 0)),
-        mp.Process(target=midi_processing.saxophone, args=(list_of_shapes, 0)),
-        mp.Process(target=midi_processing.clap, args=(list_of_shapes, 0)),
-        mp.Process(target=midi_processing.piano, args=(list_of_shapes, 0))
+        mp.Process(target=midi_processing.drum, args=(0, bpm)),
+        mp.Process(target=midi_processing.violin, args=(0, bpm)),
+        mp.Process(target=midi_processing.guitar, args=(0, bpm)),
+        mp.Process(target=midi_processing.flute, args=(0, bpm)),
+        mp.Process(target=midi_processing.saxophone, args=(0, bpm)),
+        mp.Process(target=midi_processing.clap, args=(0, bpm)),
+        mp.Process(target=midi_processing.piano, args=(0, bpm))
     ]
     
     # Start all processes
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     for process in processes:
         process.join()
         
-    midi_processing.audio_rendering()
+    midi_processing.audio_rendering(bpm)
     
         # if cv2.waitKey(1) & 0xFF == ord('q'):
         #     cv2.destroyAllWindows()
