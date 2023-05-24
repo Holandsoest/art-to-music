@@ -231,7 +231,8 @@ class MainCanvas(tkinter.Canvas):
                 new_shape = get_new_shape(shape=PalletItem(int(shape.class_id)+PalletItem.CIRCLE.value),
                                           center_pos=shape.center_pos,
                                           size=new_size,
-                                          color=PalletItem[shape.fill_color.upper()])
+                                          color=PalletItem[shape.fill_color.upper()],
+                                          rotation_rad=shape.rotation_rad)
                 
                 # Replace
                 shape.remove_shape(self)
