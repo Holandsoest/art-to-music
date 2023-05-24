@@ -19,6 +19,8 @@ class Pos:
         if (self.x != other.x): return False
         if (self.y != other.y): return False
         return True
+    def __ne__(self, other) -> bool:
+        return not (self == other)
     def __add__(self, other) -> int|float:
         return Pos(x= self.x + other.x,
                    y= self.y + other.y)
@@ -50,6 +52,16 @@ class Pos:
 class Size(Pos):
     def __str__(self) -> str:
         return f'w:{self.x}, h:{self.y}'
+    def __lt__(self, other) -> bool:
+        return self.area() < other.area()
+    def __gt__(self, other) -> bool:
+        return self.area() > other.area()
+    def __le__(self, other) -> bool:
+        return self.area() <= other.area()
+    def __ge__(self, other) -> bool:
+        return self.area() >= other.area()
+    def area(self) -> int|float:
+        return self.x * self.y
 class Box:
     def __init__(self, x, y, width, height):
         self.pos = Pos(x,y)
