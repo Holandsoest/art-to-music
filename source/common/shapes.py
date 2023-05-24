@@ -124,6 +124,9 @@ class Shape:
             self.box.size.y = self.box.size.x
             self.box.pos.x = self.center_pos.x - self.box.size.x/2
             self.box.pos.y = self.center_pos.y - self.box.size.x/2
+        
+        self.rotation_rad = 0.0
+        self.depth_percentage = 70
     def get_polygon_coordinates_(self, location_offset:loc.Pos) -> list:
         """Returns a list of coordinates that can be used by `tkinter` to draw a `polygon` on a `canvas`"""
         polygon_coordinates = []
