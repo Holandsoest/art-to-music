@@ -186,7 +186,7 @@ def MakeSong(list):
     
     midi_clap.addNote(0, 0, 70, 1, 0.5, 120) # add a note
     midi_clap.addNote(0, 0, 70, 3, 0.5, 120) # add a note
-
+    x = 0
     #fill midi files with notes
     for shape in list:
         #add flute notes
@@ -206,7 +206,7 @@ def MakeSong(list):
         #add guitar notes
         if amount_of_guitar > 0 and shape.instrument == "guitar":
             
-            midi_guitar.addNote(0, 0, scale(shape.pitch, "guitar"), shape.note_placement, 1, shape.volume) # add a note
+            midi_guitar.addNote(0, 0, scale(shape.pitch, "guitar"), shape.note_placement, 0.5, shape.volume) # add a note
 
             object_guitar += 1
 
@@ -247,9 +247,9 @@ def MakeSong(list):
                 midi_flute.writeFile(output_file1)
             with open(model_custom_path + "\\violin_output.mid", "wb") as output_file2:
                 midi_violin.writeFile(output_file2)
-            with open(model_custom_path + "\\piano_output.mid", "wb") as output_file3:
+            with open(model_custom_path + "\\guitar_output.mid", "wb") as output_file3:
                 midi_guitar.writeFile(output_file3)
-            with open(model_custom_path + "\\guitar_output.mid", "wb") as output_file4:
+            with open(model_custom_path + "\\violin_output.mid", "wb") as output_file4:
                 midi_violin.writeFile(output_file4)
             with open(model_custom_path + "\\drum_output.mid", "wb") as output_file5:
                 midi_drum.writeFile(output_file5)

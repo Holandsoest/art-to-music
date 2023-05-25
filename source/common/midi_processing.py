@@ -10,127 +10,20 @@ model_preset_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'prese
 model_wav_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'wav_files')
 model_plugin_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'StupidSimpleSampler')      
 
-def drum(amount_of_drum, bpm):
-    if amount_of_drum == 0:
-        engine = daw.RenderEngine(sample_rate, buffer_size)
-        synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
-        assert synth.get_name() == "my_synth"
-        synth.load_state(model_preset_path + "\\kick.fxb")
-        #synth.open_editor()
-        synth.load_midi(model_midi_path + "\\drum_output.mid", clear_previous=False, beats=False, all_events=False) 
-        engine.load_graph([
-                        (synth,[])
-        ])
-        engine.set_bpm(bpm)
-        engine.render(4/(bpm/60))  
-        audio = engine.get_audio()  
-        wavfile.write(model_wav_path + "\\drum.wav",  sample_rate, audio.transpose()) 
-        amount_of_drum +=1
-
-def guitar(amount_of_guitar, bpm):      
-    if amount_of_guitar == 0:
-        engine = daw.RenderEngine(sample_rate, buffer_size)
-        synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
-        assert synth.get_name() == "my_synth"
-        synth.load_state(model_preset_path + "\\guitar.fxb")
-        synth.load_midi(model_midi_path + "\\guitar_output.mid", clear_previous=False, beats=False, all_events=False) 
-
-        engine.load_graph([
-                        (synth,[])
-        ])
-        engine.set_bpm(bpm)
-        engine.render(4/(bpm/60))  
-        audio = engine.get_audio()  
-        wavfile.write(model_wav_path + "\\guitar.wav",  sample_rate, audio.transpose()) 
-        amount_of_guitar +=1
-
-def violin (amount_of_violin, bpm):
-    if amount_of_violin == 0:
-        engine = daw.RenderEngine(sample_rate, buffer_size)
-        synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
-        assert synth.get_name() == "my_synth"
-        synth.load_state(model_preset_path + "\\violin.fxb")
-        synth.load_midi(model_midi_path + "\\violin_output.mid", clear_previous=False, beats=False, all_events=False) 
-
-        engine.load_graph([
-                        (synth,[])
-        ])
-        engine.set_bpm(bpm)
-        engine.render(4/(bpm/60))  
-        audio = engine.get_audio()  
-        wavfile.write(model_wav_path + "\\violin.wav",  sample_rate, audio.transpose()) 
-        amount_of_violin +=1
-
-def flute (amount_of_flute, bpm):
-    if amount_of_flute == 0:
-        engine = daw.RenderEngine(sample_rate, buffer_size)
-        synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
-        assert synth.get_name() == "my_synth"
-        synth.load_state(model_preset_path + "\\flute.fxb")
-        synth.load_midi(model_midi_path + "\\flute_output.mid", clear_previous=False, beats=False, all_events=False) 
-
-        engine.load_graph([
-                        (synth,[])
-        ])
-        engine.set_bpm(bpm)
-        engine.render(4/(bpm/60))  
-        audio = engine.get_audio()  
-        wavfile.write(model_wav_path + "\\flute.wav",  sample_rate, audio.transpose())
-        amount_of_flute +=1
-            
-def piano (amount_of_piano, bpm):
-    if amount_of_piano == 0:
-        engine = daw.RenderEngine(sample_rate, buffer_size)
-        synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
-        assert synth.get_name() == "my_synth"
-        synth.load_state(model_preset_path + "\\piano.fxb")
-        #synth.open_editor()
-        synth.load_midi(model_midi_path + "\\piano_output.mid", clear_previous=False, beats=False, all_events=False) 
-
-        engine.load_graph([
-                        (synth,[])
-        ])
-        engine.set_bpm(bpm)
-        engine.render(4/(bpm/60))  
-        audio = engine.get_audio()  
-        wavfile.write(model_wav_path + "\\piano.wav", sample_rate, audio.transpose())
-        amount_of_piano +=1
-    
-def saxophone (amount_of_saxophone, bpm):
-    if amount_of_saxophone == 0:
-        engine = daw.RenderEngine(sample_rate, buffer_size)
-        synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
-        assert synth.get_name() == "my_synth"
-        synth.load_state(model_preset_path + "\\saxophone.fxb")
-        synth.load_midi(model_midi_path + "\\saxophone_output.mid", clear_previous=False, beats=False, all_events=False) 
-
-        engine.load_graph([
-                        (synth,[])
-        ])
-        engine.set_bpm(bpm)
-        engine.render(4/(bpm/60))  
-        audio = engine.get_audio()  
-        wavfile.write(model_wav_path + "\\saxophone.wav", sample_rate, audio.transpose())
-        amount_of_saxophone +=1
-    
-def clap (amount_of_clap, bpm):
-    if amount_of_clap == 0:
-        engine = daw.RenderEngine(sample_rate, buffer_size)
-        synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
-        assert synth.get_name() == "my_synth"
-        synth.load_state(model_preset_path + "\\clap.fxb")
-        #synth.open_editor()
-        #synth.save_state()
-        synth.load_midi(model_midi_path + "\\clap_output.mid", clear_previous=False, beats=False, all_events=False) 
-
-        engine.load_graph([
-                        (synth,[])
-        ])
-        engine.set_bpm(bpm)
-        engine.render(4/(bpm/60))  
-        audio = engine.get_audio()  
-        wavfile.write(model_wav_path + "\\clap.wav", sample_rate, audio.transpose())
-        amount_of_clap +=1
+def instrument (bpm, instrument):
+    engine = daw.RenderEngine(sample_rate, buffer_size)
+    synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
+    assert synth.get_name() == "my_synth"
+    synth.load_state(model_preset_path + f"\\{instrument}.fxb")
+    synth.load_midi(model_midi_path + f"\\{instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
+    engine.load_graph([
+                    (synth,[])
+    ])
+    engine.set_bpm(bpm)
+    engine.render(4/(bpm/60))  
+    audio = engine.get_audio()  
+    wavfile.write(model_wav_path + f"\\{instrument}.wav",  sample_rate, audio.transpose())
+       
 
 def audio_rendering(bpm):
     # Load the first MP3 file
