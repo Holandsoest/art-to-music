@@ -1,0 +1,121 @@
+
+FONT_CATEGORY "control_edit"
+font-size 14
+GDI_pixelHeight 16
+GDI_pixelWidth 10
+font-weight bold
+font-family "MS Sans Serif" 
+
+FONT_CATEGORY "control_label"
+font-size 14
+font-color #dddddd
+GDI_pixelHeight 19
+GDI_pixelWidth 11
+font-family "Arial Black" 
+
+FONT_CATEGORY "heading 1"
+font-size 28
+font-color #fff7f7
+GDI_pixelHeight 33
+GDI_pixelWidth 20
+font-weight bold
+text-align center
+text-decoration underline
+font-family "Arial" 
+
+FONT_CATEGORY "heading 2"
+font-size 18
+GDI_pixelHeight 21
+GDI_pixelWidth 12
+text-align center
+font-family "Arial" 
+
+FONT_CATEGORY "heading 3"
+font-size 14
+GDI_pixelHeight 16
+GDI_pixelWidth 9
+text-align center
+font-family "Arial" 
+
+FONT_CATEGORY "module_title"
+font-size 12
+GDI_pixelHeight 15
+GDI_pixelWidth 8
+font-family "Segoe UI" 
+
+FONT_CATEGORY "normal"
+font-size 12
+font-color #0
+background-color #ffffff
+GDI_pixelHeight 13
+GDI_pixelWidth 7
+text-align center
+font-family "MS Sans Serif" 
+
+FONT_CATEGORY "panel_group"
+font-size 14
+font-color #dddddd
+GDI_pixelHeight 16
+GDI_pixelWidth 10
+font-weight bold
+font-family "Arial" 
+
+FONT_CATEGORY "plug"
+font-size 10
+font-color #0
+GDI_pixelHeight 12
+GDI_pixelWidth 7
+font-family "Segoe UI" 
+
+FONT_CATEGORY "properties_heading"
+font-size 14
+font-color #0
+background-color #ffffff
+GDI_pixelHeight 16
+GDI_pixelWidth 10
+font-weight bold
+font-family "Arial" 
+
+FONT_CATEGORY "selector_text"
+font-size 10
+font-color #dddddd
+GDI_pixelHeight 12
+GDI_pixelWidth 7
+font-weight bold
+font-family "Arial" 
+
+FONT_CATEGORY "switch_label"
+font-size 10
+font-color #dddddd
+GDI_pixelHeight 12
+GDI_pixelWidth 7
+font-weight bold
+font-family "Arial" 
+
+FONT_CATEGORY "tty"
+font-size 10
+font-color #dddddd
+GDI_pixelHeight 12
+GDI_pixelWidth 7
+font-weight bold
+font-family "Arial" 
+
+FONT_CATEGORY "user 1"
+font-size 14
+font-color #0
+background-color #ffffff
+GDI_pixelHeight 16
+GDI_pixelWidth 9
+font-family "Arial" 
+
+FONT_CATEGORY "user 2"
+font-size 12
+GDI_pixelHeight 13
+GDI_pixelWidth 8
+font-family "Courier" 
+
+FONT_CATEGORY "user 3"
+font-size 12
+GDI_pixelHeight 15
+GDI_pixelWidth 8
+font-family "Fixedsys" 
