@@ -119,7 +119,7 @@ def clap (amount_of_clap, bpm):
         synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
         assert synth.get_name() == "my_synth"
         synth.load_state(model_preset_path + "\\clap.fxb")
-        #synth.open_editor()
+        synth.open_editor()
         #synth.save_state()
         synth.load_midi(model_midi_path + "\\clap_output.mid", clear_previous=False, beats=False, all_events=False) 
 
