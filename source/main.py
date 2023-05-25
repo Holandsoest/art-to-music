@@ -9,7 +9,7 @@ cap = cv2.VideoCapture(0)
 img_proc_ai.setup_ai()
 
 if __name__ == "__main__":
-    img_path = 'files\image_processing\star.png'
+    img_path = 'files\image_processing\example_shapes (3).png'
     img = cv2.imread(img_path)
     assert img is not None, "file could not be read, check with os.path.exists()"
 
