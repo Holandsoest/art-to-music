@@ -51,9 +51,6 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Threshold values
-files\image_processing\threshold_values.txt
-
 # Translations
 *.mo
 *.pot
@@ -128,10 +125,21 @@ venv.bak/
 
 # Created audio files
 files/audio_generator/created_song.mp3
-files/audio_generator/midi_files
-files/audio_generator/wav_files
 files/audio_generator/created_song
-
+files/audio_generator/midi_files/clap_output.mid
+files/audio_generator/midi_files/drum_output.mid
+files/audio_generator/midi_files/flute_output.mid
+files/audio_generator/midi_files/guitar_output.mid
+files/audio_generator/midi_files/piano_output.mid
+files/audio_generator/midi_files/saxophone_output.mid
+files/audio_generator/midi_files/violin_output.mid
+files/audio_generator/wav_files/clap.wav
+files/audio_generator/wav_files/drum.wav
+files/audio_generator/wav_files/flute.wav
+files/audio_generator/wav_files/guitar.wav
+files/audio_generator/wav_files/piano.wav
+files/audio_generator/wav_files/saxophone.wav
+files/audio_generator/wav_files/violin.wav
 
 # Rope project settings
 .ropeproject
