@@ -51,9 +51,6 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
-# Threshold values
-files/image_processing/threshold_values.txt
-
 # Translations
 *.mo
 *.pot

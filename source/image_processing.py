@@ -1,45 +1,66 @@
 import math
+import common.image_properties as img_prop
+import cv2
+import numpy as np
 
-def get_bpm_from_color(x_axis, y_axis, image) -> int:
+# Function to get the color of an object in the image
+def get_color(img:cv2.Mat) -> str:
     """
-    This function gets the RGB values of a pixel on the (x,y)-coordinates of an image and scales this to a number of the table of 30.
-    It takes three arguments:
-    - x_axis: the x axis coordinate of the pixel
-    - y_axis: the y axis coordinate of the pixel
-    - image:  the image that will be scanned for the pixel
+    function to detect the most common color of an object
+    It has one parameter:
+    - img: the object that the function should go through
     
-    It returns a scaled value of the table of 30. This number will represent the beats per minute(BPM) of the instrument.
+    Returns what color the object mainly has
     """
-    b, g, r = image[y_axis, x_axis]
-    b = int(b)
-    g = int(g)
-    r = int(r)
+    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-    # # For now the rgb colorcode will represent a bpm match, but later on we will probably work with colorname to bpm
-    # def get_shape_color(R,G,B):
-    #         #Reading csv file with pandas and giving names to each column
-    #     index=["color","color_name","hex","R","G","B"]
-    #     absolute_path = os.path.join(os.getcwd(), 'files','image_processing', 'colors.csv')
-    #     csv = pd.read_csv(absolute_path, names=index, header=None)
+    # Define color range for red, green, and blue
+    lower_yellow = np.array([20, 100, 100])
+    upper_yellow = np.array([30, 255, 255])
+    lower_orange = np.array([5, 100, 100])
+    upper_orange = np.array([15, 255, 255])
+    lower_green = np.array([36, 25, 25])
+    upper_green = np.array([86, 255, 255])
+    lower_blue = np.array([110, 50, 50])
+    upper_blue = np.array([130, 255, 255])
+    lower_violet = np.array([140, 50, 50])
+    upper_violet = np.array([160, 255, 255])
+    lower_red1 = np.array([0, 50, 50])
+    upper_red1 = np.array([10, 255, 255])
+    lower_red2 = np.array([170, 50, 50])
+    upper_red2 = np.array([180, 255, 255])
 
-    #     minimum = 10000
-    #     for i in range(len(csv)):
-    #         d = abs(R- int(csv.loc[i,"R"])) + abs(G- int(csv.loc[i,"G"]))+ abs(B- int(csv.loc[i,"B"]))
-    #         if(d<=minimum):
-    #             minimum = d
-    #             cname = csv.loc[i,"color_name"]
-    #     return cname
-    
-    # colorName = get_shape_color(r,g,b)
+    # Create masks for each color range
+    yellow_mask = cv2.inRange(hsv_img, lower_yellow, upper_yellow)
+    orange_mask = cv2.inRange(hsv_img, lower_orange, upper_orange)
+    green_mask = cv2.inRange(hsv_img, lower_green, upper_green)
+    blue_mask = cv2.inRange(hsv_img, lower_blue, upper_blue)
+    violet_mask = cv2.inRange(hsv_img, lower_violet, upper_violet)
+    red_mask1 = cv2.inRange(hsv_img, lower_red1, upper_red1)
+    red_mask2 = cv2.inRange(hsv_img, lower_red2, upper_red2)
+    red_mask = cv2.bitwise_or(red_mask1, red_mask2)
 
-    def round_up_to_30(number):
-        return min(((number + 29) // 30) * 30, 240)
-    
-    bpm = round_up_to_30((b + g + r) / 3)
-    if bpm < 30:
-        return 30
+    # Count the number of pixels in each mask
+    yellow_pixels = cv2.countNonZero(yellow_mask)
+    orange_pixels = cv2.countNonZero(orange_mask)
+    green_pixels = cv2.countNonZero(green_mask)
+    blue_pixels = cv2.countNonZero(blue_mask)
+    violet_pixels = cv2.countNonZero(violet_mask)
+    red_pixels = cv2.countNonZero(red_mask)
+
+    # Determine the dominant color based on the number of pixels
+    if yellow_pixels > orange_pixels and yellow_pixels > green_pixels and yellow_pixels > blue_pixels and yellow_pixels > violet_pixels and yellow_pixels > red_pixels:
+        return img_prop.ColorType.YELLOW
+    elif orange_pixels > yellow_pixels and orange_pixels > green_pixels and orange_pixels > blue_pixels and orange_pixels > violet_pixels and orange_pixels > red_pixels:
+        return img_prop.ColorType.ORANGE
+    elif green_pixels > yellow_pixels and green_pixels > orange_pixels and green_pixels > blue_pixels and green_pixels > violet_pixels and green_pixels > red_pixels:
+        return img_prop.ColorType.GREEN
+    elif blue_pixels > yellow_pixels and blue_pixels > orange_pixels and blue_pixels > green_pixels and blue_pixels > violet_pixels and blue_pixels > red_pixels:
+        return img_prop.ColorType.BLUE
+    elif violet_pixels > yellow_pixels and violet_pixels > orange_pixels and violet_pixels > green_pixels and violet_pixels > blue_pixels and violet_pixels > red_pixels:
+        return img_prop.ColorType.VIOLET
     else:
-        return bpm
+        return img_prop.ColorType.RED
 
 def get_placement_of_note(x_axis_middlepoint, img_width) -> int | float:
     """

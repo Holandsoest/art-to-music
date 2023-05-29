@@ -1,3 +1,4 @@
+from midiutil.MidiFile import MIDIFile
 from midiutil.MidiFile import *
 import os
 
@@ -83,21 +84,21 @@ def MakeSong(list):
     # --- high --- single
     amount_of_flute = 0 
     object_flute = 0    
+
     amount_of_violin = 0 # could also be mid
     object_violin = 0 # could also be mid    
     # --- mid --- accord
     amount_of_guitar = 0    
     object_guitar = 0
+
     amount_of_piano = 0
     object_piano = 0
     # --- low --- single 
     amount_of_drum = 0    
     object_drum = 0
+    
     amount_of_saxophone = 0  
     object_saxophone = 0
-    # --- kick --- single
-    amount_of_kick = 0
-    object_kick = 0
     # --- clap --- single
     amount_of_clap = 0    
     object_clap = 0
@@ -105,7 +106,7 @@ def MakeSong(list):
     bpm = 0
     
     forbidden_notes = [22,25,27,30,32,34,42,44,46,49,51,54,56,58,61,63,66,68,70,73,75,78,80,82,85,87,90,92,94,97,99,102,104,106]
-    
+
     # determine the amount of shapes with the same instrument in the list
     for shape in list:
         match shape.instrument:
@@ -127,15 +128,12 @@ def MakeSong(list):
             case 'saxophone':  
                 amount_of_saxophone += 1
                 bpm = bpm + shape.bpm 
-            case 'kick':  
-                amount_of_kick += 1
-                bpm = bpm + shape.bpm 
             case 'clap':   
                 amount_of_clap += 1
                 bpm = bpm + shape.bpm 
             case _: pass        
 
-    bpm = bpm/amount_of_instruments # determen bpm of composition
+    bpm = int(bpm/amount_of_instruments) # determen bpm of composition
 
     # make midi file for every instrument
     midi_flute          = MIDIFile(1, removeDuplicates=False) # high
@@ -144,7 +142,6 @@ def MakeSong(list):
     midi_piano          = MIDIFile(1, removeDuplicates=False) # mid
     midi_drum           = MIDIFile(1, removeDuplicates=False) # low     
     midi_saxophone      = MIDIFile(1, removeDuplicates=False) # low     
-    midi_kick           = MIDIFile(1, removeDuplicates=False) # kick
     midi_clap           = MIDIFile(1, removeDuplicates=False) # clap
     
     # -----------flute / high-----------  
@@ -177,19 +174,21 @@ def MakeSong(list):
     midi_saxophone.addTempo(0, 0, bpm) # set bpm
     midi_saxophone.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
 
-    # -----------kick-----------
-    midi_kick.addTrackName(0, 0, "Track0") # give track a name
-    midi_kick.addTempo(0, 0, bpm) # set bpm
-    midi_kick.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
-
     # -----------clap-----------
     midi_clap.addTrackName(0, 0, "Track0") # give track a name
     midi_clap.addTempo(0, 0, bpm) # set bpm
     midi_clap.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
+    
+    midi_drum.addNote(0, 0, 70, 0, 0.5, 120) # add a note
+    midi_drum.addNote(0, 0, 70, 1, 0.5, 120) # add a note
+    midi_drum.addNote(0, 0, 70, 2, 0.5, 120) # add a note
+    midi_drum.addNote(0, 0, 70, 3, 0.5, 120) # add a note
+    
+    midi_clap.addNote(0, 0, 70, 1, 0.5, 120) # add a note
+    midi_clap.addNote(0, 0, 70, 3, 0.5, 120) # add a note
 
     #fill midi files with notes
     for shape in list:
-        
         #add flute notes
         if amount_of_flute > 0 and shape.instrument == "flute":
             
@@ -223,13 +222,6 @@ def MakeSong(list):
 
             object_piano += 1
 
-        #add drum notes
-        if amount_of_drum > 0 and shape.instrument == "drum":
-            
-            midi_drum.addNote(0, 0, 84, shape.note_placement, 1, shape.volume) # add a note
-
-            object_drum +=1
-
         #add saxophone notes
         if amount_of_saxophone > 0 and shape.instrument == "saxophone":
             
@@ -237,21 +229,7 @@ def MakeSong(list):
 
             object_saxophone +=1
 
-        #add kick notes
-        if amount_of_kick > 0 and shape.instrument == "kick":
-            
-            midi_kick.addNote(0, 0, 84, shape.note_placement, 1, shape.volume) # add a note
-
-            object_kick +=1
-        
-        #add clap notes
-        if amount_of_clap > 0 and shape.instrument == "clap":
-        
-            midi_clap.addNote(object_clap, channel_clap, 84, shape.note_placement, 1, shape.volume) # add a note
-
-            object_clap +=1
-        
-        #Mmake wav files of all the midi's when al nodes are added
+        #Make wav files of all the midi's when al nodes are added
         if amount_of_instruments -1 == iteration:
             if amount_of_flute == 0:
                 midi_flute.addNote(0, 0, 0, 1, 1, 120) #clear track
@@ -261,14 +239,8 @@ def MakeSong(list):
                 midi_guitar.addNote(0, 0, 0, 1, 1, 120) #clear track
             if amount_of_piano == 0:
                 midi_piano.addNote(0, 0, 0, 1, 1, 120) #clear track
-            if amount_of_drum == 0:
-                midi_drum.addNote(0, 0, 0, 1, 1, 120) #clear track 
             if amount_of_saxophone == 0:
                 midi_saxophone.addNote(0, 0, 0, 1, 1, 120) #clear track
-            if amount_of_kick == 0:
-                midi_kick.addNote(0, 0, 0, 1, 1, 120) #clear track
-            if amount_of_clap == 0:
-                midi_clap.addNote(0, 0, 0, 1, 1, 120) #clear track
 
             #write all the midi files
             with open(os.path.join(model_custom_path, "flute_output.mid"), "wb") as output_file1: 
@@ -283,12 +255,8 @@ def MakeSong(list):
                 midi_drum.writeFile(output_file5)
             with open(os.path.join(model_custom_path, "saxophone_output.mid"), "wb") as output_file6: 
                 midi_saxophone.writeFile(output_file6)
-            with open(os.path.join(model_custom_path, "kick_output.mid"), "wb") as output_file7:
-                midi_kick.writeFile(output_file7)
-            with open(os.path.join(model_custom_path, "clap_output.mid"), "wb") as output_file8:
-                midi_clap.writeFile(output_file8)
-
+            with open(os.path.join(model_custom_path, "clap_output.mid"), "wb") as output_file7:
+                midi_clap.writeFile(output_file7)
+            return bpm
+        
         iteration += 1
-
-    
-
