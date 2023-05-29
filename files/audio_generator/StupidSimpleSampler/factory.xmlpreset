@@ -1,0 +1,42 @@
+<?xml version="1.0" ?>
+<Presets>
+    <PresetNames>
+        <Name>Bell</Name>
+        <Name>Tone</Name>
+        <Name>Cat</Name>
+        <Name>Human</Name>
+        <Name>Bonce</Name>
+        <Name>Clink</Name>
+        <Name>Stick</Name>
+        <Name>strings</Name>
+    </PresetNames>
+    <Parameters>
+        <Parameter Handle="9" Name="Polyphony" DataType="8">
+            <patch-list>6</patch-list>
+        </Parameter>
+        <Parameter Handle="10" Name="ReserveVoices" DataType="8">
+            <patch-list>3</patch-list>
+        </Parameter>
+        <Parameter Handle="11" Name="VoiceAllocationMode" DataType="8">
+            <patch-list>768</patch-list>
+        </Parameter>
+        <Parameter Handle="432659180" Name="ADSR2 Attack" DataType="6">
+            <patch-list>0 0 0 0 0 0 0 0</patch-list>
+        </Parameter>
+        <Parameter Handle="498802333" Name="ADSR2 Release" DataType="6">
+            <patch-list>3.3 4 4 8.15 4 4 4 4</patch-list>
+        </Parameter>
+        <Parameter Handle="752907596" Name="Wave Player File Name" DataType="1">
+            <patch-list>\samples\bell.wav \samples\tone.wav \samples\meow.wav \samples\voice.wav \samples\bounce.wav \samples\clink.wav \samples\stick.wav \samples\strings.wav</patch-list>
+        </Parameter>
+        <Parameter Handle="1559965434" Name="ADSR2 Decay" DataType="6">
+            <patch-list>2.6 5 5 4.05 5 5 5 5</patch-list>
+        </Parameter>
+        <Parameter Handle="1935012613" Name="Sample Oscillator2 Quality" DataType="8">
+            <patch-list>8 8 8 8 8 8 8 8</patch-list>
+        </Parameter>
+        <Parameter Handle="2020817305" Name="ADSR2 Sustain" DataType="6">
+            <patch-list>4.5 7 7 5.1 7 7 7 7</patch-list>
+        </Parameter>
+    </Parameters>
+</Presets>
