@@ -243,19 +243,19 @@ def MakeSong(list):
                 midi_saxophone.addNote(0, 0, 0, 1, 1, 120) #clear track
 
             #write all the midi files
-            with open(model_custom_path + "\\flute_output.mid", "wb") as output_file1: 
+            with open(os.path.join(model_custom_path, "flute_output.mid"), "wb") as output_file1: 
                 midi_flute.writeFile(output_file1)
-            with open(model_custom_path + "\\violin_output.mid", "wb") as output_file2:
+            with open(os.path.join(model_custom_path, "violin_output.mid"), "wb") as output_file2:
                 midi_violin.writeFile(output_file2)
-            with open(model_custom_path + "\\piano_output.mid", "wb") as output_file3:
+            with open(os.path.join(model_custom_path, "piano_output.mid"), "wb") as output_file3:
                 midi_guitar.writeFile(output_file3)
-            with open(model_custom_path + "\\guitar_output.mid", "wb") as output_file4:
+            with open(os.path.join(model_custom_path, "guitar_output.mid"), "wb") as output_file4:
                 midi_violin.writeFile(output_file4)
-            with open(model_custom_path + "\\drum_output.mid", "wb") as output_file5:
+            with open(os.path.join(model_custom_path, "drum_output.mid"), "wb") as output_file5:
                 midi_drum.writeFile(output_file5)
-            with open(model_custom_path + "\\saxophone_output.mid", "wb") as output_file6: 
+            with open(os.path.join(model_custom_path, "saxophone_output.mid"), "wb") as output_file6: 
                 midi_saxophone.writeFile(output_file6)
-            with open(model_custom_path + "\\clap_output.mid", "wb") as output_file7:
+            with open(os.path.join(model_custom_path, "clap_output.mid"), "wb") as output_file7:
                 midi_clap.writeFile(output_file7)
             return bpm
         

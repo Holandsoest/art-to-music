@@ -77,15 +77,6 @@ target/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# Output
-output.mid
-
-# Stuff for training the AI, Way to big...
-dataset/train/annotations/*
-dataset/train/images/*
-dataset/validation/annotations/*
-dataset/validation/images/*
-
 # IPython
 profile_default/
 ipython_config.py
@@ -123,24 +114,6 @@ venv.bak/
 .spyderproject
 .spyproject
 
-# Created audio files
-files/audio_generator/created_song.mp3
-files/audio_generator/created_song
-files/audio_generator/midi_files/clap_output.mid
-files/audio_generator/midi_files/drum_output.mid
-files/audio_generator/midi_files/flute_output.mid
-files/audio_generator/midi_files/guitar_output.mid
-files/audio_generator/midi_files/piano_output.mid
-files/audio_generator/midi_files/saxophone_output.mid
-files/audio_generator/midi_files/violin_output.mid
-files/audio_generator/wav_files/clap.wav
-files/audio_generator/wav_files/drum.wav
-files/audio_generator/wav_files/flute.wav
-files/audio_generator/wav_files/guitar.wav
-files/audio_generator/wav_files/piano.wav
-files/audio_generator/wav_files/saxophone.wav
-files/audio_generator/wav_files/violin.wav
-
 # Rope project settings
 .ropeproject
 
@@ -154,3 +127,17 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Created audio files
+files/audio_generator/created_song.mp3
+files/audio_generator/midi_files/*.mid
+files/audio_generator/wav_files/*.wav
+
+# Output
+output.mid
+
+# Stuff for training the AI, Way to big...
+dataset/train/annotations/*
+dataset/train/images/*
+dataset/validation/annotations/*
+dataset/validation/images/*
