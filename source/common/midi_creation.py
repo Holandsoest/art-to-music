@@ -83,25 +83,16 @@ def MakeSong(list):
     # define variables amount and objects
     # --- high --- single
     amount_of_flute = 0 
-    object_flute = 0    
-
     amount_of_violin = 0 # could also be mid
-    object_violin = 0 # could also be mid    
+
     # --- mid --- accord
     amount_of_guitar = 0    
-    object_guitar = 0
-
     amount_of_piano = 0
-    object_piano = 0
+ 
     # --- low --- single 
     amount_of_drum = 0    
-    object_drum = 0
-    
-    amount_of_saxophone = 0  
-    object_saxophone = 0
-    # --- clap --- single
-    amount_of_clap = 0    
-    object_clap = 0
+    amount_of_saxophone = 0
+
     # --- bpm ---
     bpm = 0
     
@@ -127,10 +118,7 @@ def MakeSong(list):
                 bpm = bpm + shape.bpm 
             case 'saxophone':  
                 amount_of_saxophone += 1
-                bpm = bpm + shape.bpm 
-            case 'clap':   
-                amount_of_clap += 1
-                bpm = bpm + shape.bpm 
+                bpm = bpm + shape.bpm
             case _: pass        
 
     bpm = int(bpm/amount_of_instruments) # determen bpm of composition
@@ -178,56 +166,66 @@ def MakeSong(list):
     midi_clap.addTrackName(0, 0, "Track0") # give track a name
     midi_clap.addTempo(0, 0, bpm) # set bpm
     midi_clap.addProgramChange(0, 0, 0, 1) # add instrument = shape.instrument = 1
-    
-    midi_drum.addNote(0, 0, 70, 0, 0.5, 120) # add a note
-    midi_drum.addNote(0, 0, 70, 1, 0.5, 120) # add a note
-    midi_drum.addNote(0, 0, 70, 2, 0.5, 120) # add a note
-    midi_drum.addNote(0, 0, 70, 3, 0.5, 120) # add a note
-    
-    midi_clap.addNote(0, 0, 70, 1, 0.5, 120) # add a note
-    midi_clap.addNote(0, 0, 70, 3, 0.5, 120) # add a note
-    x = 0
+
     #fill midi files with notes
     for shape in list:
         #add flute notes
         if amount_of_flute > 0 and shape.instrument == "flute":
-            
             midi_flute.addNote(0, 0, scale(shape.pitch, "flute"), shape.note_placement, 1, shape.volume) # add a note
+        
+        if amount_of_drum > 0 and shape.instrument == "drum":
+            if amount_of_drum == 1 or 5 or 9 or 13:
+                midi_drum.addNote(0, 0, 70, 0, 0.5, 120) # add a note
+                midi_drum.addNote(0, 0, 70, 2, 0.5, 120) # add a note
 
-            object_drum +=1
+                midi_clap.addNote(0, 0, 70, 2, 0.5, 120) # add a note
+
+            if amount_of_drum == 2 or 6 or 10 or 14:
+                midi_drum.addNote(0, 0, 70, 0, 0.5, 120) # add a note
+                midi_drum.addNote(0, 0, 70, 2, 0.5, 120) # add a note
+                
+                midi_clap.addNote(0, 0, 70, 0.75, 0.5, 120) # add a note
+                midi_clap.addNote(0, 0, 70, 3, 0.5, 120) # add a note
+            
+            if amount_of_drum == 3 or 7 or 11 or 15:
+                midi_drum.addNote(0, 0, 70, 0, 0.5, 120) # add a note
+                midi_drum.addNote(0, 0, 70, 1, 0.5, 120) # add a note
+                midi_drum.addNote(0, 0, 70, 2, 0.5, 120) # add a note
+                midi_drum.addNote(0, 0, 70, 3, 0.5, 120) # add a note
+                
+                midi_clap.addNote(0, 0, 70, 1, 0.5, 120) # add a note
+                midi_clap.addNote(0, 0, 70, 3, 0.5, 120) # add a note
+            
+            if amount_of_drum == 4 or 8 or 12:
+                midi_drum.addNote(0, 0, 70, 0, 0.5, 120) # add a note
+                midi_drum.addNote(0, 0, 70, 1, 0.5, 120) # add a note
+                midi_drum.addNote(0, 0, 70, 2, 0.5, 120) # add a note
+                midi_drum.addNote(0, 0, 70, 3, 0.5, 120) # add a note
+                
+                midi_clap.addNote(0, 0, 70, 1.5, 0.5, 120) # add a note
+                midi_clap.addNote(0, 0, 70, 2.75, 0.5, 120) # add a note
 
         #add violin notes
         if amount_of_violin > 0 and shape.instrument == "violin":
-
             midi_violin.addNote(0, 0, scale(shape.pitch, "violin"), shape.note_placement, 1, shape.volume) # add a note
-
-            object_violin += 1
 
         #add guitar notes
         if amount_of_guitar > 0 and shape.instrument == "guitar":
-            
             midi_guitar.addNote(0, 0, scale(shape.pitch, "guitar"), shape.note_placement, 0.5, shape.volume) # add a note
 
-            object_guitar += 1
 
         #add piano notes
         if amount_of_piano > 0 and shape.instrument == "piano":
-            
             notes = piano_notes(scale(shape.pitch, "piano"))
 
-            # add an accord
+            # add an chord
             midi_piano.addNote(0, 0, notes[0], shape.note_placement, 1, shape.volume) # add a note
             midi_piano.addNote(0, 0, notes[1], shape.note_placement, 1, shape.volume) # add a note
             midi_piano.addNote(0, 0, notes[2], shape.note_placement, 1, shape.volume) # add a note
 
-            object_piano += 1
-
         #add saxophone notes
         if amount_of_saxophone > 0 and shape.instrument == "saxophone":
-            
             midi_saxophone.addNote(0, 0, scale(shape.pitch, "saxophone"), shape.note_placement, 1, shape.volume) # add a note
-
-            object_saxophone +=1
 
         #Make wav files of all the midi's when al nodes are added
         if amount_of_instruments -1 == iteration:
