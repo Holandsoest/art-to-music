@@ -14,7 +14,7 @@ def AudiRenderPlugin(list):
     amount_of_cello = 0
 
     AudioSegment.ffmpeg 
-
+    
     model_midi_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_files')
     model_preset_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'preset_files')
     model_wav_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'wav_files')
