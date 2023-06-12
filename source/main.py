@@ -25,13 +25,13 @@ if __name__ == "__main__":
     bpm = midi_creation.MakeSong(list_of_shapes) 
     
     processes = [
-        mp.Process(target=midi_processing.drum, args=(0, bpm)),
-        mp.Process(target=midi_processing.violin, args=(0, bpm)),
-        mp.Process(target=midi_processing.guitar, args=(0, bpm)),
-        mp.Process(target=midi_processing.flute, args=(0, bpm)),
-        mp.Process(target=midi_processing.saxophone, args=(0, bpm)),
-        mp.Process(target=midi_processing.clap, args=(0, bpm)),
-        mp.Process(target=midi_processing.piano, args=(0, bpm))
+        mp.Process(target=midi_processing.instrument, args=(bpm, "drum")),
+        mp.Process(target=midi_processing.instrument, args=(bpm, "violin")),
+        mp.Process(target=midi_processing.instrument, args=(bpm, "guitar")),
+        mp.Process(target=midi_processing.instrument, args=(bpm, "flute")),
+        mp.Process(target=midi_processing.instrument, args=(bpm, "saxophone")),
+        mp.Process(target=midi_processing.instrument, args=(bpm, "clap")),
+        mp.Process(target=midi_processing.instrument, args=(bpm, "piano"))
     ]
     
     # Start all processes
