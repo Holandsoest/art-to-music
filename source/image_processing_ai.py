@@ -21,65 +21,6 @@ def setup_ai():
     shape_detector.setJsonPath(jason_path)
     shape_detector.loadModel()
 
-# Function to get the color of an object in the image
-def get_color(img:cv2.Mat) -> str:
-    """
-    function to detect the most common color of an object
-    It has one parameter:
-    - img: the object that the function should go through
-    
-    Returns what color the object mainly has
-    """
-    hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-    # Define color range for red, green, and blue
-    lower_yellow = np.array([20, 100, 100])
-    upper_yellow = np.array([30, 255, 255])
-    lower_orange = np.array([5, 100, 100])
-    upper_orange = np.array([15, 255, 255])
-    lower_green = np.array([36, 25, 25])
-    upper_green = np.array([86, 255, 255])
-    lower_blue = np.array([110, 50, 50])
-    upper_blue = np.array([130, 255, 255])
-    lower_violet = np.array([140, 50, 50])
-    upper_violet = np.array([160, 255, 255])
-    lower_red1 = np.array([0, 50, 50])
-    upper_red1 = np.array([10, 255, 255])
-    lower_red2 = np.array([170, 50, 50])
-    upper_red2 = np.array([180, 255, 255])
-
-    # Create masks for each color range
-    yellow_mask = cv2.inRange(hsv_img, lower_yellow, upper_yellow)
-    orange_mask = cv2.inRange(hsv_img, lower_orange, upper_orange)
-    green_mask = cv2.inRange(hsv_img, lower_green, upper_green)
-    blue_mask = cv2.inRange(hsv_img, lower_blue, upper_blue)
-    violet_mask = cv2.inRange(hsv_img, lower_violet, upper_violet)
-    red_mask1 = cv2.inRange(hsv_img, lower_red1, upper_red1)
-    red_mask2 = cv2.inRange(hsv_img, lower_red2, upper_red2)
-    red_mask = cv2.bitwise_or(red_mask1, red_mask2)
-
-    # Count the number of pixels in each mask
-    yellow_pixels = cv2.countNonZero(yellow_mask)
-    orange_pixels = cv2.countNonZero(orange_mask)
-    green_pixels = cv2.countNonZero(green_mask)
-    blue_pixels = cv2.countNonZero(blue_mask)
-    violet_pixels = cv2.countNonZero(violet_mask)
-    red_pixels = cv2.countNonZero(red_mask)
-
-    # Determine the dominant color based on the number of pixels
-    if yellow_pixels > orange_pixels and yellow_pixels > green_pixels and yellow_pixels > blue_pixels and yellow_pixels > violet_pixels and yellow_pixels > red_pixels:
-        return 'yellow'
-    elif orange_pixels > yellow_pixels and orange_pixels > green_pixels and orange_pixels > blue_pixels and orange_pixels > violet_pixels and orange_pixels > red_pixels:
-        return 'orange'
-    elif green_pixels > yellow_pixels and green_pixels > orange_pixels and green_pixels > blue_pixels and green_pixels > violet_pixels and green_pixels > red_pixels:
-        return 'green'
-    elif blue_pixels > yellow_pixels and blue_pixels > orange_pixels and blue_pixels > green_pixels and blue_pixels > violet_pixels and blue_pixels > red_pixels:
-        return 'blue'
-    elif violet_pixels > yellow_pixels and violet_pixels > orange_pixels and violet_pixels > green_pixels and violet_pixels > blue_pixels and violet_pixels > red_pixels:
-        return 'violet'
-    else:
-        return 'red'
-    
 def correct_boxes(img:cv2.Mat, detected_objects): # -> image, boxpoints
     boxes = []
     boxes_w_names = []
@@ -191,7 +132,6 @@ def detect_shapes_with_ai(image): # -> image, list
                                                                 minimum_percentage_probability=60,
                                                                 display_percentage_probability=True,
                                                                 display_object_name=True)
-    cv2.imshow('imgai',img)
     img, boxes = correct_boxes(image, detected_objects)
 
     for counter, box in enumerate (boxes):
@@ -203,11 +143,14 @@ def detect_shapes_with_ai(image): # -> image, list
         width = int(x2) - int(x1)
         height = int(y2) - int(y1)
 
+        obj_img = img[int(y1):int(y2), int(x1):int(x2)]
+        color_code = img_proc.get_color(obj_img)
+
         shape_ai = img_prop.Shape("", 
                                   counter, 
                                   0, 
                                   int(img_proc.get_volume_from_size(width*height, img_size)), 
-                                  int(img_proc.get_bpm_from_color(int(middle_point_x),int(middle_point_y),image)), 
+                                  color_code, 
                                   float(img_proc.get_placement_of_note(middle_point_x, img_width)), 
                                   int(img_proc.get_pitch_from_y_axis(middle_point_y, img_height)), 
                                   (int(x1), int(y1), int(x2), int(y2)) )
@@ -215,19 +158,19 @@ def detect_shapes_with_ai(image): # -> image, list
         cv2.putText(img, str(counter), (int(middle_point_x), int(middle_point_y)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (125, 0, 0), 2)
 
         if box_name == "circle":
-            shape_ai.instrument = "violin"
+            shape_ai.instrument = img_prop.ShapeType.CIRCLE
         elif box_name == "half circle":
-            shape_ai.instrument = "flute"
+            shape_ai.instrument = img_prop.ShapeType.HALF_CIRCLE
         elif box_name == "square":
-            shape_ai.instrument = "drum"
+            shape_ai.instrument = img_prop.ShapeType.SQUARE
         elif box_name == "heart": 
-            shape_ai.instrument = "piano"
+            shape_ai.instrument = img_prop.ShapeType.HEART
         elif box_name == "star":
-            shape_ai.instrument = "saxophone"
+            shape_ai.instrument = img_prop.ShapeType.STAR
         elif box_name == "triangle":
-            shape_ai.instrument = "guitar"
+            shape_ai.instrument = img_prop.ShapeType.TRIANGLE
         else:
-            shape_ai.instrument = "empty"
+            shape_ai.instrument = img_prop.ShapeType.EMPTY
         list_of_shapes.append(shape_ai)
 
     return img, list_of_shapes
@@ -239,7 +182,7 @@ def annotate_detected_colors(img:cv2.Mat, detected_objects) -> None:
         obj_img = img[y1:y2, x1:x2]
 
         # Call function to extract color data
-        color = get_color(obj_img)
+        color = img_proc.get_color(obj_img)
         obj["color"] = color
         if obj_last:
             if obj_last["name"] == obj["name"] and obj_last["color"] == obj["color"] and obj_last["percentage_probability"] == obj["percentage_probability"]:
