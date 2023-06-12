@@ -16,7 +16,7 @@ def instrument (bpm, instrument):
     assert synth.get_name() == "my_synth"
     synth.load_state(model_preset_path + f"\\{instrument}.fxb")
     synth.load_midi(model_midi_path + f"\\{instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
-    #synth.open_editor() #undo # to check if path from plugin is working
+    synth.open_editor() #undo # to check if path from plugin is working
     engine.load_graph([
                     (synth,[])
     ])
@@ -56,10 +56,9 @@ def audio_rendering(bpm):
     combined_sound4 = overlap_part4.overlay(combined_sound3)
     combined_sound5 = overlap_part5.overlay(combined_sound4)
 
-    
-
     combined_sound6 = (combined_sound5 + combined_sound5)*2
     # Export the combined audio to an MP3 file
+
     with open("files\\audio_generator\\created_song.mp3", "wb") as output_file1:
                 combined_sound6.export(output_file1, format = "mp3")
 
