@@ -26,7 +26,7 @@ def get_image():
         img = np.ndarray((height, width, 3), buffer=frame.data, dtype=np.uint8)
         buf.unmap(frame)
 
-        #cv2.imshow('Camera', img)
+        # cv2.imshow('Camera', img)
 
         if cv2.waitKey(1):
             break
@@ -35,3 +35,6 @@ def get_image():
     pipeline.get_state(Gst.CLOCK_TIME_NONE)
     pipeline.set_state(Gst.State.NULL)
     return img
+if __name__ == '__main__':
+    cv2.imshow('Camera', get_image())
+    cv2.waitKey(600)
