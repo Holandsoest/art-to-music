@@ -16,6 +16,7 @@ def instrument (bpm, instrument):
     assert synth.get_name() == "my_synth"
     synth.load_state(model_preset_path + f"\\{instrument}.fxb")
     synth.load_midi(model_midi_path + f"\\{instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
+    #synth.open_editor() #undo # to check if path from plugin is working
     engine.load_graph([
                     (synth,[])
     ])
@@ -26,7 +27,8 @@ def instrument (bpm, instrument):
        
 
 def audio_rendering(bpm):
-    # Load the first MP3 file
+    AudioSegment.silent()
+    # Load the MP3 files
     sound1 = AudioSegment.from_file(model_wav_path + "\\drum.wav", format="wav")
     sound2 = AudioSegment.from_file(model_wav_path + "\\flute.wav", format="wav")
     sound3 = AudioSegment.from_file(model_wav_path + "\\violin.wav", format="wav")
@@ -48,14 +50,16 @@ def audio_rendering(bpm):
     
     # Combine the overlapping part of the first MP3 file with the second MP3 file
     combined_sound = overlap_part.overlay(sound7)
-    combined_sound2 = overlap_part1.overlay(combined_sound)
-    combined_sound3 = overlap_part2.overlay(combined_sound2)
-    combined_sound4 = overlap_part3.overlay(combined_sound3)
-    combined_sound5 = overlap_part4.overlay(combined_sound4)
-    combined_sound6 = overlap_part5.overlay(combined_sound5)
+    combined_sound1 = overlap_part1.overlay(combined_sound)
+    combined_sound2 = overlap_part2.overlay(combined_sound1)
+    combined_sound3 = overlap_part3.overlay(combined_sound2)
+    combined_sound4 = overlap_part4.overlay(combined_sound3)
+    combined_sound5 = overlap_part5.overlay(combined_sound4)
 
-    combined_sound7 = (combined_sound6 + combined_sound6)*2
+    
+
+    combined_sound6 = (combined_sound5 + combined_sound5)*2
     # Export the combined audio to an MP3 file
     with open("files\\audio_generator\\created_song.mp3", "wb") as output_file1:
-                combined_sound7.export(output_file1, format = "mp3")
+                combined_sound6.export(output_file1, format = "mp3")
 
