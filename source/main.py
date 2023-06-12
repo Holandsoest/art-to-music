@@ -11,17 +11,14 @@ if __name__ == "__main__":
     # TODO: Do this when jetson button press
     
     img = take_image.get_image()
-    print(' here')
     cv2.imshow('Camera', img)
-    print(' here')
 
     image_ai, list_of_shapes = img_proc_ai.detect_shapes_with_ai(img)
-    print(' here')
 
     midi_creation.MakeSong(list_of_shapes)
-    print(' here')
+    print('success')
     midi_processing.AudiRenderPlugin(list_of_shapes)
-    print(' here')
+    print('stuck')
 
     # TODO: play audio with pygame
 

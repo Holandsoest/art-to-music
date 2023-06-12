@@ -4,6 +4,8 @@ import numpy as np
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 
+# NOTE: if the cammera is stuck then check the `sudo service nvargus-daemon status` and you might want to `sudo service nvargus-daemon stop;sudo service nvargus-daemon status;sudo service nvargus-daemon start;sudo service nvargus-daemon status`
+
 def get_image():
     Gst.init(None)
 
