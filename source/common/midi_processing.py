@@ -12,30 +12,30 @@ model_plugin_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'Stupi
 
 def instrument (bpm, instrument):
     engine = daw.RenderEngine(sample_rate, buffer_size)
-    synth = engine.make_plugin_processor("my_synth", model_plugin_path + "\\StupidSimpleSampler.dll")
+    synth = engine.make_plugin_processor("my_synth", os.path.join(model_plugin_path, "StupidSimpleSampler.dll"))
     assert synth.get_name() == "my_synth"
-    synth.load_state(model_preset_path + f"\\{instrument}.fxb")
-    synth.load_midi(model_midi_path + f"\\{instrument}_output.mid", clear_previous=False, beats=False, all_events=False) 
-    synth.open_editor() #undo # to check if path from plugin is working
+    synth.load_state(os.path.join(model_preset_path, f"{instrument}.fxb"))
+    synth.load_midi(os.path.join(model_midi_path, f"{instrument}_output.mid"), clear_previous=False, beats=False, all_events=False) 
+    #synth.open_editor() #undo # to check if path from plugin is working
     engine.load_graph([
                     (synth,[])
     ])
     engine.set_bpm(bpm)
     engine.render(4/(bpm/60))  
     audio = engine.get_audio()  
-    wavfile.write(model_wav_path + f"\\{instrument}.wav",  sample_rate, audio.transpose())
+    wavfile.write(os.path.join(model_wav_path, f"{instrument}.wav"),  sample_rate, audio.transpose())
        
 
 def audio_rendering(bpm):
     AudioSegment.silent()
     # Load the MP3 files
-    sound1 = AudioSegment.from_file(model_wav_path + "\\drum.wav", format="wav")
-    sound2 = AudioSegment.from_file(model_wav_path + "\\flute.wav", format="wav")
-    sound3 = AudioSegment.from_file(model_wav_path + "\\violin.wav", format="wav")
-    sound4 = AudioSegment.from_file(model_wav_path + "\\clap.wav", format="wav")
-    sound5 = AudioSegment.from_file(model_wav_path + "\\saxophone.wav", format="wav")
-    sound6 = AudioSegment.from_file(model_wav_path + "\\guitar.wav", format="wav")
-    sound7 = AudioSegment.from_file(model_wav_path + "\\piano.wav", format="wav")
+    sound1 = AudioSegment.from_file(os.path.join(model_wav_path, "drum.wav"), format="wav")
+    sound2 = AudioSegment.from_file(os.path.join(model_wav_path, "flute.wav"), format="wav")
+    sound3 = AudioSegment.from_file(os.path.join(model_wav_path, "violin.wav"), format="wav")
+    sound4 = AudioSegment.from_file(os.path.join(model_wav_path, "clap.wav"), format="wav")
+    sound5 = AudioSegment.from_file(os.path.join(model_wav_path, "saxophone.wav"), format="wav")
+    sound6 = AudioSegment.from_file(os.path.join(model_wav_path, "guitar.wav"), format="wav")
+    sound7 = AudioSegment.from_file(os.path.join(model_wav_path, "piano.wav"), format="wav")
 
     # Set the desired overlap time in milliseconds
     overlap_time = 4/(bpm/60) * 1000
@@ -58,7 +58,5 @@ def audio_rendering(bpm):
 
     combined_sound6 = (combined_sound5 + combined_sound5)*2
     # Export the combined audio to an MP3 file
-
-    with open("files\\audio_generator\\created_song.mp3", "wb") as output_file1:
+    with open(os.path.join('files','audio_generator','created_song.mp3'), "wb") as output_file1:
                 combined_sound6.export(output_file1, format = "mp3")
-
