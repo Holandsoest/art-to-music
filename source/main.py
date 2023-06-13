@@ -1,50 +1,64 @@
 import cv2
-import image_processing as img_proc
-import common.midi_creation as midi_creation
-import common.midi_processing as midi_processing
-import image_processing_ai as img_proc_ai
-import multiprocessing as mp
+# import image_processing as img_proc
+# import common.midi_creation as midi_creation
+# import common.midi_processing as midi_processing
+# import image_processing_ai as img_proc_ai
+# import multiprocessing as mp
 
-cap = cv2.VideoCapture(0)
-img_proc_ai.setup_ai()
+# img_proc_ai.setup_ai()
 
 import os
-
+import time
 if __name__ == "__main__":
-    img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes (3).png')
-    img = cv2.imread(img_path)
-    assert img is not None, "file could not be read, check with os.path.exists()"
+    # open with file
+    # img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes (3).png')
+    # img = cv2.imread(img_path)
+    # assert img is not None, "file could not be read, check with os.path.exists()"
 
-    # while(1):
-        # success, img = cap.read()
-    image_ai, list_of_shapes = img_proc_ai.detect_shapes_with_ai(img)
-
-    img_proc_ai.detect_shapes_with_ai(img)
-    img_proc.display_list_of_shapes(list_of_shapes)
-
-    bpm = midi_creation.MakeSong(list_of_shapes) 
+    # open with default cam
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("ERROR! Unable to open camera")
+        exit()
+    while True:
+        # Capture the video frame
+        ret, frame = cap.read()
+        if not ret:
+            print("Can't receive frame (stream end?)")
     
-    processes = [
-        mp.Process(target=midi_processing.drum, args=(0, bpm)),
-        mp.Process(target=midi_processing.violin, args=(0, bpm)),
-        mp.Process(target=midi_processing.guitar, args=(0, bpm)),
-        mp.Process(target=midi_processing.flute, args=(0, bpm)),
-        mp.Process(target=midi_processing.saxophone, args=(0, bpm)),
-        mp.Process(target=midi_processing.clap, args=(0, bpm)),
-        mp.Process(target=midi_processing.piano, args=(0, bpm))
-    ]
-    
-    # Start all processes
-    for process in processes:
-        process.start()
+        # Display the resulting frame
+        cv2.imshow('frame', frame)
+        if cv2.waitKey(1) == ord('q'):
+            break
 
-    # Wait for all processes to finish
-    for process in processes:
-        process.join()
+    # image_ai, list_of_shapes = img_proc_ai.detect_shapes_with_ai(img)
+
+    # img_proc_ai.detect_shapes_with_ai(img)
+    # img_proc.display_list_of_shapes(list_of_shapes)
+
+    # bpm = midi_creation.MakeSong(list_of_shapes) 
+    
+    # processes = [
+    #     mp.Process(target=midi_processing.drum, args=(0, bpm)),
+    #     mp.Process(target=midi_processing.violin, args=(0, bpm)),
+    #     mp.Process(target=midi_processing.guitar, args=(0, bpm)),
+    #     mp.Process(target=midi_processing.flute, args=(0, bpm)),
+    #     mp.Process(target=midi_processing.saxophone, args=(0, bpm)),
+    #     mp.Process(target=midi_processing.clap, args=(0, bpm)),
+    #     mp.Process(target=midi_processing.piano, args=(0, bpm))
+    # ]
+    
+    # # Start all processes
+    # for process in processes:
+    #     process.start()
+
+    # # Wait for all processes to finish
+    # for process in processes:
+    #     process.join()
         
-    midi_processing.audio_rendering(bpm)
+    # midi_processing.audio_rendering(bpm)
     
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     cv2.destroyAllWindows()
-        #     break 
+    #     # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     #     cv2.destroyAllWindows()
+    #     #     break 
     
