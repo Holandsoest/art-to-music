@@ -1,12 +1,36 @@
 import cv2
-import gi
-import numpy as np
-gi.require_version('Gst', '1.0')
-from gi.repository import Gst
+import os
 
-# NOTE: if the cammera is stuck then check the `sudo service nvargus-daemon status` and you might want to `sudo service nvargus-daemon stop;sudo service nvargus-daemon status;sudo service nvargus-daemon start;sudo service nvargus-daemon status`
+# NOTE: if the camera is stuck then check the `sudo service nvargus-daemon status` and you might want to `sudo service nvargus-daemon stop;sudo service nvargus-daemon status;sudo service nvargus-daemon start;sudo service nvargus-daemon status`
 
-def get_image():
+def get_image() -> cv2.Mat:
+    """Gets an cv2.Mat as an image in one of 4 ways:
+    1. if the following file exists `art-to-music/files/enable_gstreamer.flag` then it uses GStreamer to get the image.
+    This would require the Nvidea Jetson Nano to function.
+    2. otherwise it tries to find an accessible camera with `cv2.VideoCapture(0)`
+    3. if there are no cameras available then TODO: it raises an error at the moment, but it would use the GUI so you can draw your art and import existing art"""
+    if not os.path.exists(os.path.join(os.getcwd(), 'files', 'enable_gstreamer.flag')):
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            raise RuntimeError("ERROR! Unable to open camera")
+        # Capture the video frame
+        ret, frame = cap.read()
+        if not ret:
+            raise RuntimeError("Can't receive frame (stream end?)")
+        cap.release()
+        return frame
+        
+    # open with file
+    # img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes (3).png')
+    # img = cv2.imread(img_path)
+    # assert img is not None, "file could not be read, check with os.path.exists()"
+
+    # open with gstreamer
+    import gi
+    import numpy as np
+    gi.require_version('Gst', '1.0')
+    from gi.repository import Gst
+
     Gst.init(None)
 
     pipeline_str =  'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=1280, height=720, format=NV12, framerate=30/1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink'
