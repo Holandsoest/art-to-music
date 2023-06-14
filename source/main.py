@@ -14,12 +14,15 @@ import time
 if __name__ == "__main__":
     while True:
     
-        # BUG: currently there is a problem when there are no shapes detected TODO: change this back #img = take_image.get_image()
-        img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes (3).png')
-        img = cv2.imread(img_path)
-        cv2.imshow('Camera', img)
+        # BUG: Currently i did not get any shapes working with the camera test
+        img = take_image.get_image()
+        # img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes (3).png')
+        # img = cv2.imread(img_path)
 
         image_ai, list_of_shapes = img_proc_ai.detect_shapes_with_ai(img)
+        cv2.destroyAllWindows()
+        cv2.imshow('AI processing', image_ai)
+        cv2.waitKey(1)# Displays the new image immediately
         img_proc.display_list_of_shapes(list_of_shapes)
 
         bpm = midi_creation.MakeSong(list_of_shapes) 
@@ -44,10 +47,15 @@ if __name__ == "__main__":
             
         midi_processing.audio_rendering(bpm)
 
+        cv2.destroyAllWindows()
+        cv2.imshow('Playing audio... Any key continue...', image_ai)
+        cv2.waitKey(1)# Displays the new image immediately
         key = midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
                                                     decay= 0.75,
                                                     cutoff=0.05)
         if key == -1: 
+            cv2.destroyAllWindows()
+            cv2.imshow('Press any key to start... (q to exit)', image_ai)
             key = cv2.waitKey(0)
         if key == ord('q'): break
     cv2.destroyAllWindows()

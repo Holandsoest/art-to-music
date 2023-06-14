@@ -1,7 +1,6 @@
 import dawdreamer as daw
 from scipy.io import wavfile
 from pydub import AudioSegment
-from pygame import mixer
 import typing
 import cv2
 import time
@@ -60,6 +59,8 @@ def play_loop(song_absolute_path, decay=0.75, cutoff=0.1) -> typing.Any:
     Every time it plays the volume decays with the `decay`until it reaches a certain `cutoff` value.
     
     If duding playing you interrupted it with a keystroke it returns the `cv2.type`"""
+    from pygame import mixer
+
     mixer.init()
     mixer.music.load(song_absolute_path)
     volume = 1.0
