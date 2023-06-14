@@ -41,24 +41,13 @@ def audio_rendering(bpm):
     sound6 = AudioSegment.from_file(os.path.join(model_wav_path, "guitar.wav"), format="wav")
     sound7 = AudioSegment.from_file(os.path.join(model_wav_path, "piano.wav"), format="wav")
 
-    # Set the desired overlap time in milliseconds
-    overlap_time = 4/(bpm/60) * 1000
-
-    # Extract the overlapping part from the end of the first MP3 file
-    overlap_part = sound1[-overlap_time:]
-    overlap_part1 = sound2[-overlap_time:]
-    overlap_part2 = sound3[-overlap_time:]
-    overlap_part3 = sound4[-overlap_time:]
-    overlap_part4 = sound5[-overlap_time:]
-    overlap_part5 = sound6[-overlap_time:]
-    
     # Combine the overlapping part of the first MP3 file with the second MP3 file
-    combined_sound = overlap_part.overlay(sound7)
-    combined_sound1 = overlap_part1.overlay(combined_sound)
-    combined_sound2 = overlap_part2.overlay(combined_sound1)
-    combined_sound3 = overlap_part3.overlay(combined_sound2)
-    combined_sound4 = overlap_part4.overlay(combined_sound3)
-    combined_sound5 = overlap_part5.overlay(combined_sound4)
+    combined_sound = sound1.overlay(sound7)
+    combined_sound1 = sound2.overlay(combined_sound)
+    combined_sound2 = sound3.overlay(combined_sound1)
+    combined_sound3 = sound4.overlay(combined_sound2)
+    combined_sound4 = sound5.overlay(combined_sound3)
+    combined_sound5 = sound6.overlay(combined_sound4)
 
     combined_sound6 = (combined_sound5 + combined_sound5)*2
     # Export the combined audio to an MP3 file
