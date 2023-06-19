@@ -1,6 +1,9 @@
 import dawdreamer as daw
 from scipy.io import wavfile
 from pydub import AudioSegment
+import typing
+import cv2
+import time
 import os
 
 sample_rate = 44100
@@ -49,3 +52,33 @@ def audio_rendering(bpm):
     # Export the combined audio to an MP3 file
     with open(os.path.join('files','audio_generator','created_song.mp3'), "wb") as output_file1:
                 combined_sound6.export(output_file1, format = "mp3")
+
+def play_loop(song_absolute_path, decay=0.75, cutoff=0.1) -> typing.Any:
+    """Uses pygame to play the given music in a blocking manner.  
+
+    Every time it plays the volume decays with the `decay`until it reaches a certain `cutoff` value.
+    
+    If during playing you interrupted it with a keystroke it returns the [`typing.`key](https://docs.opencv.org/4.x/d7/dfc/group__highgui.html#ga5628525ad33f52eab17feebcfba38bd7) """
+    from pygame import mixer
+
+    mixer.init()
+    mixer.music.load(song_absolute_path)
+    volume = 1.0
+    
+    while volume > cutoff:
+        mixer.music.set_volume(volume)
+        mixer.music.play()
+        print(f'Playing music at {volume*100}% volume')
+        while mixer.music.get_busy():
+            key = cv2.waitKey(1) # time in ms before polling again
+            if key != -1:
+                mixer.stop()
+                mixer.quit()
+                return key # `-1` is time expired
+        volume = volume * decay
+    mixer.quit()
+    print('Volume cutoff')
+    return -1
+
+if __name__ == "__main__":
+    audio_rendering()
