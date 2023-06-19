@@ -127,3 +127,18 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Created audio files
+files/audio_generator/created_song.mp3
+files/audio_generator/midi_files/*.mid
+files/audio_generator/wav_files/*.wav
+files/enable_gstreamer.flag
+
+# Output
+output.mid
+
+# Stuff for training the AI, Way to big...
+dataset/train/annotations/*
+dataset/train/images/*
+dataset/validation/annotations/*
+dataset/validation/images/*

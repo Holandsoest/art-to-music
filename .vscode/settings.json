@@ -1,0 +1,21 @@
+{
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+          "source": "PowerShell",
+          "icon": "terminal-powershell",
+          "args": ["-ExecutionPolicy", "Bypass"]
+        }
+      },
+      "terminal.integrated.defaultProfile.windows": "PowerShell",
+
+
+    "editor.detectIndentation": false,
+    "git.autofetch": "all",
+    "git.autofetchPeriod": 600,
+    "cSpell.words": [
+        "argmax",
+        "argmin",
+        "astype",
+        "homography"
+    ],
+}
