@@ -1,30 +1,34 @@
-import dawdreamer as daw
-from scipy.io import wavfile
 from pydub import AudioSegment
 import os
+import sf2_loader as sf
 
 sample_rate = 44100
 buffer_size = 128
 model_midi_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_files')
-model_preset_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'preset_files')
 model_wav_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'wav_files')
-model_plugin_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'StupidSimpleSampler')      
+model_font_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'soundfonts')
+   
+# def instrument (bpm, instrument):
+#     engine = daw.RenderEngine(sample_rate, buffer_size)
+#     synth = engine.make_plugin_processor("my_synth", os.path.join(model_plugin_path, "StupidSimpleSampler.dll"))
+#     assert synth.get_name() == "my_synth"
+#     synth.load_state(os.path.join(model_preset_path, f"{instrument}.fxb"))
+#     synth.load_midi(os.path.join(model_midi_path, f"{instrument}_output.mid"), clear_previous=False, beats=False, all_events=False) 
+#     #synth.open_editor() #undo # to check if path from plugin is working
+#     engine.load_graph([
+#                     (synth,[])
+#     ])
+#     engine.set_bpm(bpm)
+#     engine.render(4/(bpm/60))  
+#     audio = engine.get_audio()  
+#     wavfile.write(os.path.join(model_wav_path, f"{instrument}.wav"),  sample_rate, audio.transpose())
 
 def instrument (bpm, instrument):
-    engine = daw.RenderEngine(sample_rate, buffer_size)
-    synth = engine.make_plugin_processor("my_synth", os.path.join(model_plugin_path, "StupidSimpleSampler.dll"))
-    assert synth.get_name() == "my_synth"
-    synth.load_state(os.path.join(model_preset_path, f"{instrument}.fxb"))
-    synth.load_midi(os.path.join(model_midi_path, f"{instrument}_output.mid"), clear_previous=False, beats=False, all_events=False) 
-    #synth.open_editor() #undo # to check if path from plugin is working
-    engine.load_graph([
-                    (synth,[])
-    ])
-    engine.set_bpm(bpm)
-    engine.render(4/(bpm/60))  
-    audio = engine.get_audio()  
-    wavfile.write(os.path.join(model_wav_path, f"{instrument}.wav"),  sample_rate, audio.transpose())
-       
+    loader = sf.sf2_loader(os.path.join(model_font_path, f"{instrument}.sf2"))
+    loader.change(preset=0) # change current preset number to 0
+    inst = loader.get_current_instrument()
+    print (inst)
+    loader.export_midi_file(os.path.join(model_midi_path, f"{instrument}_output.mid"), name=os.path.join(model_wav_path, f"{instrument}.wav"), format='wav', show_msg=True)
 
 def audio_rendering(bpm):
     AudioSegment.silent()
@@ -49,3 +53,7 @@ def audio_rendering(bpm):
     # Export the combined audio to an MP3 file
     with open(os.path.join('files','audio_generator','created_song.mp3'), "wb") as output_file1:
                 combined_sound6.export(output_file1, format = "mp3")
+
+
+
+
