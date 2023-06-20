@@ -12,7 +12,7 @@ import image_processing as img_proc
 shape_detector = CustomObjectDetection()
 
 def setup_ai():
-    # # Custom Object Detection
+    # Custom Object Detection
     jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
     model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'dataset_version_mAP-0.63917.pt')
 
