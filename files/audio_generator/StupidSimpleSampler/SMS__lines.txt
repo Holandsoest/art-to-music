@@ -1,9 +1,0 @@
-; SynthEdit Skin Definition File
-;
-; Skin Set:	ProphetBlack
-; Skin Item:	Panel Group
-; Files:	lines.png
-
-type lines
-frame_size 27,27	// Size of corners
-line_end_length 8	// Pixels between line end and label text

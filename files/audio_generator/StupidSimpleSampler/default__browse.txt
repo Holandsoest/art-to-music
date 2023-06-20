@@ -1,3 +1,0 @@
-type animated
-mouse_response click
-frame_size 21,21
