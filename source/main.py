@@ -10,7 +10,7 @@ import multiprocessing as mp
 img_proc_ai.setup_ai()
 
 import os
-import time
+
 if __name__ == "__main__":
     while True:
     

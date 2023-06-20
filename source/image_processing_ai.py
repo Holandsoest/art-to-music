@@ -14,7 +14,7 @@ shape_detector = CustomObjectDetection()
 def setup_ai():
     # Custom Object Detection
     jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'dataset_version_mAP-0.63917.pt')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'T250k_e4-b16_mAP-0.65928_epoch-1.pt')
 
     shape_detector.setModelTypeAsTinyYOLOv3()
     shape_detector.setModelPath(model_custom_path)
@@ -129,7 +129,7 @@ def detect_shapes_with_ai(image): # -> image, list
 
     img, detected_objects = shape_detector.detectObjectsFromImage(input_image=image, 
                                                                 output_type="array",
-                                                                minimum_percentage_probability=60,
+                                                                minimum_percentage_probability=50,
                                                                 display_percentage_probability=True,
                                                                 display_object_name=True)
     img, boxes = correct_boxes(image, detected_objects)

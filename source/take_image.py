@@ -30,6 +30,16 @@ def get_image() -> cv2.Mat:
     import numpy as np
     gi.require_version('Gst', '1.0')
     from gi.repository import Gst
+    
+
+    # os.system('nvgstcapture-1.0 --image-res=4 --prev-res=4 --automate --capture-auto --start-time=0 --file-name="capture" --orientation=2')
+    # for file_or_folder in os.listdir(os.getcwd()):
+    #     if file_or_folder.find('capture') == -1: continue
+    #     if file_or_folder.find('.jpg') == -1: continue
+    #     img = cv2.imread(os.path.join(os.getcwd(), file_or_folder))
+    #     # os.remove(os.path.join(os.getcwd(), file_or_folder))
+    #     return img
+    
 
     Gst.init(None)
 
@@ -63,4 +73,4 @@ def get_image() -> cv2.Mat:
     return img
 if __name__ == '__main__':
     cv2.imshow('Camera', get_image())
-    cv2.waitKey(600)
+    cv2.waitKey(10000)
