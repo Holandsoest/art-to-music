@@ -177,35 +177,35 @@ def MakeSong(list):
             
             if amount_of_drum > 0 and shape.instrument == "drum":
                 if amount_of_drum == 1 or 5 or 9 or 13:
-                    midi_drum.addNote(0, 0, 70, 0, 0.5, 120) # add a note
-                    midi_drum.addNote(0, 0, 70, 2, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 0, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 2, 0.5, 120) # add a note
 
-                    midi_clap.addNote(0, 0, 70, 2, 0.5, 120) # add a note
+                    midi_clap.addNote(0, 0, 58, 2, 0.5, 120) # add a note
 
                 if amount_of_drum == 2 or 6 or 10 or 14:
-                    midi_drum.addNote(0, 0, 70, 0, 0.5, 120) # add a note
-                    midi_drum.addNote(0, 0, 70, 2, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 0, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 2, 0.5, 120) # add a note
                     
-                    midi_clap.addNote(0, 0, 70, 0.75, 0.5, 120) # add a note
-                    midi_clap.addNote(0, 0, 70, 3, 0.5, 120) # add a note
+                    midi_clap.addNote(0, 0, 58, 0.75, 0.5, 120) # add a note
+                    midi_clap.addNote(0, 0, 58, 3, 0.5, 120) # add a note
                 
                 if amount_of_drum == 3 or 7 or 11 or 15:
-                    midi_drum.addNote(0, 0, 70, 0, 0.5, 120) # add a note
-                    midi_drum.addNote(0, 0, 70, 1, 0.5, 120) # add a note
-                    midi_drum.addNote(0, 0, 70, 2, 0.5, 120) # add a note
-                    midi_drum.addNote(0, 0, 70, 3, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 0, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 1, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 2, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 3, 0.5, 120) # add a note
                     
-                    midi_clap.addNote(0, 0, 70, 1, 0.5, 120) # add a note
-                    midi_clap.addNote(0, 0, 70, 3, 0.5, 120) # add a note
+                    midi_clap.addNote(0, 0, 58, 1, 0.5, 120) # add a note
+                    midi_clap.addNote(0, 0, 58, 3, 0.5, 120) # add a note
                 
                 if amount_of_drum == 4 or 8 or 12:
-                    midi_drum.addNote(0, 0, 70, 0, 0.5, 120) # add a note
-                    midi_drum.addNote(0, 0, 70, 1, 0.5, 120) # add a note
-                    midi_drum.addNote(0, 0, 70, 2, 0.5, 120) # add a note
-                    midi_drum.addNote(0, 0, 70, 3, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 0, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 1, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 2, 0.5, 120) # add a note
+                    midi_drum.addNote(0, 0, 58, 3, 0.5, 120) # add a note
                     
-                    midi_clap.addNote(0, 0, 70, 1.5, 0.5, 120) # add a note
-                    midi_clap.addNote(0, 0, 70, 2.75, 0.5, 120) # add a note
+                    midi_clap.addNote(0, 0, 58, 1.5, 0.5, 120) # add a note
+                    midi_clap.addNote(0, 0, 58, 2.75, 0.5, 120) # add a note
 
             #add violin notes
             if amount_of_violin > 0 and shape.instrument == "violin":
@@ -330,5 +330,4 @@ def MakeSong(list):
         with open(os.path.join(model_custom_path, "clap_output.mid"), "wb") as output_file7:
             midi_clap.writeFile(output_file7)
 
-        bpm = 1000
         return bpm

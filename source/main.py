@@ -11,7 +11,7 @@ img_proc_ai.setup_ai()
 import os
 
 if __name__ == "__main__":
-    img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes (2).png')
+    img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes (3).png')
     img = cv2.imread(img_path)
     assert img is not None, "file could not be read, check with os.path.exists()"
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
         mp.Process(target=midi_processing.instrument, args=(bpm, "flute")),
         mp.Process(target=midi_processing.instrument, args=(bpm, "saxophone")),
         mp.Process(target=midi_processing.instrument, args=(bpm, "clap")),
-        mp.Process(target=midi_processing.instrument, args=(bpm, "piano"))
+        mp.Process(target=midi_processing.instrument, args=(bpm, "piano")),
     ]
     
     # Start all processes
