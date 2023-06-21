@@ -26,51 +26,80 @@ def get_image() -> cv2.Mat:
     # assert img is not None, "file could not be read, check with os.path.exists()"
 
     # open with gstreamer
-    import gi
+    # import gi
     import numpy as np
-    gi.require_version('Gst', '1.0')
-    from gi.repository import Gst
+    from PIL import Image
+    # gi.require_version('Gst', '1.0')
+    # from gi.repository import Gst
     
 
     # os.system('nvgstcapture-1.0 --image-res=4 --prev-res=4 --automate --capture-auto --start-time=0 --file-name="capture" --orientation=2')
     # for file_or_folder in os.listdir(os.getcwd()):
     #     if file_or_folder.find('capture') == -1: continue
     #     if file_or_folder.find('.jpg') == -1: continue
-    #     img = cv2.imread(os.path.join(os.getcwd(), file_or_folder))
-    #     # os.remove(os.path.join(os.getcwd(), file_or_folder))
+    #     path = os.path.join(os.getcwd(), file_or_folder)
+    #     path2 = os.path.join(os.getcwd(), file_or_folder.split('.')[0]+'.png')
+    #     im1 = Image.open(path)
+    #     im1.save(path2)
+    #     im1.close()
+    #     img = cv2.imread(path2)
+    #     # os.remove(path)
+    #     # os.remove(path2)
     #     return img
     
 
-    Gst.init(None)
+    gstreamer_str = "sudo gst-launch1.0 nvarguscamerasrc ! video/x-raw, format=BGR ! autovideoconvert ! videoconvert ! videoscale ! video/x-raw , width=640, height=480, format=BGR ! appsink drop=1"
+    cap = cv2.VideoCapture(gstreamer_str, cv2.CAP_GSTREAMER)
 
-    pipeline_str =  'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=1280, height=720, format=NV12, framerate=30/1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! appsink'
-    pipeline = Gst.parse_launch(pipeline_str)
+    while (cap.isOpened()):
+        if isinstance(cap, None):
+            print("cap is empty")
+        else:
+            ret, frame = cap.read()
 
-    appsink = pipeline.get_by_name('appsink0')
-    appsink.set_property('caps', Gst.Caps.from_string('video/x-raw, format=BGR'))
-    pipeline.set_state(Gst.State.PLAYING)
+            if ret:
+                cv2.imshow("Input vai GStreamer", frame)
+                if cv2.waitKey(25) & 0xFF == ord('q'):
+                    return frame
+                else:
+                    return frame
+
+    cap.release()
+    cv2.destroyAllWindows() 
     
-    while True:
-        sample = appsink.emit('pull-sample')
-        buf = sample.get_buffer()
-        caps = sample.get_caps()
+    # Gst.init(None)
+
+    # pipeline_str =  'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=1280, height=720, format=NV12, framerate=30/1 ! nvvidconv ! video/x-raw, format=BGRx ! videoconvert ! video/x-raw, format=BGR ! ximagesink'
+    # pipeline = Gst.parse_launch(pipeline_str)
+
+    # appsink = pipeline.get_by_name('appsink0')
+    # appsink.set_property('caps', Gst.Caps.from_string('video/x-raw, format=BGR'))
+    # pipeline.set_state(Gst.State.PLAYING)
     
-        width = caps.get_structure(0).get_value('width')
-        height = caps.get_structure(0).get_value('height')
+    # while True:
+    #     sample = appsink.emit('pull-sample')
+    #     buf = sample.get_buffer()
+    #     caps = sample.get_caps()
+    
+    #     width = caps.get_structure(0).get_value('width')
+    #     height = caps.get_structure(0).get_value('height')
 
-        _, frame = buf.map(Gst.MapFlags.READ)
-        img = np.ndarray((height, width, 3), buffer=frame.data, dtype=np.uint8)
-        buf.unmap(frame)
+    #     _, frame = buf.map(Gst.MapFlags.READ)
+    #     img = np.ndarray((height, width, 3), buffer=frame.data, dtype=np.uint8)
+    #     buf.unmap(frame)
 
-        # cv2.imshow('Camera', img)
+    #     # cv2.imshow('Camera', img)
 
-        if cv2.waitKey(1):
-            break
+    #     if cv2.waitKey(1):
+    #         break
 
-    pipeline.send_event(Gst.Event.new_eos())
-    pipeline.get_state(Gst.CLOCK_TIME_NONE)
-    pipeline.set_state(Gst.State.NULL)
-    return img
+    # pipeline.send_event(Gst.Event.new_eos())
+    # pipeline.get_state(Gst.CLOCK_TIME_NONE)
+    # pipeline.set_state(Gst.State.NULL)
+    # return img
 if __name__ == '__main__':
-    cv2.imshow('Camera', get_image())
+    img = get_image()
+    print('here')
+    cv2.waitKey(10000)
+    cv2.imshow('Camera', img)
     cv2.waitKey(10000)
