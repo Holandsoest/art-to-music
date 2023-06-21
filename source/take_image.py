@@ -97,6 +97,14 @@ def get_image() -> cv2.Mat:
     # pipeline.get_state(Gst.CLOCK_TIME_NONE)
     # pipeline.set_state(Gst.State.NULL)
     # return img
+def set_jetson_busy(busy=True) -> None:
+    """Sets the gpio pin of the jetson, but only if the `art-to-music/files/enable_jetson_gpio.flag` exists"""
+    if not os.path.exists(os.path.join(os.getcwd(), 'files', 'enable_jetson_gpio.flag')): return
+    import Jetson.GPIO as GPIO
+    status_pin = 12  # BOARD pin 12
+    GPIO.setmode(GPIO.BOARD)  # BOARD pin-numbering scheme
+    GPIO.setup(status_pin, GPIO.OUT)  # LED pin set as output
+    GPIO.output(status_pin, GPIO.HIGH if busy else GPIO.LOW)
 if __name__ == '__main__':
     img = get_image()
     print('here')
