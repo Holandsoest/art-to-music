@@ -22,16 +22,16 @@ def MakeSong(list):
         def scale (percentage, instrument): # scale notes
 
             # lower and upperbound
-            flute_low = 79 #G5
-            flute_high = 101 #F7
-            violin_low = 72 #C5
-            violin_high = 85 #C7
+            flute_low = 67 #G5
+            flute_high = 89 #F7
+            violin_low = 60 #C5
+            violin_high = 72 #C7
             piano_low = 72 #C5
             piano_high = 84 #C6
             guitar_low = 55 #G3
             guitar_high = 67 #G4
-            saxophone_low = 84 #C6
-            saxophone_high = 96 #C7
+            saxophone_low = 60 #C6
+            saxophone_high = 72 #C7
 
             match instrument:
                 case 'flute':
