@@ -13,8 +13,7 @@ import os
 import time
 if __name__ == "__main__":
     while True:
-    
-        # BUG: Currently i did not get any shapes working with the camera test
+        take_image.set_jetson_busy(busy=True)
         img = take_image.get_image()
         # img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes (3).png')
         # img = cv2.imread(img_path)
@@ -50,6 +49,7 @@ if __name__ == "__main__":
         cv2.destroyAllWindows()
         cv2.imshow('Playing audio... Any key continue...', image_ai)
         cv2.waitKey(1)# Displays the new image immediately
+        take_image.set_jetson_busy(busy=False)
         key = midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
                                                     decay= 0.75,
                                                     cutoff=0.05)
