@@ -36,7 +36,7 @@ if __name__ == "__main__":
             mp.Process(target=midi_processing.instrument, args=(bpm, "piano"))
         ]
         
-        # Start all processes
+        # Start all processesq
         for process in processes:
             process.start()
 
@@ -47,12 +47,13 @@ if __name__ == "__main__":
         midi_processing.audio_rendering(bpm)
 
         cv2.destroyAllWindows()
-        cv2.imshow('Playing audio... Any key continue...', image_ai)
+        resize_img = cv2.resize(image_ai,(1280, 720 ))
+        cv2.imshow('Playing audio... Any key continue...', resize_img)
         cv2.waitKey(1)# Displays the new image immediately
         take_image.set_jetson_busy(busy=False)
         key = midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
                                                     decay= 0.75,
-                                                    cutoff=0.05)
+                                                    cutoff=0.05) 
         if key == -1: 
             cv2.destroyAllWindows()
             cv2.imshow('Press any key to start... (q to exit)', image_ai)
