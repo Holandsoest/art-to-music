@@ -7,6 +7,8 @@ Medium
 - [] `Last_color` is a bit to the right so it is more apparent
 - [] resize with `q` and `e`
 - [] move with `wasd`
+- [] move with arrows
+- [] `backspace` or `delete` key removes shape
 - [] Dragging color to background changes `background_color` ?
 
 Low
