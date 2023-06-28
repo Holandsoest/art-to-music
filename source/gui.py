@@ -399,7 +399,7 @@ class MainCanvas(tkinter.Canvas):
         # get a list of shapes
         list_of_shapes = []
         if not bypass_ai:
-            cv2.imshow('loading please wait...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'video_camera.png')))
+            cv2.imshow('Loading AI...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'ai.png')))
             cv2.waitKey(1)# Displays the new image immediately
             try:
                 save_img(tkinter_canvas=self,
@@ -408,16 +408,16 @@ class MainCanvas(tkinter.Canvas):
             except RuntimeError as runtime_error:
                 print(f'WARNING: Something caused a RuntimeError while saving the picture of the canvas.\n Reverting to bypassing the ai...,\n but if you are curious this was the problem: {runtime_error}')
                 bypass_ai = True
-            else: # did not fail to save.
+            else: # did not fail to save_img.
                 img = cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'temp.png'))
                 cropped = img[0:img_size.y, self.pallet_item_size().x:self.pallet_item_size().x+img_size.x]
                 image_processing_ai.setup_ai()
                 image_ai, list_of_shapes = image_processing_ai.detect_shapes_with_ai(cropped)
                 cv2.destroyAllWindows()
-                cv2.imshow('loading please wait...', image_ai)
+                cv2.imshow('Building music...', image_ai)
                 cv2.waitKey(1)# Displays the new image immediately
         if bypass_ai: # it is possible that in `if not bypass_ai:` we abort and end up here. A reason could be TODO:`not a windows machine` or `Ghostscript missing` what both causes us to not being able to make a photo of the canvas. and therefor the AI has to be bypassed
-            cv2.imshow('loading please wait...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'ai.png')))
+            cv2.imshow('Bypassing AI...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'ai_bypass.png')))
             cv2.waitKey(1)# Displays the new image immediately
             for counter, shape in enumerate (self.list_of_canvas_shapes):
                 shape_name = shapes.object_names_array[int(shape.class_id)]
