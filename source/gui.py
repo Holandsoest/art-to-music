@@ -7,8 +7,14 @@ In this version you cannot rotate & resize the shapes yet"""
 # Want to learn about Tkinter gui tool? https://youtu.be/mop6g-c5HEY It coverers about everything. ;)
 import common.shapes as shapes
 import common.location as loc
-import image_processing
 import common.midi_creation
+import common.midi_processing
+import common.image_properties
+import image_processing
+import image_processing_ai
+import multiprocessing as mp
+import cv2
+import numpy as np
 
 from enum import Enum # Keep enums UPPER_CASE according to https://docs.python.org/3/howto/enum.html  
 import math
@@ -339,37 +345,72 @@ class MainCanvas(tkinter.Canvas):
         """Returns the usable space of the canvas (exclusive the pallet)"""
         return loc.Size(x=self.winfo_width()-self.pallet_item_size().x, y=self.winfo_height())
     def play_music(self, bypass_ai=False) -> None:
-        if not bypass_ai: raise RuntimeError("no u cannot do that yet :'( i dont know how the ai works ;-;")
+        img_size = loc.Size(self.grid_size()[0],self.grid_size()[1])
+
+        # get a list of shapes
+        list_of_shapes = []
+        if not bypass_ai:
+            pass # take picure
+        else:
+            for counter, shape in enumerate (self.list_of_canvas_shapes):
+                shape_name = shapes.object_names_array[int(shape.class_id)]
+                match(shape_name):
+                    case "circle":      instrument = common.image_properties.ShapeType.CIRCLE
+                    case "half circle": instrument = common.image_properties.ShapeType.HALF_CIRCLE
+                    case "square":      instrument = common.image_properties.ShapeType.SQUARE
+                    case "heart":       instrument = common.image_properties.ShapeType.HEART
+                    case "star":        instrument = common.image_properties.ShapeType.STAR
+                    case "triangle":    instrument = common.image_properties.ShapeType.TRIANGLE
+                    case _:             raise RuntimeError("Chosen `shape_name` is out of bounds.")
+                match(shape.fill_color):
+                    case "yellow":  color = common.image_properties.ColorType.YELLOW
+                    case "orange":  color = common.image_properties.ColorType.ORANGE
+                    case "red":     color = common.image_properties.ColorType.RED
+                    case "green":   color = common.image_properties.ColorType.GREEN
+                    case "purple":  color = common.image_properties.ColorType.VIOLET
+                    case "blue":    color = common.image_properties.ColorType.BLUE
+                    case _:         raise RuntimeError("Chosen `fill_color` is out of bounds.")
+                shape_ai = common.image_properties.Shape(shape_name, counter, instrument,
+                                                         int(image_processing.get_volume_from_size(shape.box.size.x*shape.box.size.y, img_size.area())),
+                                                         color,
+                                                         float(image_processing.get_placement_of_note(shape.center_pos.x, img_size.x)), 
+                                                         int(image_processing.get_pitch_from_y_axis(shape.center_pos.y, img_size.y)), 
+                                                         (int(shape.box.pos.x), int(shape.box.pos.y)), int(shape.box.size.x), int(shape.box.size.y))
+                list_of_shapes.append(shape_ai)
         
-        notes = []
-        sounds = {
-            '0' : 81,   # circle
-            '1' : 74,   # half circle
-            '2' : 119,  # square
-            '3' : 2,    # heart
-            '4' : 43,   # star
-            '5' : 30,   # triangle
-        }
-        def rgb_to_bpm(r:int, g:int, b:int) -> int: #TODO: Replace when `image_processing.py` has a better implementation
-            average = (r + g + b) / 3
-            bpm = int(((average + 29) // 30) * 30)
-            bpm = min(240, bpm)
-            bpm = max(30,  bpm)
-            return bpm
-        if bypass_ai:
-            for shape in self.list_of_canvas_shapes:
-                r, g, b = pallet_item_to_rgb(PalletItem[shape.fill_color.upper()])
-                note = image_processing.ip.Image(name=     0,
-                                                 size=     image_processing.get_volume_from_size(obj_size=shape.box.size.x * shape.box.size.y, 
-                                                                                                 img_size=self.canvas_size().x * self.canvas_size().y),
-                                                 color=    rgb_to_bpm(r, g, b),
-                                                 x_axis=   image_processing.get_duration_from_width(obj_width=shape.box.size.x,
-                                                                                                     img_width=self.canvas_size().x),
-                                                 y_axis=   image_processing.get_volume_from_size(obj_size=shape.box.pos.y,
-                                                                                                 img_size=self.canvas_size().y))
-                note.instrument = sounds[shape.class_id]
-                notes.append(note)
-        common.midi_creation.MakeSong(notes)
+        image_processing.display_list_of_shapes(list_of_shapes)
+
+        # Create .midi -> .wav -> combined.wav -> play
+        bpm = common.midi_creation.MakeSong(list_of_shapes) 
+        
+        processes = [
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "drum")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "violin")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "guitar")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "flute")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "saxophone")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "clap")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "piano"))
+        ]
+        
+        # Start all processes
+        for process in processes:
+            process.start()
+
+        # Wait for all processes to finish
+        for process in processes:
+            process.join()
+            
+        common.midi_processing.audio_rendering(bpm)
+
+        cv2.destroyAllWindows()
+        cv2.imshow('Playing audio... Any key continue...', image_ai)
+        cv2.waitKey(1)# Displays the new image immediately
+        take_image.set_jetson_busy(busy=False)
+        key = midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
+                                                    decay= 0.75,
+                                                    cutoff=0.05)
+            
 class GuiActions(ttk.Frame):
     def __init__(self, master, background_color:str):
         super().__init__(master, borderwidth=2, relief='groove')
