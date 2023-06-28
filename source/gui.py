@@ -15,13 +15,13 @@ import image_processing_ai
 import multiprocessing as mp
 import os
 import cv2
+import psutil
 import numpy as np
 
 from enum import Enum # Keep enums UPPER_CASE according to https://docs.python.org/3/howto/enum.html  
 import math
 import tkinter
 from tkinter import ttk
-
 
 class PalletItem(Enum):
     """The pallet in on the left. This are the items that are on it."""
@@ -57,9 +57,7 @@ def save_img(tkinter_canvas:tkinter.Canvas, path_filename:str, as_png=False, as_
     - `tkinter_canvas` The canvas that has to be saved as an image.
     - `path_filename` The (absolute) path that point to the image file without the extension. Example:`r'C:\Program Files\my_project\my_folder_with_images\image_1'`
     - `as_###` The bool that can be true to export that file format. This allows multiple at once. At least one is required."""
-    if not ( as_png or as_jpg or as_gif or as_bmp or as_eps ):
-        print('WARNING: Could not save, as no file format was given.')
-        return
+    if not ( as_png or as_jpg or as_gif or as_bmp or as_eps ): raise UserWarning('Did not got any formats to save. I did not save anything.')
 
     # Create that directory if it does not exists yet
     parent_path = os.path.split(path_filename)[0] # 1 directory up
@@ -86,8 +84,16 @@ def save_img(tkinter_canvas:tkinter.Canvas, path_filename:str, as_png=False, as_
     # 1. CRY
     # 2. https://ghostscript.com/releases/gsdnld.html Just brrrr install this as x64
     # 3. This took me 5.5 hours :'(
-    EpsImagePlugin.gs_windows_binary =  r'C:\Program Files\gs\gs10.01.1\bin\gswin64c' # This is the default location, Telling PIL that it should be here
-
+    if psutil.WINDOWS:
+        expected_install_location = r'C:\Program Files\gs\gs10.01.1\bin\gswin64c'
+        if not os.path.exists(expected_install_location+'.exe'):
+            raise RuntimeError(f'Missing Ghostscript files in: ({str(expected_install_location)}),\n Please install Ghostscript get it from the official website: (https://ghostscript.com/releases/gsdnld.html) to make photos of your Tkinter.Canvas')
+    elif psutil.LINUX:
+        expected_install_location = 'usr/bin/ghostscript'
+        if not os.path.exists(expected_install_location):
+            raise RuntimeError(f'Missing Ghostscript files in: ({str(expected_install_location)}),\n Please install Ghostscript get it from the official website: (https://ghostscript.com/releases/gsdnld.html) or if you are on Ubuntu or another Debian system please try: (`sudo apt install ghostscript`) to make photos of your Tkinter.Canvas')
+    else:   raise RuntimeError('Missing implementations for this operating system of Ghostscript to take photos of your Tkinter.Canvas')
+    EpsImagePlugin.gs_windows_binary = expected_install_location # This is the default location, Telling PIL that it should be here
 
     if as_png: img.save(path_filename + '.png', 'png')
     if as_gif: img.save(path_filename + '.gif', 'gif')
@@ -395,17 +401,22 @@ class MainCanvas(tkinter.Canvas):
         if not bypass_ai:
             cv2.imshow('loading please wait...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'video_camera.png')))
             cv2.waitKey(1)# Displays the new image immediately
-            save_img(tkinter_canvas=self,
-                     path_filename=os.path.join(os.getcwd(), 'files', 'gui', 'temp'),
-                     as_png=True)
-            img = cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'temp.png'))
-            cropped = img[0:img_size.y, self.pallet_item_size().x:self.pallet_item_size().x+img_size.x]
-            image_processing_ai.setup_ai()
-            image_ai, list_of_shapes = image_processing_ai.detect_shapes_with_ai(cropped)
-            cv2.destroyAllWindows()
-            cv2.imshow('loading please wait...', image_ai)
-            cv2.waitKey(1)# Displays the new image immediately
-        else:
+            try:
+                save_img(tkinter_canvas=self,
+                         path_filename=os.path.join(os.getcwd(), 'files', 'gui', 'temp'),
+                         as_png=True)
+            except RuntimeError as runtime_error:
+                print(f'WARNING: Something caused a RuntimeError while saving the picture of the canvas.\n Reverting to bypassing the ai...,\n but if you are curious this was the problem: {runtime_error}')
+                bypass_ai = True
+            else: # did not fail to save.
+                img = cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'temp.png'))
+                cropped = img[0:img_size.y, self.pallet_item_size().x:self.pallet_item_size().x+img_size.x]
+                image_processing_ai.setup_ai()
+                image_ai, list_of_shapes = image_processing_ai.detect_shapes_with_ai(cropped)
+                cv2.destroyAllWindows()
+                cv2.imshow('loading please wait...', image_ai)
+                cv2.waitKey(1)# Displays the new image immediately
+        if bypass_ai: # it is possible that in `if not bypass_ai:` we abort and end up here. A reason could be TODO:`not a windows machine` or `Ghostscript missing` what both causes us to not being able to make a photo of the canvas. and therefor the AI has to be bypassed
             cv2.imshow('loading please wait...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'ai.png')))
             cv2.waitKey(1)# Displays the new image immediately
             for counter, shape in enumerate (self.list_of_canvas_shapes):
@@ -457,7 +468,7 @@ class MainCanvas(tkinter.Canvas):
         cv2.destroyAllWindows()
         cv2.imshow('Playing audio... Any key return...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'play.png')))
         cv2.waitKey(1)# Displays the new image immediately
-        key = common.midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
+        common.midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
                                                decay= 0.75,
                                                cutoff=0.05)
         cv2.destroyAllWindows()
