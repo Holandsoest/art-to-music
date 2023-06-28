@@ -13,6 +13,7 @@ import common.image_properties
 import image_processing
 import image_processing_ai
 import multiprocessing as mp
+import os
 import cv2
 import numpy as np
 
@@ -345,13 +346,15 @@ class MainCanvas(tkinter.Canvas):
         """Returns the usable space of the canvas (exclusive the pallet)"""
         return loc.Size(x=self.winfo_width()-self.pallet_item_size().x, y=self.winfo_height())
     def play_music(self, bypass_ai=False) -> None:
-        img_size = loc.Size(self.grid_size()[0],self.grid_size()[1])
+        img_size = self.canvas_size()
 
         # get a list of shapes
         list_of_shapes = []
         if not bypass_ai:
             pass # take picure
         else:
+            cv2.imshow('loading please wait...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'ai.png')))
+            cv2.waitKey(1)# Displays the new image immediately
             for counter, shape in enumerate (self.list_of_canvas_shapes):
                 shape_name = shapes.object_names_array[int(shape.class_id)]
                 match(shape_name):
@@ -370,19 +373,20 @@ class MainCanvas(tkinter.Canvas):
                     case "purple":  color = common.image_properties.ColorType.VIOLET
                     case "blue":    color = common.image_properties.ColorType.BLUE
                     case _:         raise RuntimeError("Chosen `fill_color` is out of bounds.")
-                shape_ai = common.image_properties.Shape(shape_name, counter, instrument,
-                                                         int(image_processing.get_volume_from_size(shape.box.size.x*shape.box.size.y, img_size.area())),
-                                                         color,
-                                                         float(image_processing.get_placement_of_note(shape.center_pos.x, img_size.x)), 
-                                                         int(image_processing.get_pitch_from_y_axis(shape.center_pos.y, img_size.y)), 
-                                                         (int(shape.box.pos.x), int(shape.box.pos.y)), int(shape.box.size.x), int(shape.box.size.y))
+                shape_ai = common.image_properties.Shape(shape=     shape_name,
+                                                         counter=   counter,
+                                                         instrument=instrument,
+                                                         size=      int(image_processing.get_volume_from_size(shape.box.size.area(), img_size.area())),
+                                                         color=     color,
+                                                         x_axis=    float(image_processing.get_placement_of_note(shape.center_pos.x, img_size.x)), 
+                                                         y_axis=    int(image_processing.get_pitch_from_y_axis(shape.center_pos.y, img_size.y)), 
+                                                         box=       (int(shape.box.pos.x), int(shape.box.pos.y), int(shape.box.size.x), int(shape.box.size.y)))
                 list_of_shapes.append(shape_ai)
         
         image_processing.display_list_of_shapes(list_of_shapes)
 
         # Create .midi -> .wav -> combined.wav -> play
-        bpm = common.midi_creation.MakeSong(list_of_shapes) 
-        
+        bpm = common.midi_creation.MakeSong(list_of_shapes)
         processes = [
             mp.Process(target=common.midi_processing.instrument, args=(bpm, "drum")),
             mp.Process(target=common.midi_processing.instrument, args=(bpm, "violin")),
@@ -392,24 +396,18 @@ class MainCanvas(tkinter.Canvas):
             mp.Process(target=common.midi_processing.instrument, args=(bpm, "clap")),
             mp.Process(target=common.midi_processing.instrument, args=(bpm, "piano"))
         ]
-        
-        # Start all processes
         for process in processes:
             process.start()
-
-        # Wait for all processes to finish
         for process in processes:
             process.join()
-            
         common.midi_processing.audio_rendering(bpm)
-
         cv2.destroyAllWindows()
-        cv2.imshow('Playing audio... Any key continue...', image_ai)
+        cv2.imshow('Playing audio... Any key return...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'play.png')))
         cv2.waitKey(1)# Displays the new image immediately
-        take_image.set_jetson_busy(busy=False)
-        key = midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
-                                                    decay= 0.75,
-                                                    cutoff=0.05)
+        key = common.midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
+                                               decay= 0.75,
+                                               cutoff=0.05)
+        cv2.destroyAllWindows()
             
 class GuiActions(ttk.Frame):
     def __init__(self, master, background_color:str):
