@@ -50,7 +50,49 @@ def pallet_item_to_rgb(pallet_item:PalletItem) -> tuple:
         case PalletItem.BLUE:   return (0,0,255)
         case _:
             raise RuntimeError(f'{pallet_item.name} is not a color!')
-        
+def save_img(tkinter_canvas:tkinter.Canvas, path_filename:str, as_png=False, as_jpg=False, as_gif=False, as_bmp=False, as_eps=False) -> None:
+    """Saves the `tkinter.Canvas` object as a image, on the location of `path_filename` as the chosen formats.
+    
+    ### WARNING this requires Ghostscript, please install https://ghostscript.com/releases/gsdnld.html, and restart your PC 
+    - `tkinter_canvas` The canvas that has to be saved as an image.
+    - `path_filename` The (absolute) path that point to the image file without the extension. Example:`r'C:\Program Files\my_project\my_folder_with_images\image_1'`
+    - `as_###` The bool that can be true to export that file format. This allows multiple at once. At least one is required."""
+    if not ( as_png or as_jpg or as_gif or as_bmp or as_eps ):
+        print('WARNING: Could not save, as no file format was given.')
+        return
+
+    # Create that directory if it does not exists yet
+    parent_path = os.path.split(path_filename)[0] # 1 directory up
+    if not os.path.exists(parent_path): os.makedirs(parent_path)
+
+
+    from PIL import Image, ImageTk, EpsImagePlugin
+    if as_eps:
+        tkinter_canvas.postscript(file = path_filename + '.eps')
+        img = Image.open(path_filename + '.eps')
+    else:
+        import io
+        postscript = tkinter_canvas.postscript(colormode='color')
+        img = Image.open(io.BytesIO(postscript.encode('utf-8')))
+
+
+    # Warning this requires Ghostscript that has to be installed manually on your operating system
+    #
+    # Error: `OSError: Unable to locate Ghostscript on paths`
+    #
+    # Official guide: https://ghostscript.com/docs/9.54.0/Install.htm
+    #
+    # My guide:
+    # 1. CRY
+    # 2. https://ghostscript.com/releases/gsdnld.html Just brrrr install this as x64
+    # 3. This took me 5.5 hours :'(
+    EpsImagePlugin.gs_windows_binary =  r'C:\Program Files\gs\gs10.01.1\bin\gswin64c' # This is the default location, Telling PIL that it should be here
+
+
+    if as_png: img.save(path_filename + '.png', 'png')
+    if as_gif: img.save(path_filename + '.gif', 'gif')
+    if as_bmp: img.save(path_filename + '.bmp', 'bmp')
+    if as_jpg: img.save(path_filename + '.jpg', 'JPEG')  
 
 class Gui(tkinter.Tk):
     """This is the whole GUI of the art-to-music application. And is of course separate standalone from the real webcam/camera implementation.
@@ -58,13 +100,13 @@ class Gui(tkinter.Tk):
     `app.mainloop()` to run it (blocking, will continue after `alt + F4` was pressed)"""
     def __init__(self) -> None:
         super().__init__()
-        self.title('art-to-music')
+        self.title('art-to-music | R to rotate | scroll to resize | drag to place')
         self.minsize(width=528,height=360)
 
         # Declare objects
         self.canvas = MainCanvas(master=self, background_color='white')
         self.actions = GuiActions(master=self, background_color='white')
-        self.actions.play.configure(command=lambda : self.canvas.play_music(bypass_ai=True) )
+        self.actions.play.configure(command=lambda : self.canvas.play_music(bypass_ai=False) )
 class MainCanvas(tkinter.Canvas):
     def __init__(self, master, background_color:str):
         super().__init__(master, background=background_color, borderwidth=2, relief='raised')
@@ -351,7 +393,18 @@ class MainCanvas(tkinter.Canvas):
         # get a list of shapes
         list_of_shapes = []
         if not bypass_ai:
-            pass # take picure
+            cv2.imshow('loading please wait...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'video_camera.png')))
+            cv2.waitKey(1)# Displays the new image immediately
+            save_img(tkinter_canvas=self,
+                     path_filename=os.path.join(os.getcwd(), 'files', 'gui', 'temp'),
+                     as_png=True)
+            img = cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'temp.png'))
+            cropped = img[0:img_size.y, self.pallet_item_size().x:self.pallet_item_size().x+img_size.x]
+            image_processing_ai.setup_ai()
+            image_ai, list_of_shapes = image_processing_ai.detect_shapes_with_ai(cropped)
+            cv2.destroyAllWindows()
+            cv2.imshow('loading please wait...', image_ai)
+            cv2.waitKey(1)# Displays the new image immediately
         else:
             cv2.imshow('loading please wait...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'ai.png')))
             cv2.waitKey(1)# Displays the new image immediately
