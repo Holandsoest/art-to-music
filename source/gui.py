@@ -21,7 +21,7 @@ import numpy as np
 from enum import Enum # Keep enums UPPER_CASE according to https://docs.python.org/3/howto/enum.html  
 import math
 import tkinter
-from tkinter import ttk
+from tkinter import ttk, filedialog
 
 class PalletItem(Enum):
     """The pallet in on the left. This are the items that are on it."""
@@ -112,7 +112,11 @@ class Gui(tkinter.Tk):
         # Declare objects
         self.canvas = MainCanvas(master=self, background_color='white')
         self.actions = GuiActions(master=self, background_color='white')
+
+        # Bind actions
         self.actions.play.configure(command=lambda : self.canvas.play_music(bypass_ai=False) )
+        self.actions.bypass.configure(command=lambda : self.canvas.play_music(bypass_ai=True) )
+        self.actions.image.configure(command=lambda : self.canvas.import_image() )
 class MainCanvas(tkinter.Canvas):
     def __init__(self, master, background_color:str):
         super().__init__(master, background=background_color, borderwidth=2, relief='raised')
@@ -466,13 +470,50 @@ class MainCanvas(tkinter.Canvas):
             process.join()
         common.midi_processing.audio_rendering(bpm)
         cv2.destroyAllWindows()
-        cv2.imshow('Playing audio... Any key return...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'play.png')))
+        if bypass_ai:   cv2.imshow('Playing audio... Any key return...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'play.png')))
+        else:           cv2.imshow('Playing audio... Any key return...', image_ai)
         cv2.waitKey(1)# Displays the new image immediately
         common.midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
                                                decay= 0.75,
                                                cutoff=0.05)
         cv2.destroyAllWindows()
-            
+    def import_image(self) -> None:
+        file_path = filedialog.askopenfilename()
+        
+        img = cv2.imread(file_path)
+        cv2.imshow('Loading AI...', img)
+        cv2.waitKey(1)# Displays the new image immediately
+
+        image_processing_ai.setup_ai()
+        image_ai, list_of_shapes = image_processing_ai.detect_shapes_with_ai(img)
+        cv2.destroyAllWindows()
+        cv2.imshow('Building music...', image_ai)
+        cv2.waitKey(1)# Displays the new image immediately
+
+        image_processing.display_list_of_shapes(list_of_shapes)
+        # Create .midi -> .wav -> combined.wav -> play
+        bpm = common.midi_creation.MakeSong(list_of_shapes)
+        processes = [
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "drum")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "violin")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "guitar")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "flute")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "saxophone")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "clap")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "piano"))
+        ]
+        for process in processes:
+            process.start()
+        for process in processes:
+            process.join()
+        common.midi_processing.audio_rendering(bpm)
+        cv2.destroyAllWindows()
+        cv2.imshow('Playing audio... Any key return...', image_ai)
+        cv2.waitKey(1)# Displays the new image immediately
+        common.midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
+                                               decay= 0.75,
+                                               cutoff=0.05)
+        cv2.destroyAllWindows()
 class GuiActions(ttk.Frame):
     def __init__(self, master, background_color:str):
         super().__init__(master, borderwidth=2, relief='groove')
@@ -480,9 +521,11 @@ class GuiActions(ttk.Frame):
         # Declare
         self.settings_frame = ttk.Frame(master=self, borderwidth=2, relief='groove')
         self.play  =tkinter.Button(master=self.settings_frame, text = 'Play')# command in parent
-        self.ai  =ttk.Label(master=self.settings_frame, text = 'AI' ,background = background_color)
+        self.bypass  =tkinter.Button(master=self.settings_frame, text = 'Play\n(without ai)')
+        self.image  =tkinter.Button(master=self.settings_frame, text = 'Import file')
         self.play.pack (expand=True, fill='both', pady=3)
-        self.ai.pack   (expand=True, fill='both', pady=3)
+        self.bypass.pack (expand=True, fill='both', pady=3)
+        self.image.pack (expand=True, fill='both', pady=3)
 
         # Pack
         self.settings_frame.pack(expand=True, fill='y')
