@@ -243,7 +243,7 @@ class MainCanvas(tkinter.Canvas):
                 # Create a new shape
                 new_shape=None
                 if not found:
-                    if item_is_color: # TODO: Change background
+                    if item_is_color:
                         self.in_hand.remove(item)
                         continue
                     # else place a new shape
