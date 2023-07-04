@@ -27,11 +27,14 @@ The center is the area that where you can create your art. The "Art-area" so to 
 
 - You can drag and drop shapes to move them.
 - **Press** '**R**' while hovering above the said shape **to rotate** the said shape.
-- **Scroll** with the **mouse-wheel** while hovering above the said shape to **rescale** the said shape.
+- **Scroll** with the **mouse-wheel** or **Press** '**-**', '**+**', '**Q**', '**E**' while hovering above the said shape to **rescale** the said shape.
+- The last touched shape will be on top, and the tools prefer to grab the smallest shapes.
 
 The right of the GUI is the action-panel.
 
 - Click "Play" to interpret art to music
+- If the AI does not work for you, As it sometimes does not understand when things are too close to each other... Click "Play (without ai)" to interpret art to music in a more cheaty way
+- Or just let the AI interpret your art by importing a file ('.PNG' is preferred)
 
 ### issues
 
