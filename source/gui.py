@@ -404,7 +404,7 @@ class MainCanvas(tkinter.Canvas):
             return new_shape
     def pallet_item_size(self) -> loc.Size:
         """Returns the size of each tool from the pallet"""
-        return loc.Size(x= 64,  #TODO: Magic number
+        return loc.Size(x= self.winfo_width()/15,
                         y= self.winfo_height()/(len(PalletItem)-1))
     def canvas_size(self) -> loc.Size:
         """Returns the usable space of the canvas (exclusive the pallet)"""
