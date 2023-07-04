@@ -271,7 +271,8 @@ class MainCanvas(tkinter.Canvas):
         self.bind('<Button-1>',         lambda event: pick_up(event))
         self.bind('<ButtonRelease-1>',  lambda event: let_go (event))
 
-        def scroll(event) -> None:
+        def scroll(event, delta_overwrite=0) -> None:
+            if delta_overwrite != 0:    event.delta = 240 * delta_overwrite
             if (self.verbose_events): print(f'<scroll> at {event.x},{event.y} for {event.delta}')
 
             event.x -= self.pallet_item_size().x
@@ -296,6 +297,12 @@ class MainCanvas(tkinter.Canvas):
             self.list_of_canvas_shapes.append(new_shape)
             return
         self.bind("<MouseWheel>",       lambda event: scroll(event))
+        self.bind_all("q",lambda event:scroll(event, delta_overwrite=-1))
+        self.bind_all("-",lambda event:scroll(event, delta_overwrite=-1))
+        self.bind_all("_",lambda event:scroll(event, delta_overwrite=-1))
+        self.bind_all("e",lambda event:scroll(event, delta_overwrite=1))
+        self.bind_all("+",lambda event:scroll(event, delta_overwrite=1))
+        self.bind_all("=",lambda event:scroll(event, delta_overwrite=1))
 
         def rotate(event) -> None:
             if (self.verbose_events): print(f'<Key> {event.char} at {event.x},{event.y}')

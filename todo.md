@@ -5,7 +5,7 @@ High
 Medium
 - [] Use pictograms instead of buttons
 - [] `Last_color` is a bit to the right so it is more apparent
-- [] resize with `q` and `e`
+- [x] resize with `q` and `e`
 - [] move with `wasd`
 - [] move with arrows
 - [] `backspace` or `delete` key removes shape
@@ -13,5 +13,3 @@ Medium
 
 Low
 - [] Dragging viewer overlay where you see what is in your hand
-- [] Some particle effects
-- [] Audio feedback ?
