@@ -180,22 +180,21 @@ class MainCanvas(tkinter.Canvas):
             
             # Pick_up event did not happen in the pallet
             event.x -= self.pallet_item_size().x
-            for shape in self.list_of_canvas_shapes:
-                if event.x < shape.box.pos.x: continue                      # Left of shape.box  (out of range)
-                if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of shape.box (out of range)
-                if event.y < shape.box.pos.y: continue                      # Top of shape.box   (out of range)
-                if event.y > shape.box.pos.y + shape.box.size.y: continue   # Bottom of shape.box(out of range)
-
-                self.in_hand.append(shape)
-                shape.remove_shape(self)
-                self.list_of_canvas_shapes.remove(shape)
-                if (self.verbose_events): print (f'Shape picked up from: {shape.box}')
+            smallest_shape_in_range = get_smallest_shape_on_position(from_list=self.list_of_canvas_shapes,
+                                                                     position=loc.Pos(event.x, event.y))
+            if smallest_shape_in_range == None and self.verbose_events:
+                print ('No shape in the region')
                 return
-            if (self.verbose_events): print ('No shape in the region')
+            self.in_hand.append(smallest_shape_in_range)
+            smallest_shape_in_range.remove_shape(self)
+            self.list_of_canvas_shapes.remove(smallest_shape_in_range)
+            if (self.verbose_events): print (f'Shape picked up from: {smallest_shape_in_range.box}')
+            return
         def let_go(event) -> None:
             if (self.verbose_events): print(f'<let_go> at {event.x},{event.y}')
             pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
 
+            # Letting go in the pallet destroys the hand
             if pallet_item != PalletItem.NONE:
                 print (f"Tossed: {len(self.in_hand)} item's in the garbage can.")
                 self.in_hand.clear()
@@ -204,8 +203,11 @@ class MainCanvas(tkinter.Canvas):
             # Let go on the canvas
             event.x -= self.pallet_item_size().x
             for item in self.in_hand:
-                # Relocate the shape        
-                if not isinstance(item, PalletItem):
+                item_is_color = isinstance(item, PalletItem) and PalletItem.YELLOW.value <= item.value <= PalletItem.BLUE.value
+                item_is_shape = isinstance(item, PalletItem) and PalletItem.CIRCLE.value <= item.value <= PalletItem.TRIANGLE.value
+
+                # Relocate (move) the shape that we have in our hand     
+                if not item_is_color and not item_is_shape:
                     rotation_rad = 0.0
                     depth_percentage = 0
                     try:
@@ -232,41 +234,36 @@ class MainCanvas(tkinter.Canvas):
                 new_shape_rot_rad=0.0
                 new_shape_depth =70
 
-                # Apply properties to shape
+                # Apply properties to existing shape
                 found = False
-                for shape in self.list_of_canvas_shapes: # Find a shape where we drop
-                    if event.x < shape.box.pos.x: continue                      # Left of box  (out of range)
-                    if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of box (out of range)
-                    if event.y < shape.box.pos.y: continue                      # Top of box   (out of range)
-                    if event.y > shape.box.pos.y + shape.box.size.y: continue   # Bottom of box(out of range)
-
-                    new_shape_shape = shapes.object_names_array[int(shape.class_id)].replace(' ', '_')
-                    if PalletItem.YELLOW.value <= pallet_item.value <= PalletItem.BLUE.value:           new_shape_color = pallet_item.name.lower()
-                    if PalletItem.CIRCLE.value <= pallet_item.value <= PalletItem.HALF_CIRCLE.value:    new_shape_shape = pallet_item.name.lower()
-
-                    shape.remove_shape(self)
-                    self.list_of_canvas_shapes.remove(shape)
-
-                    found = True
+                if item_is_color:
+                    smallest_shape_in_range = get_smallest_shape_on_position(from_list=self.list_of_canvas_shapes,
+                                                                             position=loc.Pos(event.x, event.y))
+                    found = smallest_shape_in_range != None
                 # Create a new shape
                 new_shape=None
                 if not found:
-                    if PalletItem.YELLOW.value <= item.value <= PalletItem.BLUE.value: # TODO: Change background
+                    if item_is_color: # TODO: Change background
                         self.in_hand.remove(item)
                         continue
                     # else place a new shape
                     new_shape = get_new_shape(shape=item,
                                               center_pos=loc.Pos(event.x, event.y),
                                               size=None, color=None)
-                else:# So we did find it
-                    if PalletItem.YELLOW.value <= item.value <= PalletItem.BLUE.value: # Apply color to shape 
-                        new_shape = get_new_shape(shape=PalletItem(int(shape.class_id)+PalletItem.CIRCLE.value),
-                                                  center_pos=shape.center_pos,
-                                                  size=shape.box.size, color=item)
-                    else: # Apply shape to shape 
-                        new_shape = get_new_shape(shape=item,
-                                                  center_pos=shape.center_pos,
-                                                  size=shape.box.size, color=PalletItem[shape.fill_color.upper()])
+                elif item_is_color: # Apply color to shape 
+                    new_shape_shape = shapes.object_names_array[int(smallest_shape_in_range.class_id)].replace(' ', '_')
+                    if item_is_color:   new_shape_color = pallet_item.name.lower()
+                    if item_is_shape:   new_shape_shape = pallet_item.name.lower()
+
+                    smallest_shape_in_range.remove_shape(self)
+                    self.list_of_canvas_shapes.remove(smallest_shape_in_range)
+                    new_shape = get_new_shape(shape=PalletItem(int(smallest_shape_in_range.class_id)+PalletItem.CIRCLE.value),
+                                            center_pos=smallest_shape_in_range.center_pos,
+                                            size=smallest_shape_in_range.box.size, color=item)
+                else: # Apply shape to shape 
+                    new_shape = get_new_shape(shape=item,
+                                            center_pos=smallest_shape_in_range.center_pos,
+                                            size=smallest_shape_in_range.box.size, color=PalletItem[smallest_shape_in_range.fill_color.upper()])
                 new_shape.draw_shape(tkinter_canvas=self,
                                      location_offset=loc.Pos(x=self.pallet_item_size().x,y=0))
                 self.list_of_canvas_shapes.append(new_shape)
@@ -278,28 +275,26 @@ class MainCanvas(tkinter.Canvas):
             if (self.verbose_events): print(f'<scroll> at {event.x},{event.y} for {event.delta}')
 
             event.x -= self.pallet_item_size().x
-            for shape in self.list_of_canvas_shapes:
-                if event.x < shape.box.pos.x: continue                      # Left of shape.box  (out of range)
-                if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of shape.box (out of range)
-                if event.y < shape.box.pos.y: continue                      # Top of shape.box   (out of range)
-                if event.y > shape.box.pos.y + shape.box.size.y: continue   # Bottom of shape.box(out of range)
+            smallest_shape_in_range = get_smallest_shape_on_position(from_list=self.list_of_canvas_shapes,
+                                                                     position=loc.Pos(event.x, event.y))
+            found = smallest_shape_in_range != None
                 
-                # Copy
-                new_size = loc.Size(x=max(10, min(2000, (math.sqrt(shape.box.size.x) + event.delta/240)**2)),
-                                    y=max(10, min(2000, (math.sqrt(shape.box.size.y) + event.delta/240)**2)))
-                new_shape = get_new_shape(shape=PalletItem(int(shape.class_id)+PalletItem.CIRCLE.value),
-                                          center_pos=shape.center_pos,
-                                          size=new_size,
-                                          color=PalletItem[shape.fill_color.upper()],
-                                          rotation_rad=shape.rotation_rad)
-                
-                # Replace
-                shape.remove_shape(self)
-                self.list_of_canvas_shapes.remove(shape)
-                new_shape.draw_shape(tkinter_canvas=self,
-                                     location_offset=loc.Pos(x=self.pallet_item_size().x,y=0))
-                self.list_of_canvas_shapes.append(new_shape)
-                return
+            # Copy
+            new_size = loc.Size(x=max(10, min(2000, (math.sqrt(smallest_shape_in_range.box.size.x) + event.delta/240)**2)),
+                                y=max(10, min(2000, (math.sqrt(smallest_shape_in_range.box.size.y) + event.delta/240)**2)))
+            new_shape = get_new_shape(shape=PalletItem(int(smallest_shape_in_range.class_id)+PalletItem.CIRCLE.value),
+                                      center_pos=smallest_shape_in_range.center_pos,
+                                      size=new_size,
+                                      color=PalletItem[smallest_shape_in_range.fill_color.upper()],
+                                      rotation_rad=smallest_shape_in_range.rotation_rad)
+            
+            # Replace
+            smallest_shape_in_range.remove_shape(self)
+            self.list_of_canvas_shapes.remove(smallest_shape_in_range)
+            new_shape.draw_shape(tkinter_canvas=self,
+                                    location_offset=loc.Pos(x=self.pallet_item_size().x,y=0))
+            self.list_of_canvas_shapes.append(new_shape)
+            return
         self.bind("<MouseWheel>",       lambda event: scroll(event))
 
         def rotate(event) -> None:
@@ -311,31 +306,41 @@ class MainCanvas(tkinter.Canvas):
                 try: shape.rotation_rad -= math.pi / 10
                 finally:pass
             event.x -= self.pallet_item_size().x
-            for shape in self.list_of_canvas_shapes:
-                if event.x < shape.box.pos.x: continue                      # Left of shape.box  (out of range)
-                if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of shape.box (out of range)
-                if event.y < shape.box.pos.y: continue                      # Top of shape.box   (out of range)
-                if event.y > shape.box.pos.y + shape.box.size.y: continue   # Bottom of shape.box(out of range)
+            smallest_shape_in_range = get_smallest_shape_on_position(from_list=self.list_of_canvas_shapes,
+                                                                     position=loc.Pos(event.x, event.y))
+            found = smallest_shape_in_range != None
                 
-                # Copy
-                new_shape = get_new_shape(shape=PalletItem(int(shape.class_id)+PalletItem.CIRCLE.value),
-                                        center_pos=shape.center_pos,
-                                        size=shape.box.size,
-                                        color=PalletItem[shape.fill_color.upper()],
-                                        rotation_rad=shape.rotation_rad - math.pi / 10)
-                
-                # Replace
-                shape.remove_shape(self)
-                self.list_of_canvas_shapes.remove(shape)
-                new_shape.draw_shape(tkinter_canvas=self,
-                                     location_offset=loc.Pos(x=self.pallet_item_size().x,y=0))
-                self.list_of_canvas_shapes.append(new_shape)
-                return
-            self.update()
+            # Copy
+            new_shape = get_new_shape(shape=PalletItem(int(smallest_shape_in_range.class_id)+PalletItem.CIRCLE.value),
+                                      center_pos=smallest_shape_in_range.center_pos,
+                                      size=smallest_shape_in_range.box.size,
+                                      color=PalletItem[smallest_shape_in_range.fill_color.upper()],
+                                      rotation_rad=smallest_shape_in_range.rotation_rad - math.pi / 10)
+            
+            # Replace
+            smallest_shape_in_range.remove_shape(self)
+            self.list_of_canvas_shapes.remove(smallest_shape_in_range)
+            new_shape.draw_shape(tkinter_canvas=self,
+                                 location_offset=loc.Pos(x=self.pallet_item_size().x,y=0))
+            self.list_of_canvas_shapes.append(new_shape)
+            return
         self.bind_all("r",lambda event:rotate(event))
 
-
-
+        def get_smallest_shape_on_position(from_list:list, position:loc.Pos) -> None|shapes.Circle|shapes.HalfCircle|shapes.Square|shapes.Heart|shapes.Star|shapes.SymmetricTriangle:
+            """Returns `None` when no shape was found, otherwise returns the smallest shape as the shape class that has `position` inside it's `loc.Box`
+            
+            also it prefers shapes with grater index"""
+            smallest_shape = []
+            for shape in from_list:
+                if position.x < shape.box.pos.x: continue                      # Left of shape.box  (out of range)
+                if position.x > shape.box.pos.x + shape.box.size.x: continue   # Right of shape.box (out of range)
+                if position.y < shape.box.pos.y: continue                      # Top of shape.box   (out of range)
+                if position.y > shape.box.pos.y + shape.box.size.y: continue   # Bottom of shape.box(out of range)
+                if len(smallest_shape) != 0 and shape.box.size > smallest_shape[0].box.size: continue # Get the smallest one (and also the last of the same area) (except for when we dont have one yet)
+                smallest_shape.clear()
+                smallest_shape.append(shape)
+            if len(smallest_shape) == 0: return None
+            return smallest_shape[0]
         def get_new_shape(shape:PalletItem, center_pos:loc.Pos, size:loc.Size|None, color:PalletItem|None, rotation_rad=0.0, depth_percentage=70) -> shapes.Circle|shapes.HalfCircle|shapes.Square|shapes.Heart|shapes.Star|shapes.SymmetricTriangle:
             """Creates a new shape
             ## Args

@@ -1,5 +1,5 @@
 High
-- [] Moving shapes onto shapes does move shapes only
+- [x] Moving shapes onto shapes does move shapes only
 - [] Largest shapes are at the back
 
 Medium
