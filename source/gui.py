@@ -432,7 +432,7 @@ class MainCanvas(tkinter.Canvas):
                 cv2.destroyAllWindows()
                 cv2.imshow('Building music...', image_ai)
                 cv2.waitKey(1)# Displays the new image immediately
-        if bypass_ai: # it is possible that in `if not bypass_ai:` we abort and end up here. A reason could be TODO:`not a windows machine` or `Ghostscript missing` what both causes us to not being able to make a photo of the canvas. and therefor the AI has to be bypassed
+        if bypass_ai: # it is possible that in `if not bypass_ai:` we abort and end up here. A reason could be `Ghostscript missing` what both causes us to not being able to make a photo of the canvas. and therefor the AI has to be bypassed
             cv2.imshow('Bypassing AI...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'ai_bypass.png')))
             cv2.waitKey(1)# Displays the new image immediately
             for counter, shape in enumerate (self.list_of_canvas_shapes):
