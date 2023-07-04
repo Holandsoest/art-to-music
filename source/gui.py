@@ -126,7 +126,7 @@ class MainCanvas(tkinter.Canvas):
         # Declare
         self.list_of_canvas_shapes = []
         self.in_hand = []
-        self.verbose_events = True
+        self.verbose_events = False
 
         self.last_color = PalletItem.YELLOW
         def get_pallet_item(canvas_pos:loc.Pos) -> PalletItem:
@@ -196,7 +196,7 @@ class MainCanvas(tkinter.Canvas):
 
             # Letting go in the pallet destroys the hand
             if pallet_item != PalletItem.NONE:
-                print (f"Tossed: {len(self.in_hand)} item's in the garbage can.")
+                if self.verbose_events: print (f"Tossed: {len(self.in_hand)} item's in the garbage can.")
                 self.in_hand.clear()
                 return
             
@@ -375,7 +375,7 @@ class MainCanvas(tkinter.Canvas):
                               width= new_size.x,
                               height=new_size.y)
             
-            print( f'Got new_shape: [\n\tWith shape: `{new_shape_type}`\n\tOn the Box: {new_box}\n\tWith the Color: {new_color}\n]')
+            if self.verbose_events: print( f'Got new_shape: [\n\tWith shape: `{new_shape_type}`\n\tOn the Box: {new_box}\n\tWith the Color: {new_color}\n]')
             
             # Get the shape
             match (new_shape_type):
@@ -426,7 +426,7 @@ class MainCanvas(tkinter.Canvas):
                 bypass_ai = True
             else: # did not fail to save_img.
                 img = cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'temp.png'))
-                cropped = img[0:img_size.y, self.pallet_item_size().x:self.pallet_item_size().x+img_size.x]
+                cropped = img[0:int(img_size.y), int(self.pallet_item_size().x):int(self.pallet_item_size().x+img_size.x)]
                 image_processing_ai.setup_ai()
                 image_ai, list_of_shapes = image_processing_ai.detect_shapes_with_ai(cropped)
                 cv2.destroyAllWindows()
