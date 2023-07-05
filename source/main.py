@@ -36,7 +36,7 @@ if __name__ == "__main__":
             mp.Process(target=midi_processing.instrument, args=(bpm, "piano"))
         ]
         
-        # Start all processesq
+        # Start all processes
         for process in processes:
             process.start()
 
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         take_image.set_jetson_busy(busy=False)
         key = midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
                                                     decay= 0.75,
-                                                    cutoff=0.05) 
+                                                    cutoff=0.05)
         if key == -1: 
             cv2.destroyAllWindows()
             cv2.imshow('Press any key to start... (q to exit)', image_ai)
