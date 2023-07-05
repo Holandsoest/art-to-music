@@ -7,14 +7,21 @@ In this version you cannot rotate & resize the shapes yet"""
 # Want to learn about Tkinter gui tool? https://youtu.be/mop6g-c5HEY It coverers about everything. ;)
 import common.shapes as shapes
 import common.location as loc
-import image_processing
 import common.midi_creation
+import common.midi_processing
+import common.image_properties
+import image_processing
+import image_processing_ai
+import multiprocessing as mp
+import os
+import cv2
+import psutil
+import numpy as np
 
 from enum import Enum # Keep enums UPPER_CASE according to https://docs.python.org/3/howto/enum.html  
 import math
 import tkinter
 from tkinter import ttk
-
 
 class PalletItem(Enum):
     """The pallet in on the left. This are the items that are on it."""
@@ -43,7 +50,55 @@ def pallet_item_to_rgb(pallet_item:PalletItem) -> tuple:
         case PalletItem.BLUE:   return (0,0,255)
         case _:
             raise RuntimeError(f'{pallet_item.name} is not a color!')
-        
+def save_img(tkinter_canvas:tkinter.Canvas, path_filename:str, as_png=False, as_jpg=False, as_gif=False, as_bmp=False, as_eps=False) -> None:
+    """Saves the `tkinter.Canvas` object as a image, on the location of `path_filename` as the chosen formats.
+    
+    ### WARNING this requires Ghostscript, please install https://ghostscript.com/releases/gsdnld.html, and restart your PC 
+    - `tkinter_canvas` The canvas that has to be saved as an image.
+    - `path_filename` The (absolute) path that point to the image file without the extension. Example:`r'C:\Program Files\my_project\my_folder_with_images\image_1'`
+    - `as_###` The bool that can be true to export that file format. This allows multiple at once. At least one is required."""
+    if not ( as_png or as_jpg or as_gif or as_bmp or as_eps ): raise UserWarning('Did not got any formats to save. I did not save anything.')
+
+    # Create that directory if it does not exists yet
+    parent_path = os.path.split(path_filename)[0] # 1 directory up
+    if not os.path.exists(parent_path): os.makedirs(parent_path)
+
+
+    from PIL import Image, ImageTk, EpsImagePlugin
+    if as_eps:
+        tkinter_canvas.postscript(file = path_filename + '.eps')
+        img = Image.open(path_filename + '.eps')
+    else:
+        import io
+        postscript = tkinter_canvas.postscript(colormode='color')
+        img = Image.open(io.BytesIO(postscript.encode('utf-8')))
+
+
+    # Warning this requires Ghostscript that has to be installed manually on your operating system
+    #
+    # Error: `OSError: Unable to locate Ghostscript on paths`
+    #
+    # Official guide: https://ghostscript.com/docs/9.54.0/Install.htm
+    #
+    # My guide:
+    # 1. CRY
+    # 2. https://ghostscript.com/releases/gsdnld.html Just brrrr install this as x64
+    # 3. This took me 5.5 hours :'(
+    if psutil.WINDOWS:
+        expected_install_location = r'C:\Program Files\gs\gs10.01.1\bin\gswin64c'
+        if not os.path.exists(expected_install_location+'.exe'):
+            raise RuntimeError(f'Missing Ghostscript files in: ({str(expected_install_location)}),\n Please install Ghostscript get it from the official website: (https://ghostscript.com/releases/gsdnld.html) to make photos of your Tkinter.Canvas')
+    elif psutil.LINUX:
+        expected_install_location = 'usr/bin/ghostscript'
+        if not os.path.exists(expected_install_location):
+            raise RuntimeError(f'Missing Ghostscript files in: ({str(expected_install_location)}),\n Please install Ghostscript get it from the official website: (https://ghostscript.com/releases/gsdnld.html) or if you are on Ubuntu or another Debian system please try: (`sudo apt install ghostscript`) to make photos of your Tkinter.Canvas')
+    else:   raise RuntimeError('Missing implementations for this operating system of Ghostscript to take photos of your Tkinter.Canvas')
+    EpsImagePlugin.gs_windows_binary = expected_install_location # This is the default location, Telling PIL that it should be here
+
+    if as_png: img.save(path_filename + '.png', 'png')
+    if as_gif: img.save(path_filename + '.gif', 'gif')
+    if as_bmp: img.save(path_filename + '.bmp', 'bmp')
+    if as_jpg: img.save(path_filename + '.jpg', 'JPEG')  
 
 class Gui(tkinter.Tk):
     """This is the whole GUI of the art-to-music application. And is of course separate standalone from the real webcam/camera implementation.
@@ -51,13 +106,13 @@ class Gui(tkinter.Tk):
     `app.mainloop()` to run it (blocking, will continue after `alt + F4` was pressed)"""
     def __init__(self) -> None:
         super().__init__()
-        self.title('art-to-music')
+        self.title('art-to-music | R to rotate | scroll to resize | drag to place')
         self.minsize(width=528,height=360)
 
         # Declare objects
         self.canvas = MainCanvas(master=self, background_color='white')
         self.actions = GuiActions(master=self, background_color='white')
-        self.actions.play.configure(command=lambda : self.canvas.play_music(bypass_ai=True) )
+        self.actions.play.configure(command=lambda : self.canvas.play_music(bypass_ai=False) )
 class MainCanvas(tkinter.Canvas):
     def __init__(self, master, background_color:str):
         super().__init__(master, background=background_color, borderwidth=2, relief='raised')
@@ -339,37 +394,85 @@ class MainCanvas(tkinter.Canvas):
         """Returns the usable space of the canvas (exclusive the pallet)"""
         return loc.Size(x=self.winfo_width()-self.pallet_item_size().x, y=self.winfo_height())
     def play_music(self, bypass_ai=False) -> None:
-        if not bypass_ai: raise RuntimeError("no u cannot do that yet :'( i dont know how the ai works ;-;")
+        img_size = self.canvas_size()
+
+        # get a list of shapes
+        list_of_shapes = []
+        if not bypass_ai:
+            cv2.imshow('Loading AI...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'ai.png')))
+            cv2.waitKey(1)# Displays the new image immediately
+            try:
+                save_img(tkinter_canvas=self,
+                         path_filename=os.path.join(os.getcwd(), 'files', 'gui', 'temp'),
+                         as_png=True)
+            except RuntimeError as runtime_error:
+                print(f'WARNING: Something caused a RuntimeError while saving the picture of the canvas.\n Reverting to bypassing the ai...,\n but if you are curious this was the problem: {runtime_error}')
+                bypass_ai = True
+            else: # did not fail to save_img.
+                img = cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'temp.png'))
+                cropped = img[0:img_size.y, self.pallet_item_size().x:self.pallet_item_size().x+img_size.x]
+                image_processing_ai.setup_ai()
+                image_ai, list_of_shapes = image_processing_ai.detect_shapes_with_ai(cropped)
+                cv2.destroyAllWindows()
+                cv2.imshow('Building music...', image_ai)
+                cv2.waitKey(1)# Displays the new image immediately
+        if bypass_ai: # it is possible that in `if not bypass_ai:` we abort and end up here. A reason could be TODO:`not a windows machine` or `Ghostscript missing` what both causes us to not being able to make a photo of the canvas. and therefor the AI has to be bypassed
+            cv2.imshow('Bypassing AI...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'ai_bypass.png')))
+            cv2.waitKey(1)# Displays the new image immediately
+            for counter, shape in enumerate (self.list_of_canvas_shapes):
+                shape_name = shapes.object_names_array[int(shape.class_id)]
+                match(shape_name):
+                    case "circle":      instrument = common.image_properties.ShapeType.CIRCLE
+                    case "half circle": instrument = common.image_properties.ShapeType.HALF_CIRCLE
+                    case "square":      instrument = common.image_properties.ShapeType.SQUARE
+                    case "heart":       instrument = common.image_properties.ShapeType.HEART
+                    case "star":        instrument = common.image_properties.ShapeType.STAR
+                    case "triangle":    instrument = common.image_properties.ShapeType.TRIANGLE
+                    case _:             raise RuntimeError("Chosen `shape_name` is out of bounds.")
+                match(shape.fill_color):
+                    case "yellow":  color = common.image_properties.ColorType.YELLOW
+                    case "orange":  color = common.image_properties.ColorType.ORANGE
+                    case "red":     color = common.image_properties.ColorType.RED
+                    case "green":   color = common.image_properties.ColorType.GREEN
+                    case "purple":  color = common.image_properties.ColorType.VIOLET
+                    case "blue":    color = common.image_properties.ColorType.BLUE
+                    case _:         raise RuntimeError("Chosen `fill_color` is out of bounds.")
+                shape_ai = common.image_properties.Shape(shape=     shape_name,
+                                                         counter=   counter,
+                                                         instrument=instrument,
+                                                         size=      int(image_processing.get_volume_from_size(shape.box.size.area(), img_size.area())),
+                                                         color=     color,
+                                                         x_axis=    float(image_processing.get_placement_of_note(shape.center_pos.x, img_size.x)), 
+                                                         y_axis=    int(image_processing.get_pitch_from_y_axis(shape.center_pos.y, img_size.y)), 
+                                                         box=       (int(shape.box.pos.x), int(shape.box.pos.y), int(shape.box.size.x), int(shape.box.size.y)))
+                list_of_shapes.append(shape_ai)
         
-        notes = []
-        sounds = {
-            '0' : 81,   # circle
-            '1' : 74,   # half circle
-            '2' : 119,  # square
-            '3' : 2,    # heart
-            '4' : 43,   # star
-            '5' : 30,   # triangle
-        }
-        def rgb_to_bpm(r:int, g:int, b:int) -> int: #TODO: Replace when `image_processing.py` has a better implementation
-            average = (r + g + b) / 3
-            bpm = int(((average + 29) // 30) * 30)
-            bpm = min(240, bpm)
-            bpm = max(30,  bpm)
-            return bpm
-        if bypass_ai:
-            for shape in self.list_of_canvas_shapes:
-                r, g, b = pallet_item_to_rgb(PalletItem[shape.fill_color.upper()])
-                note = image_processing.ip.Image(name=     0,
-                                                 size=     image_processing.get_volume_from_size(obj_size=shape.box.size.x * shape.box.size.y, 
-                                                                                                 img_size=self.canvas_size().x * self.canvas_size().y),
-                                                 color=    rgb_to_bpm(r, g, b),
-                                                 x_axis=   image_processing.get_duration_from_width(obj_width=shape.box.size.x,
-                                                                                                     img_width=self.canvas_size().x),
-                                                 y_axis=   image_processing.get_volume_from_size(obj_size=shape.box.pos.y,
-                                                                                                 img_size=self.canvas_size().y))
-                note.instrument = sounds[shape.class_id]
-                notes.append(note)
-        common.midi_creation.MakeSong(notes)
+        image_processing.display_list_of_shapes(list_of_shapes)
+
+        # Create .midi -> .wav -> combined.wav -> play
+        bpm = common.midi_creation.MakeSong(list_of_shapes)
+        processes = [
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "drum")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "violin")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "guitar")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "flute")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "saxophone")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "clap")),
+            mp.Process(target=common.midi_processing.instrument, args=(bpm, "piano"))
+        ]
+        for process in processes:
+            process.start()
+        for process in processes:
+            process.join()
+        common.midi_processing.audio_rendering(bpm)
+        cv2.destroyAllWindows()
+        cv2.imshow('Playing audio... Any key return...', cv2.imread(os.path.join(os.getcwd(), 'files', 'gui', 'play.png')))
+        cv2.waitKey(1)# Displays the new image immediately
+        common.midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),
+                                               decay= 0.75,
+                                               cutoff=0.05)
+        cv2.destroyAllWindows()
+            
 class GuiActions(ttk.Frame):
     def __init__(self, master, background_color:str):
         super().__init__(master, borderwidth=2, relief='groove')
