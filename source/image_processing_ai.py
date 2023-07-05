@@ -21,9 +21,11 @@ def setup_ai():
     shape_detector.setJsonPath(jason_path)
     shape_detector.loadModel()
 
-def correct_boxes(img:cv2.Mat, detected_objects): # -> image, boxpoints
+def correct_boxes(img:cv2.Mat, detected_objects): # -> boxpoints, list[ cv2.rectangle( -> rec <- ) ]
     boxes = []
     boxes_w_names = []
+
+    cv2_rectangles = []
 
     def non_max_suppression(boxes, boxes_w_names, overlapThresh = 0.4): # -> boxpoints
         """
@@ -111,9 +113,9 @@ def correct_boxes(img:cv2.Mat, detected_objects): # -> image, boxpoints
         box_name = obj[4]
 
         # Adding a text to the object 
-        cv2.rectangle(img, (int(x1), int(y1)), (int(x2), int(y2)), (255,0,0), 2)
+        cv2_rectangles.append((int(x1), int(y1), int(x2), int(y2)))
     
-    return img, double_boxes
+    return double_boxes, cv2_rectangles
     
 def detect_shapes_with_ai(image): # -> image, list
     """
@@ -132,7 +134,12 @@ def detect_shapes_with_ai(image): # -> image, list
                                                                 minimum_percentage_probability=50,
                                                                 display_percentage_probability=True,
                                                                 display_object_name=True)
-    img, boxes = correct_boxes(image, detected_objects)
+    boxes, cv2_rectangle_recs = correct_boxes(image, detected_objects)
+    for rec in cv2_rectangle_recs:
+        cv2.rectangle(img,
+                      (rec[0], rec[1]), (rec[2], rec[3]),
+                      color=(255,0,100),
+                      thickness=1)
 
     for counter, box in enumerate (boxes):
         x1, y1, x2, y2, box_name = box
