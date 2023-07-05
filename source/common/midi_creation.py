@@ -22,16 +22,16 @@ def MakeSong(list):
         def scale (percentage, instrument): # scale notes
 
             # lower and upperbound
-            flute_low = 79 #G5
-            flute_high = 101 #F7
-            violin_low = 72 #C5
-            violin_high = 96 #C7
+            flute_low = 67 #G5
+            flute_high = 89 #F7
+            violin_low = 60 #C5
+            violin_high = 72 #C7
             piano_low = 72 #C5
             piano_high = 84 #C6
             guitar_low = 55 #G3
             guitar_high = 67 #G4
-            saxophone_low = 84 #C6
-            saxophone_high = 96 #C7
+            saxophone_low = 60 #C6
+            saxophone_high = 72 #C7
 
             match instrument:
                 case 'flute':
@@ -248,9 +248,9 @@ def MakeSong(list):
                 with open(os.path.join(model_custom_path, "violin_output.mid"), "wb") as output_file2:
                     midi_violin.writeFile(output_file2)
                 with open(os.path.join(model_custom_path, "piano_output.mid"), "wb") as output_file3:
-                    midi_guitar.writeFile(output_file3)
+                    midi_piano.writeFile(output_file3)
                 with open(os.path.join(model_custom_path, "guitar_output.mid"), "wb") as output_file4:
-                    midi_violin.writeFile(output_file4)
+                    midi_guitar.writeFile(output_file4)
                 with open(os.path.join(model_custom_path, "drum_output.mid"), "wb") as output_file5:
                     midi_drum.writeFile(output_file5)
                 with open(os.path.join(model_custom_path, "saxophone_output.mid"), "wb") as output_file6: 

@@ -61,6 +61,7 @@ class Size(Pos):
     def __ge__(self, other) -> bool:
         return self.area() >= other.area()
     def area(self) -> int|float:
+        """Multiplies width and height"""
         return self.x * self.y
 class Box:
     def __init__(self, x, y, width, height):
