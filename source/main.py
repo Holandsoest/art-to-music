@@ -10,7 +10,7 @@ import multiprocessing as mp
 img_proc_ai.setup_ai()
 
 import os
-import time
+
 if __name__ == "__main__":
     while True:
         take_image.set_jetson_busy(busy=True)
@@ -47,7 +47,8 @@ if __name__ == "__main__":
         midi_processing.audio_rendering(bpm)
 
         cv2.destroyAllWindows()
-        cv2.imshow('Playing audio... Any key continue...', image_ai)
+        resize_img = cv2.resize(image_ai,(1280, 720 ))
+        cv2.imshow('Playing audio... Any key continue...', resize_img)
         cv2.waitKey(1)# Displays the new image immediately
         take_image.set_jetson_busy(busy=False)
         key = midi_processing.play_loop(os.path.join(os.getcwd(), 'files', 'audio_generator', 'created_song.mp3'),

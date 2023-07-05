@@ -12,7 +12,7 @@ model_font_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'soundfo
 def instrument (bpm, instrument):
     loader = sf.sf2_loader(os.path.join(model_font_path, f"{instrument}.sf2"))
     loader.change(channel=0, bank=0, preset=0) # change current preset number to 0
-    loader.export_midi_file(os.path.join(model_midi_path, f"{instrument}_output.mid"), name=os.path.join(model_wav_path, f"{instrument}.wav"), format='wav', show_msg=True)
+    loader.export_midi_file(os.path.join(model_midi_path, f"{instrument}_output.mid"), name=os.path.join(model_wav_path, f"{instrument}.wav"), format='wav')
 
 def audio_rendering(bpm):
     total_time=(4/(bpm/60))*1000
