@@ -105,6 +105,8 @@ class MainCanvas(tkinter.Canvas):
                 shape.draw_shape(self, location_offset=loc.Pos())
             self.update()
         redraw_pallet_elements()
+        self.bind("<Configure>", lambda event: redraw_pallet_elements())
+
         def pick_up(event) -> None:
             if (self.verbose_events): print(f'<pick_up> at {event.x},{event.y}')
             pallet_item = get_pallet_item(loc.Pos(event.x, event.y))
@@ -210,7 +212,71 @@ class MainCanvas(tkinter.Canvas):
                                      location_offset=loc.Pos(x=self.pallet_item_size().x,y=0))
                 self.list_of_canvas_shapes.append(new_shape)
                 self.in_hand.remove(item)
-        
+        self.bind('<Button-1>',         lambda event: pick_up(event))
+        self.bind('<ButtonRelease-1>',  lambda event: let_go (event))
+
+        def scroll(event) -> None:
+            if (self.verbose_events): print(f'<scroll> at {event.x},{event.y} for {event.delta}')
+
+            event.x -= self.pallet_item_size().x
+            for shape in self.list_of_canvas_shapes:
+                if event.x < shape.box.pos.x: continue                      # Left of shape.box  (out of range)
+                if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of shape.box (out of range)
+                if event.y < shape.box.pos.y: continue                      # Top of shape.box   (out of range)
+                if event.y > shape.box.pos.y + shape.box.size.y: continue   # Bottom of shape.box(out of range)
+                
+                # Copy
+                new_size = loc.Size(x=max(10, min(2000, (math.sqrt(shape.box.size.x) + event.delta/240)**2)),
+                                    y=max(10, min(2000, (math.sqrt(shape.box.size.y) + event.delta/240)**2)))
+                new_shape = get_new_shape(shape=PalletItem(int(shape.class_id)+PalletItem.CIRCLE.value),
+                                          center_pos=shape.center_pos,
+                                          size=new_size,
+                                          color=PalletItem[shape.fill_color.upper()],
+                                          rotation_rad=shape.rotation_rad)
+                
+                # Replace
+                shape.remove_shape(self)
+                self.list_of_canvas_shapes.remove(shape)
+                new_shape.draw_shape(tkinter_canvas=self,
+                                     location_offset=loc.Pos(x=self.pallet_item_size().x,y=0))
+                self.list_of_canvas_shapes.append(new_shape)
+                return
+        self.bind("<MouseWheel>",       lambda event: scroll(event))
+
+        def rotate(event) -> None:
+            if (self.verbose_events): print(f'<Key> {event.char} at {event.x},{event.y}')
+            if event.char != "r": return
+
+            for shape in self.in_hand:
+                if isinstance(shape, PalletItem): continue
+                try: shape.rotation_rad -= math.pi / 10
+                finally:pass
+            event.x -= self.pallet_item_size().x
+            for shape in self.list_of_canvas_shapes:
+                if event.x < shape.box.pos.x: continue                      # Left of shape.box  (out of range)
+                if event.x > shape.box.pos.x + shape.box.size.x: continue   # Right of shape.box (out of range)
+                if event.y < shape.box.pos.y: continue                      # Top of shape.box   (out of range)
+                if event.y > shape.box.pos.y + shape.box.size.y: continue   # Bottom of shape.box(out of range)
+                
+                # Copy
+                new_shape = get_new_shape(shape=PalletItem(int(shape.class_id)+PalletItem.CIRCLE.value),
+                                        center_pos=shape.center_pos,
+                                        size=shape.box.size,
+                                        color=PalletItem[shape.fill_color.upper()],
+                                        rotation_rad=shape.rotation_rad - math.pi / 10)
+                
+                # Replace
+                shape.remove_shape(self)
+                self.list_of_canvas_shapes.remove(shape)
+                new_shape.draw_shape(tkinter_canvas=self,
+                                     location_offset=loc.Pos(x=self.pallet_item_size().x,y=0))
+                self.list_of_canvas_shapes.append(new_shape)
+                return
+            self.update()
+        self.bind_all("r",lambda event:rotate(event))
+
+
+
         def get_new_shape(shape:PalletItem, center_pos:loc.Pos, size:loc.Size|None, color:PalletItem|None, rotation_rad=0.0, depth_percentage=70) -> shapes.Circle|shapes.HalfCircle|shapes.Square|shapes.Heart|shapes.Star|shapes.SymmetricTriangle:
             """Creates a new shape
             ## Args
@@ -265,12 +331,6 @@ class MainCanvas(tkinter.Canvas):
                                                          fill_color=new_color, outline_color=new_color,
                                                          rotation_rad=rotation_rad)
             return new_shape
-
-
-        self.bind ('<Button-1>',        lambda event: pick_up(event))
-        self.bind ('<ButtonRelease-1>', lambda event: let_go (event))
-        # self.bind ('<Motion>',          lambda event: temp   (event))
-        self.bind("<Configure>", lambda event: redraw_pallet_elements())
     def pallet_item_size(self) -> loc.Size:
         """Returns the size of each tool from the pallet"""
         return loc.Size(x= 64,  #TODO: Magic number
