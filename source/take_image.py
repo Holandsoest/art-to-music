@@ -46,6 +46,8 @@ def get_image() -> cv2.Mat:
     #     # os.remove(path)
     #     # os.remove(path2)
     #     return img
+    #convert_command = f'gst-launch-1.0 -e filesrc location="{path}" ! decodebin ! videoconvert ! pngenc ! filesink location="{path_png}"'
+        #subprocess.call(convert_command, shell=True)
     
 
     # gstreamer_str = "sudo gst-launch1.0 nvarguscamerasrc ! video/x-raw, format=BGR ! autovideoconvert ! videoconvert ! videoscale ! video/x-raw , width=640, height=480, format=BGR ! appsink drop=1"
