@@ -7,14 +7,19 @@
 Windows:
 
 > 1. [Download ffmpeg](https://phoenixnap.com/kb/ffmpeg-windows)  
-> 2. [Download Ghostscript](https://ghostscript.com/releases/gsdnld.html)  
+> 2. [Download Ghostscript](https://ghostscript.com/releases/gsdnld.html) *For GUI only*  
 > 3. [Python 3.11.4](https://www.python.org/downloads/) (or up) **Do not forget to: '`Add to path`'**  
-> 4. Open the start-menu and type `powershell`, right click the blue icon and `run as administrator`  
-> 5.  
+> 4. Reboot your pc...
+> 5. Open the start-menu and type `powershell`, right click the blue icon and `run as administrator`  
+> 6. `python3.11 -m pip install virtualenv && git clone https://github.com/Holandsoest/art-to-music.git && cd ./art-to-music && python3.11 -m venv .venv && source .venv/bin/activate && python3.11 -m pip install --require-virtualenv -r requirements.txt`
 
-Debian-like-OS's (like Ubuntu):
+Debian-like-OS's (like Ubuntu) :
 
-> 1. `sudo apt install ffmpeg ghostscript python3.11-dev && sudo update-alternatives --install /usr/bin/python python3 /usr/bin/python3.11 11`
+> 1. Open a terminal
+> 2. `ctrl`+`shift`+`V` the following in the terminal: `sudo apt install ffmpeg ghostscript python3.11-dev python3.11-venv python3.11-tk fluidsynth && python3.11 -m pip install virtualenv && git clone https://github.com/Holandsoest/art-to-music.git && cd ./art-to-music && python3.11 -m venv .venv && source .venv/bin/activate && python3.11 -m pip install --require-virtualenv -r requirements.txt` to install everything. *This might take a while.*  
+
+MacOS:
+Is not supported.
 
 ### Nvidea Jetson Nano only  
 
