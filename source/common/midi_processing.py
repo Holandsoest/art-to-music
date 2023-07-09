@@ -1,7 +1,6 @@
 from pydub import AudioSegment
 import typing
 import cv2
-import time
 import os
 import sf2_loader as sf
 
@@ -35,8 +34,8 @@ def audio_rendering(bpm):
     combined_sound4 = combined_sound3.overlay(sound5)
     combined_sound5 = combined_sound4.overlay(sound6)
     combined_sound6 = combined_sound5.overlay(sound7)
-
     combined_sound7 = (combined_sound6 + combined_sound6)*2
+
     # Export the combined audio to an MP3 file
     with open(os.path.join('files','audio_generator','created_song.mp3'), "wb") as output_file1:
                 combined_sound7.export(output_file1, format = "mp3")

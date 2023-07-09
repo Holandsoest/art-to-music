@@ -24,8 +24,8 @@ if __name__ == "__main__":
         cv2.waitKey(1)# Displays the new image immediately
         img_proc.display_list_of_shapes(list_of_shapes)
 
-        bpm = midi_creation.MakeSong(list_of_shapes) 
-        
+        # Process all midi's independently
+        bpm = midi_creation.MakeSong(list_of_shapes)
         processes = [
             mp.Process(target=midi_processing.instrument, args=(bpm, "drum")),
             mp.Process(target=midi_processing.instrument, args=(bpm, "violin")),
@@ -35,15 +35,12 @@ if __name__ == "__main__":
             mp.Process(target=midi_processing.instrument, args=(bpm, "clap")),
             mp.Process(target=midi_processing.instrument, args=(bpm, "piano"))
         ]
-        
-        # Start all processes
         for process in processes:
             process.start()
-
-        # Wait for all processes to finish
         for process in processes:
             process.join()
-            
+        
+        # Overlap all processed midi's
         midi_processing.audio_rendering(bpm)
 
         cv2.destroyAllWindows()
