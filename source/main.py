@@ -1,15 +1,13 @@
 import cv2
-import numpy as np
 import common.midi_creation as midi_creation
 import common.midi_processing as midi_processing
 import image_processing_ai as img_proc_ai
 import image_processing as img_proc
 import take_image
 import multiprocessing as mp
+import os
 
 img_proc_ai.setup_ai()
-
-import os
 
 if __name__ == "__main__":
     while True:
@@ -57,4 +55,3 @@ if __name__ == "__main__":
             key = cv2.waitKey(0)
         if key == ord('q'): break
     cv2.destroyAllWindows()
-
