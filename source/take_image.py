@@ -6,7 +6,7 @@ import os
 def get_image() -> cv2.Mat:
     """Gets an cv2.Mat as an image in one of 4 ways:
     1. if the following file exists `art-to-music/files/enable_gstreamer.flag` then it uses GStreamer to get the image.
-    This would require the Nvidea Jetson Nano to function.
+    Use this to access cameras that dont play nicely with the normal cv2 gathering system (note: This support is dropped cause we now use a webcam).
     2. otherwise it tries to find an accessible camera with `cv2.VideoCapture(0)`
     3. if there are no cameras available then TODO: it raises an error at the moment, but it would use the GUI so you can draw your art and import existing art"""
     if not os.path.exists(os.path.join(os.getcwd(), 'files', 'enable_gstreamer.flag')):
@@ -21,53 +21,18 @@ def get_image() -> cv2.Mat:
         return frame
         
     # open with file
+    # --------------
     # img_path = os.path.join(os.getcwd(), 'files','image_processing','example_shapes (3).png')
     # img = cv2.imread(img_path)
     # assert img is not None, "file could not be read, check with os.path.exists()"
 
     # open with gstreamer
+    # ------------------- [Support dropped] (due to we didn't get cv2 to build with gstreamer)
     import gi
     import numpy as np
     from PIL import Image
     gi.require_version('Gst', '1.0')
     from gi.repository import Gst
-    
-
-    # os.system('nvgstcapture-1.0 --image-res=4 --prev-res=4 --automate --capture-auto --start-time=0 --file-name="capture" --orientation=2')
-    # for file_or_folder in os.listdir(os.getcwd()):
-    #     if file_or_folder.find('capture') == -1: continue
-    #     if file_or_folder.find('.jpg') == -1: continue
-    #     path = os.path.join(os.getcwd(), file_or_folder)
-    #     path2 = os.path.join(os.getcwd(), file_or_folder.split('.')[0]+'.png')
-    #     im1 = Image.open(path)
-    #     im1.save(path2)
-    #     im1.close()
-    #     img = cv2.imread(path2)
-    #     # os.remove(path)
-    #     # os.remove(path2)
-    #     return img
-    #convert_command = f'gst-launch-1.0 -e filesrc location="{path}" ! decodebin ! videoconvert ! pngenc ! filesink location="{path_png}"'
-        #subprocess.call(convert_command, shell=True)
-    
-
-    # gstreamer_str = "sudo gst-launch1.0 nvarguscamerasrc ! video/x-raw, format=BGR ! autovideoconvert ! videoconvert ! videoscale ! video/x-raw , width=640, height=480, format=BGR ! appsink drop=1"
-    # cap = cv2.VideoCapture(gstreamer_str, cv2.CAP_GSTREAMER)
-
-    # while (cap.isOpened()):
-    #     if isinstance(cap, None):
-    #         print("cap is empty")
-    #     else:
-    #         ret, frame = cap.read()
-
-    #         if ret:
-    #             cv2.imshow("Input vai GStreamer", frame)
-    #             if cv2.waitKey(25) & 0xFF == ord('q'):
-    #                 return frame
-    #             else:
-    #                 return frame
-
-    # cap.release()
-    # cv2.destroyAllWindows() 
     
     Gst.init(None)
 
@@ -109,7 +74,5 @@ def set_jetson_busy(busy=True) -> None:
     GPIO.output(status_pin, GPIO.HIGH if busy else GPIO.LOW)
 if __name__ == '__main__':
     img = get_image()
-    print('here')
-    cv2.waitKey(10000)
     cv2.imshow('Camera', img)
     cv2.waitKey(10000)
