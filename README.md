@@ -11,7 +11,7 @@ Windows:
 > 3. [Python 3.11.4](https://www.python.org/downloads/) (or up) **Do not forget to: '`Add to path`'**  
 > 4. Reboot your pc...
 > 5. Open the start-menu and type `powershell`, right click the blue icon and `run as administrator`  
-> 6. `python3.11 -m pip install virtualenv && git clone https://github.com/Holandsoest/art-to-music.git && cd ./art-to-music && python3.11 -m venv .venv && source .venv/bin/activate && python3.11 -m pip install --require-virtualenv -r requirements.txt`
+> 6. `python3.11 -m pip install virtualenv && git clone https://github.com/Holandsoest/art-to-music.git && cd ./art-to-music && python3.11 -m venv .venv && source .venv/bin/activate && python3.11 -m pip install --require-virtualenv -r requirements.txt`  
 
 Debian-like-OS's (like Ubuntu) :
 
@@ -24,6 +24,7 @@ Is not supported.
 ### Nvidea Jetson Nano only  
 
 - create a file in `art-to-music/files/enable_jetson_gpio.flag` to enable the GPIO (for the animations)  
+- Building DawDreamer for ARM64: [The easy route](https://www.dropbox.com/sh/bjgqu6nwtr8pfdo/AAC79XjTzOaE2ItYniliDETQa?dl=0) or [The difficult route](https://github.com/DBraun/DawDreamer/discussions/168) or maybe, just maybe DBraun already implemented my request and you can just use `pip` what would be *'the very easy route'*.  
 
 ## GUI
 
