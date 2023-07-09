@@ -4,13 +4,11 @@ import os
 
 def MakeSong(list):
     model_custom_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_files') #path of the audio files save location
-
-    amount_of_instruments = len(list) # number of object on the screen 
- 
+    amount_of_instruments = len(list) # number of object on the screen
     if amount_of_instruments > 0:
         # --- define functions ---
-        def forbidden_note (pitch, low, high): # function to check if a note is not forbidden
-
+        def forbidden_note (pitch, low, high):
+            """function to check if a note is not forbidden"""
             if pitch in forbidden_notes:
                 if abs(pitch - low) < abs(pitch - high):
                     return pitch + 1 #value closer to low limit so + value
@@ -19,8 +17,8 @@ def MakeSong(list):
             else: 
                 return pitch #return value as it was
         
-        def scale (percentage, instrument): # scale notes
-
+        def scale (percentage, instrument):
+            """scale notes"""
             # lower and upperbound
             flute_low = 67 #G5
             flute_high = 89 #F7
@@ -76,7 +74,6 @@ def MakeSong(list):
                     note_2 = 79 #G5
                     note_3 = 76 #E5
                 case _: pass
-
             return [note_1, note_2, note_3]
 
         # --- declare variables
@@ -90,7 +87,7 @@ def MakeSong(list):
         # --- mid --- accord
         amount_of_guitar = 0    
         amount_of_piano = 0
-    
+
         # --- low --- single 
         amount_of_drum = 0    
         amount_of_saxophone = 0
@@ -206,7 +203,7 @@ def MakeSong(list):
                     
                     midi_clap.addNote(0, 0, 58, 1.5, 0.5, 120) # add a note
                     midi_clap.addNote(0, 0, 58, 2.75, 0.5, 120) # add a note
-
+            
             #add violin notes
             if amount_of_violin > 0 and shape.instrument == "violin":
                 midi_violin.addNote(0, 0, scale(shape.pitch, "violin"), shape.note_placement, 1, shape.volume) # add a note
@@ -215,7 +212,7 @@ def MakeSong(list):
             if amount_of_guitar > 0 and shape.instrument == "guitar":
                 midi_guitar.addNote(0, 0, scale(shape.pitch, "guitar"), shape.note_placement, 0.5, shape.volume) # add a note
 
-
+            
             #add piano notes
             if amount_of_piano > 0 and shape.instrument == "piano":
                 notes = piano_notes(scale(shape.pitch, "piano"))
@@ -329,5 +326,4 @@ def MakeSong(list):
             midi_saxophone.writeFile(output_file6)
         with open(os.path.join(model_custom_path, "clap_output.mid"), "wb") as output_file7:
             midi_clap.writeFile(output_file7)
-
         return bpm
