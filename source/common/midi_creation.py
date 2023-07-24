@@ -8,7 +8,7 @@ def MakeSong(list):
     if amount_of_instruments > 0:
         # --- define functions ---
         def forbidden_note (pitch, low, high):
-            """function to check if a note is not forbidden"""
+            """function to check if a note is not forbidden and return the nearest that isn't"""
             if pitch not in forbidden_notes:
                 return pitch    # return value as it was
             if abs(pitch - low) < abs(pitch - high):
@@ -17,7 +17,10 @@ def MakeSong(list):
                 return pitch - 1 #value closer to low limit so - value
         
         def scale (percentage, instrument):
-            """scale notes"""
+            """scale notes
+            @param percentage the percentage in pitch where [0-100] as int
+            @param instrument either: ['flute','violin','piano','guitar','saxophone'] as string
+            @returns the corresponding pitch of each instrument as int"""
             # lower and upper -bound
             flute_low = 67 #G5
             flute_high = 89 #F7
