@@ -21,7 +21,8 @@ def setup_ai():
     shape_detector.setJsonPath(jason_path)
     shape_detector.loadModel()
 
-def correct_boxes(img:cv2.Mat, detected_objects): # -> boxpoints, list[ cv2.rectangle( -> rec <- ) ]
+def correct_boxes(img:cv2.Mat, detected_objects):
+    """@returns (boxpoints, [cv2.rectangle( -> rec <- )])"""
     boxes = []
     boxes_w_names = []
 
@@ -129,11 +130,14 @@ def detect_shapes_with_ai(image): # -> image, list
     img_height, img_width, channel = image.shape
     img_size = img_height*img_width
 
+    # Use AI-vision to see what shapes there are
     img, detected_objects = shape_detector.detectObjectsFromImage(input_image=image, 
                                                                 output_type="array",
                                                                 minimum_percentage_probability=50,
                                                                 display_percentage_probability=True,
                                                                 display_object_name=True)
+    
+    # for any overlapping choose the largest one and discard the rest (using non-maximum suppression)
     boxes, cv2_rectangle_recs = correct_boxes(image, detected_objects)
     for rec in cv2_rectangle_recs:
         cv2.rectangle(img,
