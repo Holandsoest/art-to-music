@@ -119,7 +119,7 @@ def MakeSong(list):
                     bpm = bpm + shape.bpm
                 case _: pass        
 
-        bpm = int(bpm/amount_of_instruments) # determen bpm of composition
+        bpm = int(bpm/amount_of_instruments) # determine bpm of composition
 
     # make midi file for every instrument
         midi_flute          = MIDIFile(1, removeDuplicates=False) # high
