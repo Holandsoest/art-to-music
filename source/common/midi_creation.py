@@ -45,7 +45,7 @@ def MakeSong(list):
                 case 'saxophone':
                     return forbidden_note (int(((percentage/100) * (saxophone_high - saxophone_low) + saxophone_low)), saxophone_low, saxophone_high) # check if note is forbidden or not
 
-        def piano_notes (input_note): # sclae note for guitar
+        def piano_notes (input_note): # scale note for guitar
             match input_note:
                 case 72: #C5
                     note_1 = 72 #C5
