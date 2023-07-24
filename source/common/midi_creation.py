@@ -9,17 +9,16 @@ def MakeSong(list):
         # --- define functions ---
         def forbidden_note (pitch, low, high):
             """function to check if a note is not forbidden"""
-            if pitch in forbidden_notes:
-                if abs(pitch - low) < abs(pitch - high):
-                    return pitch + 1 #value closer to low limit so + value
-                else:
-                    return pitch - 1 #value closer to low limit so - value
-            else: 
-                return pitch #return value as it was
+            if pitch not in forbidden_notes:
+                return pitch    # return value as it was
+            if abs(pitch - low) < abs(pitch - high):
+                return pitch + 1 #value closer to low limit so + value
+            else:
+                return pitch - 1 #value closer to low limit so - value
         
         def scale (percentage, instrument):
             """scale notes"""
-            # lower and upperbound
+            # lower and upper -bound
             flute_low = 67 #G5
             flute_high = 89 #F7
             violin_low = 60 #C5
