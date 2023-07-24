@@ -1,1 +1,0 @@
-panel_group|16 control_label|19 switch_label|12 selector_text|12 tty|12 

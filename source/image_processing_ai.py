@@ -14,16 +14,19 @@ shape_detector = CustomObjectDetection()
 def setup_ai():
     # Custom Object Detection
     jason_path = os.path.join(os.getcwd(), 'dataset', 'json', 'dataset_tiny-yolov3_detection_config.json')
-    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'dataset_version_mAP-0.63917.pt')
+    model_custom_path = os.path.join(os.getcwd(), 'dataset', 'models', 'T250k_e4-b16_mAP-0.65928_epoch-1.pt')
 
     shape_detector.setModelTypeAsTinyYOLOv3()
     shape_detector.setModelPath(model_custom_path)
     shape_detector.setJsonPath(jason_path)
     shape_detector.loadModel()
 
-def correct_boxes(img:cv2.Mat, detected_objects): # -> image, boxpoints
+def correct_boxes(img:cv2.Mat, detected_objects):
+    """@returns (boxpoints, [cv2.rectangle( -> rec <- )])"""
     boxes = []
     boxes_w_names = []
+
+    cv2_rectangles = []
 
     def non_max_suppression(boxes, boxes_w_names, overlapThresh = 0.4): # -> boxpoints
         """
@@ -111,9 +114,9 @@ def correct_boxes(img:cv2.Mat, detected_objects): # -> image, boxpoints
         box_name = obj[4]
 
         # Adding a text to the object 
-        cv2.rectangle(img, (int(x1), int(y1)), (int(x2), int(y2)), (255,0,0), 2)
+        cv2_rectangles.append((int(x1), int(y1), int(x2), int(y2)))
     
-    return img, double_boxes
+    return double_boxes, cv2_rectangles
     
 def detect_shapes_with_ai(image): # -> image, list
     """
@@ -127,12 +130,20 @@ def detect_shapes_with_ai(image): # -> image, list
     img_height, img_width, channel = image.shape
     img_size = img_height*img_width
 
+    # Use AI-vision to see what shapes there are
     img, detected_objects = shape_detector.detectObjectsFromImage(input_image=image, 
                                                                 output_type="array",
-                                                                minimum_percentage_probability=60,
+                                                                minimum_percentage_probability=50,
                                                                 display_percentage_probability=True,
                                                                 display_object_name=True)
-    img, boxes = correct_boxes(image, detected_objects)
+    
+    # for any overlapping choose the largest one and discard the rest (using non-maximum suppression)
+    boxes, cv2_rectangle_recs = correct_boxes(image, detected_objects)
+    for rec in cv2_rectangle_recs:
+        cv2.rectangle(img,
+                      (rec[0], rec[1]), (rec[2], rec[3]),
+                      color=(255,0,100),
+                      thickness=1)
 
     for counter, box in enumerate (boxes):
         x1, y1, x2, y2, box_name = box

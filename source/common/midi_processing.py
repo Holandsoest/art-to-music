@@ -1,57 +1,44 @@
-import dawdreamer as daw
-from scipy.io import wavfile
 from pydub import AudioSegment
 import typing
 import cv2
-import time
 import os
+import sf2_loader as sf
 
-sample_rate = 44100
-buffer_size = 128
 model_midi_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'midi_files')
-model_preset_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'preset_files')
 model_wav_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'wav_files')
-model_plugin_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'StupidSimpleSampler')      
-
+model_font_path = os.path.join(os.getcwd(), 'files', 'audio_generator', 'soundfonts')
+   
 def instrument (bpm, instrument):
-    engine = daw.RenderEngine(sample_rate, buffer_size)
-    synth = engine.make_plugin_processor("my_synth", os.path.join(model_plugin_path, "StupidSimpleSampler.dll"))
-    assert synth.get_name() == "my_synth"
-    synth.load_state(os.path.join(model_preset_path, f"{instrument}.fxb"))
-    synth.load_midi(os.path.join(model_midi_path, f"{instrument}_output.mid"), clear_previous=False, beats=False, all_events=False) 
-    #synth.open_editor() #undo # to check if path from plugin is working
-    engine.load_graph([
-                    (synth,[])
-    ])
-    engine.set_bpm(bpm)
-    engine.render(4/(bpm/60))  
-    audio = engine.get_audio()  
-    wavfile.write(os.path.join(model_wav_path, f"{instrument}.wav"),  sample_rate, audio.transpose())
-       
+    loader = sf.sf2_loader(os.path.join(model_font_path, f"{instrument}.sf2"))
+    loader.change(channel=0, bank=0, preset=0) # change current preset number to 0
+    loader.export_midi_file(os.path.join(model_midi_path, f"{instrument}_output.mid"), name=os.path.join(model_wav_path, f"{instrument}.wav"), format='wav')
 
 def audio_rendering(bpm):
-    AudioSegment.silent()
+    total_time=(4/(bpm/60))*1000
+   
     # Load the MP3 files
-    sound1 = AudioSegment.from_file(os.path.join(model_wav_path, "drum.wav"), format="wav")
-    sound2 = AudioSegment.from_file(os.path.join(model_wav_path, "flute.wav"), format="wav")
-    sound3 = AudioSegment.from_file(os.path.join(model_wav_path, "violin.wav"), format="wav")
-    sound4 = AudioSegment.from_file(os.path.join(model_wav_path, "clap.wav"), format="wav")
-    sound5 = AudioSegment.from_file(os.path.join(model_wav_path, "saxophone.wav"), format="wav")
-    sound6 = AudioSegment.from_file(os.path.join(model_wav_path, "guitar.wav"), format="wav")
-    sound7 = AudioSegment.from_file(os.path.join(model_wav_path, "piano.wav"), format="wav")
+    sound1 = AudioSegment.from_file(os.path.join(model_wav_path, "drum.wav"), format="wav", duration=total_time)
+    sound2 = AudioSegment.from_file(os.path.join(model_wav_path, "flute.wav"), format="wav", duration=total_time)
+    sound3 = AudioSegment.from_file(os.path.join(model_wav_path, "violin.wav"), format="wav", duration=total_time)
+    sound4 = AudioSegment.from_file(os.path.join(model_wav_path, "clap.wav"), format="wav", duration=total_time)
+    sound5 = AudioSegment.from_file(os.path.join(model_wav_path, "saxophone.wav"), format="wav", duration=total_time)
+    sound6 = AudioSegment.from_file(os.path.join(model_wav_path, "guitar.wav"), format="wav", duration=total_time)
+    sound7 = AudioSegment.from_file(os.path.join(model_wav_path, "piano.wav"), format="wav", duration=total_time)
+    sound8 = AudioSegment.silent(duration=total_time)
 
     # Combine the overlapping part of the first MP3 file with the second MP3 file
-    combined_sound = sound1.overlay(sound7)
-    combined_sound1 = sound2.overlay(combined_sound)
-    combined_sound2 = sound3.overlay(combined_sound1)
-    combined_sound3 = sound4.overlay(combined_sound2)
-    combined_sound4 = sound5.overlay(combined_sound3)
-    combined_sound5 = sound6.overlay(combined_sound4)
+    combined_sound = sound8.overlay(sound1)
+    combined_sound1 = combined_sound.overlay(sound2)
+    combined_sound2 = combined_sound1.overlay(sound3)
+    combined_sound3 = combined_sound2.overlay(sound4)
+    combined_sound4 = combined_sound3.overlay(sound5)
+    combined_sound5 = combined_sound4.overlay(sound6)
+    combined_sound6 = combined_sound5.overlay(sound7)
+    combined_sound7 = (combined_sound6 + combined_sound6)*2
 
-    combined_sound6 = (combined_sound5 + combined_sound5)*2
     # Export the combined audio to an MP3 file
     with open(os.path.join('files','audio_generator','created_song.mp3'), "wb") as output_file1:
-                combined_sound6.export(output_file1, format = "mp3")
+                combined_sound7.export(output_file1, format = "mp3")
 
 def play_loop(song_absolute_path, decay=0.75, cutoff=0.1) -> typing.Any:
     """Uses pygame to play the given music in a blocking manner.  

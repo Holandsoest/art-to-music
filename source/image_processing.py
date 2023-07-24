@@ -96,7 +96,7 @@ def get_pitch_from_y_axis(y_axis, img_height) -> int:
     
     It returns a scaled value between 0 - 100
     """
-    return (y_axis/img_height)*100
+    return (100 - ((y_axis/img_height)*100))
 
 def display_list_of_shapes(list_of_shapes) -> None:
     for shape in list_of_shapes:
